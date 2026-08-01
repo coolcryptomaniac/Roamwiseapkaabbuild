@@ -1,0 +1,17 @@
+{
+  "name": "roamwise",
+  "version": "1.0.0",
+  "description": "RoamWise Pro — AI travel planner (Capacitor Android wrapper)",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/geolocation": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0"
+  }
+}
