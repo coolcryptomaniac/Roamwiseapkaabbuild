@@ -1,0 +1,82 @@
+name: Build RoamWise Android (APK + AAB)
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '17' }
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Android platform
+        run: npx cap add android || true
+
+      - name: Sync web assets into Android project
+        run: npx cap sync android
+
+      - name: Ensure location permission in manifest
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q ACCESS_FINE_LOCATION $MANIFEST || \
+            sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n\n    <application#' $MANIFEST
+          echo "---- permissions now in manifest ----"
+          grep -i location $MANIFEST || true
+
+      - name: Decode signing keystore
+        run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > android/app/rw.keystore
+
+      - name: Configure signing
+        run: |
+          cat >> android/app/build.gradle <<'GRADLE'
+
+          android {
+              defaultConfig {
+                  versionCode 77
+                  versionName "16.0"
+              }
+              signingConfigs {
+                  release {
+                      storeFile file('rw.keystore')
+                      storePassword 'roamwise2026'
+                      keyAlias 'roamwise'
+                      keyPassword 'roamwise2026'
+                  }
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                  }
+              }
+          }
+          GRADLE
+
+      - name: Build signed APK (direct install)
+        run: cd android && ./gradlew assembleRelease
+
+      - name: Build signed AAB (Play Store)
+        run: cd android && ./gradlew bundleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: RoamWise-APK
+          path: android/app/build/outputs/apk/release/*.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: RoamWise-AAB
+          path: android/app/build/outputs/bundle/release/*.aab
