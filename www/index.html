@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="google-adsense-account" content="ca-pub-4943859484482348">
+<meta name="theme-color" content="#07090F">
+<title>RoamWise Pro — AI Travel Planner | Itineraries, Budgets & Crowd-Free Destinations</title>
+<meta name="description" content="Plan smarter trips anywhere in the world. AI-powered itineraries, live crowd heatmaps, budget breakdowns in 10 currencies, packing lists and visa info. One-time Pro unlock — ₹100 in India, $4.99 worldwide.">
+<meta name="keywords" content="AI travel planner, trip itinerary generator, travel budget calculator, avoid crowds travel, offbeat destinations">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RoamWise Pro — AI Travel Planner">
+<meta property="og:description" content="Escape the crowds. AI itineraries, budgets & crowd heatmaps for 195+ countries. Pay once, yours forever.">
+<meta property="og:url" content="https://www.roamwise.co.in">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RoamWise Pro — AI Travel Planner">
+<meta name="twitter:description" content="AI itineraries, budgets & crowd heatmaps for 195+ countries. One-time unlock, lifetime access.">
+<!-- ===== BRAND ENTITY SIGNALS =====
+     Google decides "which RoamWise did they mean" from structured data and
+     entity consistency, not from keyword density. roamwise.app is a live and
+     unrelated product (visa/tax day-tracking), so these blocks exist to make the
+     distinction machine-readable rather than hoping Google infers it. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RoamWise Pro">
+<meta property="og:title" content="RoamWise Pro — AI Travel Planner for India &amp; beyond">
+<meta property="og:description" content="Plan trips with real local prices, crowd calendars and offline itineraries. Built in Almora, India.">
+<meta property="og:url" content="https://www.roamwise.co.in/">
+<meta property="og:image" content="https://www.roamwise.co.in/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RoamWise Pro — AI Travel Planner">
+<meta name="twitter:description" content="Real local prices, crowd calendars, offline itineraries. Built in Almora, India.">
+<meta name="twitter:image" content="https://www.roamwise.co.in/icon-512.png">
+<meta name="author" content="Mohit Pandey">
+<meta name="geo.region" content="IN-UT">
+<meta name="geo.placename" content="Almora, Uttarakhand">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.roamwise.co.in/#org",
+      "name": "RoamWise",
+      "alternateName": ["RoamWise Pro", "RoamWise India", "Roamwise India"],
+      "url": "https://www.roamwise.co.in/",
+      "logo": "https://www.roamwise.co.in/icon-512.png",
+      "email": "founder@roamwise.co.in",
+      "foundingDate": "2026",
+      "description": "India-first AI travel planner with real local cost data, crowd calendars, anti-overcharging guidance and offline itineraries.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Almora",
+        "addressRegion": "Uttarakhand",
+        "addressCountry": "IN"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Mohit Pandey",
+        "jobTitle": "Founder",
+        "url": "https://www.roamwise.co.in/about.html"
+      },
+      "sameAs": [
+        "https://youtube.com/@mohucool",
+        "https://in.linkedin.com/in/rockermohit"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.roamwise.co.in/#website",
+      "url": "https://www.roamwise.co.in/",
+      "name": "RoamWise Pro",
+      "publisher": { "@id": "https://www.roamwise.co.in/#org" },
+      "inLanguage": "en-IN"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "RoamWise Pro",
+      "operatingSystem": "Android, Web",
+      "applicationCategory": "TravelApplication",
+      "url": "https://www.roamwise.co.in/",
+      "publisher": { "@id": "https://www.roamwise.co.in/#org" },
+      "description": "AI travel planner built for Indian travellers: fair local prices for autos and rooms, month-by-month crowd data, scam warnings, low-carbon options, and itineraries that work offline.",
+      "featureList": [
+        "Local fair-price bands for transport, stays and food",
+        "Anti-overcharging and scam guidance",
+        "Month-by-month crowd calendar",
+        "Offline itineraries",
+        "Low-carbon travel ledger"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "INR",
+        "description": "One-time founder price for the first 1,000 members. Regular plans apply afterwards."
+      }
+    }
+  ]
+}
+</script>
+<link rel="canonical" href="https://www.roamwise.co.in">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307090F'/%3E%3Cpath d='M12 46 26 20l8 14 6-9 12 21z' fill='%23E8BA6C'/%3E%3Ccircle cx='46' cy='16' r='5' fill='%23BF8CFF'/%3E%3C/svg%3E">
+<!-- PWA: iOS ignores SVG data-URI touch icons in most versions, so this must be a real PNG -->
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RoamWise">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="app.css">
+<style id="rwPolish">
+/* ===== rwPolish — press feel, elevation, motion, pill tab bar ===== */
+*{-webkit-tap-highlight-color:transparent}
+html{overflow-x:clip;overscroll-behavior-x:none}
+@supports not (overflow:clip){html{overflow-x:hidden}}
+body{overflow-x:clip;overscroll-behavior-x:none;max-width:100vw}
+html{scroll-behavior:smooth}
+body{overscroll-behavior-y:none;touch-action:manipulation}
+button,.tact,.dr-link,.tabbar button,.exp,.trek,.rzp-main-btn{user-select:none;-webkit-user-select:none}
+/* Duolingo press-squish on every tappable */
+.tact,.rzp-main-btn,.tabbar button,.exp,.trek,.dr-link,.k-save,.share-fab,.dna-opt{transition:transform .12s ease,box-shadow .2s ease,background .2s ease,border-color .2s ease}
+.tact:active,.rzp-main-btn:active,.exp:active,.trek:active,.dna-opt:active,.k-save:active{transform:scale(.965)}
+.tabbar button:active .ti{transform:scale(1.22)}
+.tabbar button .ti{transition:transform .16s cubic-bezier(.34,1.56,.64,1)}
+/* Elevated cards (Airbnb) */
+.exp,.trek{border-radius:18px;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 8px 24px rgba(0,0,0,.28)}
+.exp:hover,.trek:hover{border-color:rgba(232,186,108,.45);box-shadow:0 12px 34px rgba(0,0,0,.4)}
+.modal{border-radius:22px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.mode-box{border-radius:14px}
+.rzp-main-btn{border-radius:16px;box-shadow:0 10px 26px rgba(196,48,43,.35)}
+/* Floating pill tab bar (Uber/Spotify) */
+.tabbar{left:10px;right:10px;bottom:10px;border-radius:22px;border:1px solid var(--b2);box-shadow:0 12px 40px rgba(0,0,0,.5);max-height:74px;overflow:hidden;align-items:start;padding-bottom:8px!important}
+.tabbar button{border-radius:15px;margin:0 2px}
+.tabbar button.on{background:linear-gradient(135deg,rgba(196,48,43,.22),rgba(196,48,43,.08))}
+.tabbar button.on::after{display:none}
+body.shell{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+/* Scroll-reveal (Apple) */
+@media (prefers-reduced-motion:no-preference){
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+  .rv.inview{opacity:1;transform:none}
+}
+/* Inputs & search pill */
+.txn-inp:focus,.k-inp:focus,input:focus,select:focus{outline:none;border-color:var(--gold2)!important;box-shadow:0 0 0 3px rgba(232,186,108,.15)}
+#destInput{border-radius:16px}
+/* Section rhythm */
+.xsec{padding-top:34px}
+.xsec-title{letter-spacing:-.02em}
+/* Icon tiles (fintech-style emoji chips) */
+.exp-ic{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,rgba(196,48,43,.18),rgba(232,186,108,.10));display:flex;align-items:center;justify-content:center;font-size:24px!important;margin-bottom:10px;border:1px solid rgba(232,186,108,.18)}
+.exp{padding:18px}
+/* Billboard (video hero) */
+#promoTop{margin:10px 12px 4px}
+.bb{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--b2);box-shadow:0 14px 40px rgba(0,0,0,.45);cursor:pointer;background:linear-gradient(110deg,#12121C 30%,#1A1A26 50%,#12121C 70%);background-size:200% 100%;animation:bbsheen 1.4s linear infinite}
+#promoPlayerBox iframe{position:absolute!important;inset:0!important;width:100% !important;height:100% !important;display:block;border:0}
+.bb img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+.bb .ov{position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(7,9,15,.88) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px}
+.bb .t1{font-family:'Playfair Display',Georgia,serif;font-weight:800;font-size:22px;color:#fff;letter-spacing:.01em}
+.bb .t2{font-size:11.5px;color:var(--gold2);margin-top:2px;letter-spacing:.14em}
+.bb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:64px;height:64px;border-radius:50%;background:var(--crim);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;box-shadow:0 10px 34px rgba(196,48,43,.55)}
+@keyframes bbsheen{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:no-preference){
+  .rzp-main-btn{animation:ctaglow 3.2s ease-in-out infinite}
+  @keyframes ctaglow{0%,100%{box-shadow:0 10px 26px rgba(196,48,43,.32)}50%{box-shadow:0 10px 34px rgba(196,48,43,.55)}}
+}
+/* — Enkio language: flat dark cards, white pill on media, icon tiles, media rows — */
+@media (max-width:1024px){
+  .exp,.trek{background:#15151E;border-color:rgba(255,255,255,.05)}
+}
+.bb .try{position:absolute;right:14px;bottom:14px;background:#fff;color:#0A0C14;font-weight:800;font-size:14.5px;padding:11px 22px;border-radius:99px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.bb .play{display:none}
+/* feature tiles (Image-to-video row style) */
+.ftrow{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ftrow::-webkit-scrollbar{display:none}
+.ftile{flex:0 0 auto;width:96px;background:#17171F;border-radius:18px;padding:14px 8px 12px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:transform .12s ease}
+.ftile:active{transform:scale(.94)}
+.ftile .fi{font-size:26px;display:block;margin-bottom:8px}
+.ftile .fl{font-size:12px;font-weight:600;color:var(--t1);line-height:1.25}
+/* popular media row (9:16 gradient covers) */
+.prow{display:flex;gap:11px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.prow::-webkit-scrollbar{display:none}
+.pcard{flex:0 0 auto;width:168px;aspect-ratio:3/4;border-radius:20px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px;cursor:pointer;transition:transform .15s ease;background-size:cover!important;background-position:center!important;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.pcard:active{transform:scale(.95)}
+.pcard .pe{position:absolute;top:10px;left:0;right:0;text-align:center;font-size:20px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.pcard .pn{position:relative;font-weight:800;font-size:14px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);line-height:1.15}
+.pcard .pb{position:absolute;top:9px;right:9px;font-size:9px;font-weight:800;padding:3px 8px;border-radius:99px;background:#16BF96;color:#04120D}
+.pcard::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(7,9,15,.72) 100%)}
+.pcard .pn{z-index:1}
+.rowhead{display:flex;align-items:baseline;justify-content:space-between;margin:16px 2px 9px}
+.rowhead b{font-size:21px;font-weight:800;letter-spacing:-.02em;color:#fff}
+.rowhead a{font-size:12.5px;color:var(--t3);text-decoration:none}
+/* ===== Music player chrome (Spotify embed can't be restyled, so we build glow/eq around it) ===== */
+.mus-frame{position:relative;border-radius:18px;padding:2px;background:linear-gradient(120deg,#1DB954,#E8BA6C,#C4302B,#1DB954);background-size:300% 300%;animation:musGlow 6s ease infinite}
+@keyframes musGlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.mus-inner{background:#0A0C14;border-radius:16px;padding:10px}
+.mus-eq{display:flex;align-items:flex-end;gap:3px;height:22px;margin:0 0 8px}
+.mus-eq i{width:4px;background:linear-gradient(180deg,#1DB954,#E8BA6C);border-radius:2px;animation:musBar 1.1s ease-in-out infinite}
+.mus-eq i:nth-child(1){animation-delay:0s;height:40%}
+.mus-eq i:nth-child(2){animation-delay:.15s;height:80%}
+.mus-eq i:nth-child(3){animation-delay:.3s;height:55%}
+.mus-eq i:nth-child(4){animation-delay:.45s;height:90%}
+.mus-eq i:nth-child(5){animation-delay:.6s;height:35%}
+.mus-eq i:nth-child(6){animation-delay:.2s;height:65%}
+.mus-eq i:nth-child(7){animation-delay:.5s;height:45%}
+@keyframes musBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+.mus-tabs{display:flex;gap:6px;margin-bottom:10px}
+.mus-tab{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px 0;border-radius:11px;background:#15151E;color:var(--t3);cursor:pointer;transition:all .2s}
+.mus-tab.on{background:linear-gradient(135deg,#1DB954,#159943);color:#04150A}
+/* Scrollbar (desktop Stripe-clean) */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#23232E;border-radius:9px}
+::-webkit-scrollbar-thumb:hover{background:#2E2E3C}
+.chat-tool{flex:0 0 auto;white-space:nowrap;font-size:12px;padding:7px 13px;border-radius:999px;border:1px solid var(--b2,#2A2A36);background:var(--bg3,#1A1A20);color:var(--t2,#C8C8D0);font-weight:600;cursor:pointer;transition:all .15s}
+.pin-row{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#chatFab{position:fixed;right:18px;bottom:88px;z-index:8000;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;font-size:24px;box-shadow:0 6px 20px rgba(232,186,108,.4);cursor:pointer;display:none;align-items:center;justify-content:center;animation:fabIn .25s ease}
+@keyframes fabIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+#chatFabDot{position:absolute;top:10px;right:11px;width:11px;height:11px;background:#F87171;border:2px solid #0A0A0C;border-radius:50%}
+.chat-pin{flex:0 0 auto;white-space:nowrap;font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--b2,#2A2A36);background:transparent;color:var(--t2,#C8C8D0);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+.chat-pin.on{background:rgba(232,186,108,.14);border-color:var(--gold,#E8BA6C);color:var(--gold,#E8BA6C)}
+.pin-badge{background:var(--gold,#E8BA6C);color:#0A0A0C;font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;min-width:14px;text-align:center}
+.tusk-rich{max-width:100%}
+.tusk-rich .tk-card{max-width:100%;box-sizing:border-box}
+.tusk-rich.clamped{max-height:280px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(#000 78%,transparent);mask-image:linear-gradient(#000 78%,transparent)}
+.tusk-more{display:block;width:100%;margin-top:6px;font-size:12px;font-weight:700;color:var(--gold,#E8BA6C);background:transparent;border:1px solid var(--b2,#2A2A36);border-radius:999px;padding:6px 0;cursor:pointer}
+.pin-body{margin-top:9px;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:12px;padding:11px 13px;max-height:22dvh;overflow-y:auto;animation:pinIn .18s ease}
+@keyframes pinIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.chat-tool:hover,.chat-tool:active{border-color:var(--gold,#E8BA6C);color:var(--gold,#E8BA6C)}
+</style>
+<style id="rwScale">
+/* ===== Native-app scale — bigger, thumb-friendly on mobile & tablet ===== */
+html{-webkit-text-size-adjust:100%}
+@media (max-width:1024px){
+  body{font-size:16px;line-height:1.65}
+  .tact{font-size:14.5px;padding:12px 14px;border-radius:13px;min-height:46px}
+  .rzp-main-btn{font-size:16px;padding:16px;border-radius:15px}
+  .txn-inp,.k-inp,input,select,textarea{font-size:16px!important;padding:13px 14px!important;border-radius:12px}
+  .xsec-title{font-size:27px}
+  .xsec-sub{font-size:14px}
+  .trek-name{font-size:16.5px}
+  .exp-name{font-size:16.5px}
+  .exp-desc,.exp-where,.exp-when{font-size:13.5px}
+  .tbadge{font-size:10px;padding:4px 9px}
+  .dr-link{font-size:16px;padding:15px 16px}
+  .dr-link .ic{font-size:20px}
+  .modal-title{font-size:20px}
+  .modal-sub{font-size:13px}
+  .mode-box,.ti-day{font-size:13.5px}
+  .day-seg .seg-desc{font-size:13.5px}
+  .day-seg .seg-time{font-size:11px}
+  .logo-text{font-size:19px}
+  .nav-ic{font-size:20px!important;padding:8px!important}
+  /* keep the logo and the right-side icons from colliding on narrow web screens */
+  .nav-inner{gap:8px}
+  .logo-wrap{flex:0 0 auto;margin-right:auto}
+  .nav-right{gap:2px;flex-wrap:nowrap}
+  /* --- the big one: bottom tab bar like native apps --- */
+  .tabbar{padding:9px 6px calc(11px + env(safe-area-inset-bottom))}
+  .tabbar button{font-size:11.5px;font-weight:700;letter-spacing:.02em;gap:4px;padding:5px 0}
+  .tabbar button .ti{font-size:25px;line-height:1}
+  body.shell{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+}
+@media (min-width:481px) and (max-width:1024px){ /* tablets */
+  body{font-size:17px}
+  .xsec-title{font-size:32px}
+  .tabbar button .ti{font-size:28px}
+  .tabbar button{font-size:12.5px}
+  .exp-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+}
+.lang-wrap{position:relative}
+.lang-menu{display:none;position:absolute;top:100%;right:0;margin-top:6px;background:var(--bg2,#12121C);border:1px solid var(--b2,#2A2A36);border-radius:12px;padding:6px;min-width:140px;z-index:200;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.lang-opt{display:flex;flex-direction:column;align-items:flex-start;width:100%;background:none;border:none;color:var(--t1,#fff);font:inherit;font-size:14px;font-weight:600;padding:9px 11px;border-radius:8px;cursor:pointer;text-align:left}
+.lang-opt:hover{background:rgba(255,255,255,.06)}
+.lang-opt small{font-size:10.5px;color:var(--t3,#888);font-weight:400}
+.theme-opt{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--t1,#fff);font:inherit;padding:9px 11px;border-radius:8px;cursor:pointer;text-align:left}
+.theme-opt:hover{background:rgba(255,255,255,.06)}
+.theme-dot{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.2);flex:0 0 auto}
+.theme-txt{display:flex;flex-direction:column}
+.theme-txt b{font-size:13px;font-weight:600}
+.theme-txt small{font-size:10px;color:var(--t3,#888)}
+#themeMenu{min-width:180px}
+.trust-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0 4px}
+.trust-badge{font-size:10.5px;font-weight:600;color:var(--t2,#C8C8D0);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.price-old s{color:var(--t3,#888);opacity:.75}
+.pay-testi{margin:12px 0 4px;padding:11px 13px;background:rgba(232,186,108,.07);border:1px solid rgba(232,186,108,.2);border-radius:12px}
+.pay-testi .stars{color:#E8BA6C;font-size:12px;letter-spacing:1px}
+.pay-testi .quote{font-size:12.5px;line-height:1.5;color:var(--t1,#fff);margin:4px 0 3px;font-style:italic}
+.pay-testi .who{font-size:10.5px;color:var(--t3,#888)}
+</style>
+</head>
+<body>
+<div class="intro" id="intro" onclick="killIntro()">
+  <div class="kumo" style="top:16%;left:10%"></div><div class="kumo k2" style="bottom:20%;right:12%"></div>
+  <div class="introMap"></div>
+  <div class="ninja"></div><div class="ninja n2"></div><div class="ninja n3"></div>
+  <div class="it">ROAMWISE</div>
+  <div class="is">Shinobi Edition</div>
+  <div class="ig">escape the crowds &bull; discover your world</div>
+</div>
+
+
+<div id="siteSearch" style="display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:rgba(7,9,15,.98);padding:12px;border-bottom:1px solid var(--b2)">
+  <div style="display:flex;gap:8px;max-width:640px;margin:0 auto">
+    <input id="ssInput" placeholder="Search anything &mdash; treks, events, tools, sections&hellip;" style="flex:1;background:#12121C;border:1px solid var(--b2);border-radius:11px;padding:11px 13px;color:var(--t1);font-family:Outfit;font-size:14px" oninput="ssRun(this.value)">
+    <button class="tact" onclick="ssClose()">&#215;</button>
+  </div>
+  <div id="ssOut" style="max-width:640px;margin:8px auto 0;max-height:55vh;overflow:auto"></div>
+</div>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="logo-wrap" href="#" onclick="scrollTo(0,0);return false">
+      <div class="logo-icon">R</div>
+      <span class="logo-text">Roam<span>Wise</span></span>
+    </a>
+    <div class="nav-right">
+      <div class="lang-wrap">
+        <button class="nav-ic" onclick="rwToggleLangMenu()" title="Language / भाषा" style="background:none;border:none;color:var(--t1);font-size:13px;cursor:pointer;padding:6px 8px;display:flex;align-items:center;gap:3px">&#127760; <span id="langLabel">English</span></button>
+        <div id="langMenu" class="lang-menu"></div>
+      </div>
+      <div class="lang-wrap">
+        <button class="nav-ic" onclick="rwToggleThemeMenu()" title="Theme" style="background:none;border:none;color:var(--t1);font-size:15px;cursor:pointer;padding:6px 8px">&#127912;</button>
+        <div id="themeMenu" class="lang-menu"></div>
+      </div>
+      <button class="nav-ic" onclick="ssOpen()" title="Search" style="background:none;border:none;color:var(--t1);font-size:17px;cursor:pointer;padding:6px">&#128269;</button>
+      <button class="mode-chip mode-free" id="modeChip" onclick="openSettings()">Smart Mode (free)</button>
+      <button class="btn btn-sm" onclick="openSettings()">&#9881; Settings</button>
+      <button class="btn btn-ghost" data-i18n="nav.plan" onclick="scrollTo(0,document.getElementById('app').offsetTop-10)">Plan</button>
+      <button class="xp-chip" id="xpChip" onclick="openDrawer()" title="Your traveler rank">&#129399; <span id="xpChipTxt">Genin</span></button>
+      <button class="btn btn-pro" id="proBtn" onclick="openPay()">Pro &#8377;100</button>
+      <button class="btn btn-ghost" id="authBtn" onclick="openAuth()" style="display:none">Sign in</button>
+      <img class="avatar" id="authAvatar" src="" alt="" style="display:none" onclick="authMenu()">
+      <button class="hamb" onclick="openDrawer()" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</nav>
+
+<div class="free-bar" id="freeBar">
+  <span>Free searches today: <strong id="freeCount">5</strong> left</span>
+  <span class="free-link" onclick="openPay()">Upgrade unlimited &rarr;</span>
+</div>
+
+<div id="promoTop"></div>
+
+<!-- ============ COPILOT HERO — the front door, Claude-style ============ -->
+<section class="v v-home v-copilot" id="copilotHero" style="margin:16px 14px 8px">
+  <div style="display:flex;align-items:center;gap:8px;margin:0 2px 8px"><span style="font-size:17px">⚡</span><b style="font-size:15px">Ailon Tusk</b><span style="font-size:11px;color:var(--t3)">· your travel copilot</span></div>
+  <div id="heroLog" style="display:none;margin-bottom:10px;max-height:52vh;overflow-y:auto"></div>
+  <div style="position:relative;background:linear-gradient(180deg,var(--bg2,#12121C),rgba(18,18,28,.55));border:1.5px solid rgba(232,186,108,.35);border-radius:22px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.35)">
+    <textarea id="heroInput" rows="5" placeholder="Ask me anything &mdash; &ldquo;chill 4 days near Rishikesh under 12k&rdquo;"
+      style="display:block;width:100%;box-sizing:border-box;background:transparent;border:none;padding:8px 8px 44px;color:inherit;font:inherit;font-size:16.5px;resize:none;outline:none;min-height:168px;line-height:1.6"></textarea>
+    <div style="position:absolute;right:12px;bottom:12px;display:flex;gap:8px;align-items:center">
+      <button onclick="scanImageOpen()" aria-label="Scan a screenshot" title="Scan a screenshot or reel"
+        style="width:36px;height:36px;border-radius:50%;border:1px solid var(--b2,#2A2A36);background:var(--bg3,#1A1A20);color:var(--t2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">&#128247;</button>
+      <button onclick="copilotVoiceHero()" aria-label="Voice"
+        style="width:36px;height:36px;border-radius:50%;border:1px solid var(--b2,#2A2A36);background:var(--bg3,#1A1A20);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">&#127908;</button>
+      <button onclick="copilotSend(true)" aria-label="Send"
+        style="width:36px;height:36px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center">&#10148;</button>
+    </div>
+    <div id="heroModels" style="position:absolute;left:14px;bottom:16px;display:flex;gap:6px;flex-wrap:wrap;max-width:58%"></div>
+  </div>
+</section>
+<div class="hero-sky v v-home v-web-only"><div class="kumo" style="top:12%;left:4%"></div><div class="kumo k2" style="top:58%;right:6%"></div><div class="kumo k3" style="top:30%;right:22%"></div><div class="hero">
+  <h1><span data-i18n="hero.title1">Escape the crowds.</span><br><em data-i18n="hero.title2">Discover your world.</em></h1>
+  <p data-i18n="hero.sub">The AI travel planner that works for any destination on Earth — smart itineraries, crowd heatmaps, real budget breakdowns and packing lists. No signup. No subscription. Pay once, yours forever.</p>
+  <div class="hero-btns">
+    <button class="hero-btn hb-gold" data-i18n="hero.startFree" onclick="scrollTo(0,document.getElementById('app').offsetTop-10)">Start Planning &mdash; Free &rarr;</button>
+    <button class="hero-btn hb-pm" onclick="openPay()" id="heroProBtn">Unlock Pro &mdash; &#8377;100</button>
+  </div>
+  <div class="trust-strip">
+    <span class="trust-chip"><b>195+</b> countries covered</span>
+    <span class="trust-chip"><b>No signup</b> required</span>
+    <span class="trust-chip"><b>One-time</b> pricing, no subscription</span>
+    <span class="trust-chip shinobi-chip"><b>&#129399; Shinobi mode</b> crowd-dodging routes</span>
+  </div>
+  <div class="stats-row">
+    <div class="stat-cell"><div class="stat-num">195+</div><div class="stat-lbl">Countries</div></div>
+    <div class="stat-cell"><div class="stat-num">14-day</div><div class="stat-lbl">Itineraries</div></div>
+    <div class="stat-cell"><div class="stat-num">10</div><div class="stat-lbl">Currencies</div></div>
+    <div class="stat-cell"><div class="stat-num">12</div><div class="stat-lbl">Crowd months</div></div>
+  </div>
+</div></div>
+
+<section class="brief v v-home" id="brief" style="display:none">
+  <div class="brief-card">
+    <div class="brief-head"><span class="brief-dot"></span> Your daily scroll &mdash; <span id="bDate"></span></div>
+    <div class="brief-wx" id="bWx"></div>
+    <div class="brief-row" id="bDest"></div>
+    <div class="brief-row" id="bFest" style="display:none"></div>
+    <div class="brief-row" id="bFact" style="display:none"></div>
+  </div>
+</section>
+
+<div class="promo v v-home" id="promoBar" onclick="openPay()">
+  <div class="promo-left">&#128081;</div>
+  <div class="promo-text"><strong>Unlock Pro &mdash; Lifetime Access</strong><span>Full itineraries &bull; Budget tracker &bull; WhatsApp share &bull; Packing list &bull; Unlimited searches</span></div>
+  <div class="promo-price"><span class="promo-amt" id="promoAmt">&#8377;100</span><span class="promo-sub" id="promoSub">one-time forever</span></div>
+</div>
+
+<div class="page">
+<section id="app" class="v v-plan v-home">
+<div class="form-card">
+  <div class="form-title">&#9992;&#65039; Plan your escape</div>
+  <div class="grid3">
+    <div class="field"><label class="field-label">From</label><input class="inp" type="text" id="origin" placeholder="Your city or country" value="India"></div>
+    <div class="field"><label class="field-label">Month</label>
+      <select class="inp sel" id="month">
+        <option value="">-- Select month --</option>
+        <option>January</option><option>February</option><option>March</option><option>April</option>
+        <option>May</option><option>June</option><option>July</option><option>August</option>
+        <option>September</option><option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Duration</label>
+      <select class="inp sel" id="dur">
+        <option value="4">3-5 days</option><option value="7">1 week</option>
+        <option value="14" selected>2 weeks</option><option value="21">3+ weeks</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="field"><label class="field-label">Destination</label>
+      <div class="cw"><input class="inp" type="text" id="destInput" placeholder="Country or anywhere..." autocomplete="off"><div class="cdd" id="destDD"></div></div>
+    </div>
+    <div class="field"><label class="field-label">Style</label>
+      <select class="inp sel" id="style">
+        <option>Solo backpacker</option><option>Couple</option><option>Family with kids</option>
+        <option>Group of friends</option><option>Digital nomad</option><option>Luxury traveler</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Crowds</label>
+      <select class="inp sel" id="crowd">
+        <option value="avoid">Avoid crowds</option><option value="some">Some OK</option><option value="any">Fine with crowds</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="field"><label class="field-label">Travel mode</label>
+      <select class="inp sel" id="tmode">
+        <option value="std">&#128747; Standard</option>
+        <option value="ev">&#9889; EV road trip</option>
+        <option value="walk">&#128694; Walk / slow travel</option>
+        <option value="cycle">&#128692; Cycle touring</option>
+        <option value="hybrid">&#128260; Hybrid (mix)</option>
+        <option value="lux">&#10024; Luxury</option>
+        <option value="eco">&#127807; Eco / sustainable</option>
+      </select>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="sl-label">Currency</div>
+  <div class="curr-grid" id="currGrid"></div>
+  <div class="budget-row">
+    <span class="budget-label">Budget per person</span>
+    <span class="budget-val" id="budgetDisplay">&#8377;1.2L</span>
+  </div>
+  <div class="slider-row">
+    <span class="slider-lbl">$200</span>
+    <input type="range" id="budgetSlider" min="200" max="10000" value="1200" step="50">
+    <span class="slider-lbl">$10k+</span>
+  </div>
+  <div class="divider"></div>
+  <div class="sl-label">Interests</div>
+  <div class="tags" id="tagsContainer">
+    <span class="tag on" data-v="Nature">Nature &amp; hiking</span>
+    <span class="tag" data-v="History">History &amp; culture</span>
+    <span class="tag" data-v="Beaches">Beaches</span>
+    <span class="tag" data-v="Food">Food &amp; cuisine</span>
+    <span class="tag" data-v="Adventure">Adventure</span>
+    <span class="tag" data-v="Art">Art &amp; architecture</span>
+    <span class="tag" data-v="Wildlife">Wildlife</span>
+    <span class="tag" data-v="Wellness">Wellness</span>
+    <span class="tag" data-v="Photography">Photography</span>
+    <span class="tag" data-v="Mountains">Mountains</span>
+    <span class="tag" data-v="Markets">Local markets</span>
+    <span class="tag" data-v="Wine">Wine</span>
+  </div>
+  <button class="search-btn" id="searchBtn" onclick="runSearch()">
+    <span class="shim-line"></span>
+    &#128269; Find My Destinations &mdash; Works Without Any API Key
+  </button>
+</div>
+<div id="results" class="v v-plan v-home"></div>
+<ins class="adsbygoogle rw-ad v v-plan" style="display:none;margin:10px 14px" data-ad-client="ca-pub-4943859484482348" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+
+</section>
+
+<section class="xsec v v-explore" id="reads">
+  <div class="xsec-head"><h2 class="xsec-title">&#128218; Guides &amp; <em>Blog</em></h2></div>
+  <p class="xsec-sub">Long-form route guides and field notes &mdash; written, not generated.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+    <a class="tact" style="flex:1;min-width:140px;text-align:center;text-decoration:none;padding:14px 12px;font-weight:800" href="https://roamwise.co.in/guides/" onclick="event.preventDefault();rwOpenSite('guides/')">&#128506;&#65039; Travel guides</a>
+    <a class="tact" style="flex:1;min-width:140px;text-align:center;text-decoration:none;padding:14px 12px;font-weight:800" href="https://roamwise.co.in/blog/" onclick="event.preventDefault();rwOpenSite('blog/')">&#9997;&#65039; Blog</a>
+  </div>
+</section>
+
+<section class="xsec v v-explore" id="treks">
+  <div class="xsec-head"><h2 class="xsec-title">&#9968;&#65039; Trek <em>Vault</em></h2><button class="share-fab" onclick="shareApp('treks')">&#128228; Share</button></div>
+  <p class="xsec-sub">From the world&rsquo;s most famous trails to routes barely anyone knows &mdash; plus the dangerous ones and the newly opened. Each with a pocket itinerary.</p>
+  <div class="fchips" id="trekChips">
+    <button class="fchip on" data-f="all" onclick="trekFilter(this)">All</button>
+    <button class="fchip" data-f="pop" onclick="trekFilter(this)">&#11088; Popular</button>
+    <button class="fchip" data-f="hid" onclick="trekFilter(this)">&#129399; Hidden</button>
+    <button class="fchip" data-f="dan" onclick="trekFilter(this)">&#9888;&#65039; Dangerous</button>
+    <button class="fchip" data-f="new" onclick="trekFilter(this)">&#127381; Newly opened</button>
+  </div>
+  <div class="trek-grid" id="trekGrid"></div>
+</section>
+
+<section class="xsec v v-explore" id="exps">
+  <div class="xsec-head"><h2 class="xsec-title">&#10024; Fresh <em>Experiences</em></h2><button class="share-fab" onclick="shareApp('exps')">&#128228; Share</button></div>
+  <p class="xsec-sub">Offbeat and newly-created experiences you won&rsquo;t find on the usual lists &mdash; the stuff people come home talking about.</p>
+  <div class="exp-grid" id="expGrid"></div>
+</section>
+
+<section class="xsec v v-explore" id="circuits">
+  <div class="xsec-head"><h2 class="xsec-title">&#127950;&#65039; Legendary <em>Circuits</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">Road, ride and rail loops worth building a whole trip around &mdash; with the stop-by-stop route.</p>
+  <div class="trek-grid" id="circGrid"></div>
+</section>
+
+<section class="xsec v v-explore" id="events">
+  <div class="xsec-head"><h2 class="xsec-title">&#127967;&#65039; Event <em>Radar</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">The world&rsquo;s biggest moments &mdash; World Cups, Olympics, launches, tours &mdash; turned into trip triggers with insider timing.</p>
+  <div class="exp-grid" id="evtGrid"></div>
+</section>
+
+<ins class="adsbygoogle rw-ad v v-explore" style="display:none;margin:10px 14px" data-ad-client="ca-pub-4943859484482348" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<section class="xsec v v-explore" id="hubspoke">
+  <div class="xsec-head"><h2 class="xsec-title">&#127470;&#127475; Hub &amp; Spoke <em>India</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">The fastest, most comfortable way to cover India: fly long distances to a regional hub, rent a self-drive car there, use premium trains &amp; buses between cities, and carry a folding cycle in the boot for the last mile.</p>
+  <div id="hsAcc"></div>
+</section>
+
+<section class="xsec v v-explore" id="ev">
+  <div class="xsec-head"><h2 class="xsec-title">&#9889; EV <em>Vault</em></h2></div>
+  <p class="xsec-sub">The standout electric machine in every category &mdash; range kings, charging champs and the best picks for world travel. Specs are indicative; always verify the latest.</p>
+  <div class="mode-box" style="margin-bottom:12px"><b>&#9889; 2026 breakthroughs:</b> solid-state pilot packs enter premium EVs (900+ km claims) &bull; 5C ultrafast LFP makes 10&ndash;80% a coffee stop &bull; battery-swap crosses 4,000 stations in China &bull; megawatt charging unlocks electric trucking. 
+  <div style="display:flex;gap:8px;margin-top:9px"><a class="tact" style="flex:1;text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=solid+state+battery+2026">&#9654; Solid-state, explained</a><a class="tact" style="flex:1;text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=megawatt+charging+electric+trucks">&#9654; Megawatt charging</a></div></div>
+  <div class="ev-grid" id="evGrid"></div>
+</section>
+
+<section class="xsec v v-explore" id="basecamp">
+  <div class="xsec-head"><h2 class="xsec-title">&#9978; Base<em>camp</em></h2></div>
+  <p class="xsec-sub">Trusted trek operators, expedition legends, the creators worth following, emergency numbers and your interactive packing list.</p>
+  <div id="bcAcc"></div>
+</section>
+
+<section class="xsec v v-explore" id="jlog">
+  <div class="xsec-head"><h2 class="xsec-title">&#128506;&#65039; My <em>Journey Card</em></h2></div>
+  <p class="xsec-sub">Log the places you&rsquo;ve been &mdash; get a shareable digital travel card with your stats, rank and map. Data stays on your device.</p>
+  <div class="log-row"><input class="txn-inp" id="logInput" placeholder="Add a place you&rsquo;ve visited (e.g. Ladakh 2024)"><button class="txn-btn" onclick="logAdd()">Add</button></div>
+  <div id="logChips"></div>
+  <div class="log-row"><button class="tact" style="flex:1" onclick="stravaConnect()">&#128692; Link Strava profile</button></div>
+  <button class="rzp-main-btn" style="margin-top:6px" onclick="makeCard()">&#127912; Generate my Journey Card (+25 XP)</button>
+  <img id="cardImg" alt="Your journey card">
+  <div id="cardBtns" style="display:none;gap:7px;margin-top:9px;flex-wrap:wrap">
+    <button class="tact" style="flex:1;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#07090F;border:none;font-weight:700" onclick="cardShare()">&#128228; Share</button>
+    <button class="tact" style="flex:1" onclick="cardPNG()">&#11015; PNG</button>
+    <button class="tact" style="flex:1" onclick="cardJPG()">&#11015; JPG</button>
+    <button class="tact" style="flex:1" onclick="cardPDF()">&#11015; PDF</button>
+    <button class="tact" style="flex:1;background:linear-gradient(135deg,#b8860b,#8a6400);color:#f5f1e8;border:none;font-weight:700" onclick="downloadAtlasCertificate()">&#128220; Atlas Certificate</button>
+  </div>
+  <div style="display:flex;gap:7px;margin-top:9px">
+    <button class="tact cstyle red" data-k="atlas" style="flex:1" onclick="setCardStyle('atlas')">&#127963; Atlas</button>
+    <button class="tact cstyle" data-k="noir" style="flex:1" onclick="setCardStyle('noir')">&#9899; Noir</button>
+    <button class="tact cstyle" data-k="neon" style="flex:1" onclick="setCardStyle('neon')">&#9889; Neon</button>
+    <button class="tact cstyle" data-k="shadow" id="shadowChip" style="flex:1;display:none" onclick="setCardStyle('shadow')">&#129399; Shadow</button>
+  </div>
+  <button class="rzp-main-btn" id="movieBtn" style="display:none;margin-top:9px;background:linear-gradient(135deg,#C4302B,#8E1F1B)" onclick="openMovie()">&#127916; Journey Film &mdash; 5-sec chapters &middot; &#8377;50 (free for Pro)</button>
+</section>
+</div>
+
+<ins class="adsbygoogle rw-ad v v-home" style="display:none;margin:10px 14px" data-ad-client="ca-pub-4943859484482348" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<section class="xsec v v-film" id="promofilm">
+  <div class="xsec-head"><h2 class="xsec-title">&#127916; The <em>Film</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">The official RoamWise promo &mdash; music, mountains and the mission, in one reel.</p>
+  <div id="promoBox"></div>
+</section>
+
+<section class="xsec v v-extras" id="ratings">
+  <div class="xsec-head"><h2 class="xsec-title">&#11088; Traveler <em>Ratings</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <div id="ratingsSummary" style="text-align:center;padding:14px 0 6px"><div style="font-size:11px;color:var(--t3)">Loading ratings&hellip;</div></div>
+  <div id="ratingsWall" class="exp-grid"></div>
+  <button class="rzp-main-btn" style="margin-top:12px" onclick="openRateForm()">&#11088; Rate your experience</button>
+</section>
+
+<section class="xsec v v-store" id="store">
+  <div class="xsec-head"><h2 class="xsec-title">&#128717; The <em>Store</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">Everything made in the Himalayas &mdash; tools, books and upgrades that fund the next feature.</p>
+  <div class="exp-grid">
+    <div class="exp" style="border-color:rgba(232,186,108,.45)"><div class="exp-ic">&#128081;</div><div class="exp-name">Lifetime Pro &mdash; &#8377;100</div><div class="exp-desc">Unlimited searches, AI itineraries, every hack. One payment, forever. Founding price.</div><button class="tact red" style="width:100%;margin-top:9px" onclick="useBump('store');openPay()">Unlock now</button></div>
+    <div class="exp"><div class="exp-ic">&#128213;</div><div class="exp-name">Premium PDF itinerary &mdash; &#8377;10</div><div class="exp-desc">Multi-page designed plan with photos, themes and timings. Free for Pro.</div><button class="tact" style="width:100%;margin-top:9px" onclick="tabGo('plan');showToast('Search a place \u2192 open itinerary \u2192 Premium PDF')">Make mine</button></div>
+    <div class="exp"><div class="exp-ic">&#127916;</div><div class="exp-name">Journey Movie &mdash; &#8377;50</div><div class="exp-desc">Your travels as a cinematic reel with music and chapters. Free for Pro.</div><button class="tact" style="width:100%;margin-top:9px" onclick="tabGo('explore');scrollToId('jlog')">Roll camera</button></div>
+    <div class="exp"><div class="exp-ic">&#128218;</div><div class="exp-name">Books by Mohit Pandey</div><div class="exp-desc">AI Ki Pathshala &bull; GYANVERSE &bull; Yuga &bull; Volts &amp; Vengeance &mdash; on Amazon, Pothi &amp; Flipkart.</div><button class="tact" style="width:100%;margin-top:9px" onclick="scrollToId('creator')">Browse books</button></div>
+    <div class="exp"><div class="exp-ic">&#129333;</div><div class="exp-name">1-on-1 Trip Consultation &mdash; &#8377;999</div><div class="exp-desc">60 minutes with the creator: your route, budget and crowd-dodge plan, built live.</div><button class="tact" style="width:100%;margin-top:9px" onclick="location.href='upi://pay?pa=coolmohit@ybl&pn=RoamWise&am=999&cu=INR&tn=Consultation';showToast('After paying, email proof \u2014 booking link comes back within 24h')">Book &#8377;999</button></div>
+    <div class="exp" style="opacity:.75"><div class="exp-ic">&#128085;</div><div class="exp-name">Shinobi tees &amp; merch</div><div class="exp-desc">Journey Card posters and RoamWise tees &mdash; print-on-demand store coming soon.</div><button class="tact" style="width:100%;margin-top:9px" onclick="showToast('Dropping soon \u2014 Supporters get first dibs \ud83d\udc4a')">Notify me</button></div>
+  </div>
+</section>
+
+<section class="xsec v v-explore" id="newspulse">
+  <div class="xsec-head"><h2 class="xsec-title">&#128240; Travel <em>Pulse</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">Today's travel news, crunched into one line each &mdash; refreshed daily by our agent, not fake real-time.</p>
+  <div class="exp-grid" id="newsGrid"><div class="exp"><div class="exp-desc">Loading today's pulse&hellip;</div></div></div>
+</section>
+
+<section class="xsec v v-explore" id="aipulse">
+  <div class="xsec-head"><h2 class="xsec-title">&#129302; AI <em>Pulse</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">The machines are traveling too &mdash; agents, robots and the startups building them. Refreshed by our agent.</p>
+  <div class="exp-grid">
+    <div class="exp" style="border-color:rgba(217,119,87,.5)"><div class="exp-ic">&#10024;</div><div class="exp-name">Claude &mdash; Anthropic</div><div class="exp-desc">The frontier AI assistant known for deep reasoning, long documents and agentic coding &mdash; literally the co-builder of this entire app. If you want one AI for serious work, start here.</div><a class="tact" style="display:block;text-align:center;margin-top:9px;text-decoration:none" href="https://claude.ai" target="_blank" rel="noopener">Try Claude</a></div>
+    <div class="exp"><div class="exp-ic">&#129504;</div><div class="exp-name">The agent era</div><div class="exp-desc">2026's shift: AIs that don't just answer but DO &mdash; browsing, booking, coding, running loops for days. Our GitHub agent publishing daily SEO pages is a small taste.</div></div>
+    <div class="exp"><div class="exp-ic">&#129470;</div><div class="exp-name">Humanoids are walking</div><div class="exp-desc">Figure, Tesla Optimus and Unitree's G1 moved from demos to pilot factories &mdash; the first robot you meet may hand you your hotel key.</div></div>
+    <div class="exp"><div class="exp-ic">&#127470;&#127475;</div><div class="exp-name">India builds its own</div><div class="exp-desc">Sarvam AI (Indic language models), Krutrim (Ola's full-stack bet) and CoRover (BharatGPT for railways) are making AI that speaks Bharat.</div></div>
+    <div class="exp"><div class="exp-ic">&#9889;</div><div class="exp-name">AI &#215; Travel</div><div class="exp-desc">Crowd prediction, dynamic pricing beaters, instant itineraries &mdash; the whole industry is being rebuilt. You're using one of the rebuilders right now.</div></div>
+  </div>
+</section>
+
+<section class="xsec v v-film" id="creator">
+  <div class="xsec-head"><h2 class="xsec-title">&#127956;&#65039; The <em>Creator</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <p class="xsec-sub">RoamWise is built by one person from <b>Almora, Uttarakhand</b> &mdash; <b>Mohit Pandey</b>: developer, author and creator making tools, books and music from the Himalayas. No office, no investors, no team &mdash; just mountains, code and an AI co-pilot.</p>
+  <div class="exp-grid">
+    <div class="exp" style="border-color:rgba(232,186,108,.4)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <img id="creatorPic" src="https://www.roamwise.co.in/creator.jpg" alt="Mohit Pandey"
+          style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2.5px solid var(--gold2);flex-shrink:0"
+          onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 72 72%22%3E%3Ccircle cx=%2236%22 cy=%2236%22 r=%2236%22 fill=%22%23161022%22/%3E%3Ctext x=%2236%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-size=%2226%22 font-weight=%22bold%22 fill=%22%23E8BA6C%22%3EMP%3C/text%3E%3Cpath d=%22M14 58l10-14 6 8 5-6 13 12z%22 fill=%22%23C4302B%22 opacity=%22.85%22/%3E%3C/svg%3E'">
+        <div><div class="exp-name" style="margin-bottom:2px">Mohit Pandey</div>
+        <div class="exp-where">Indie developer &bull; Author &bull; Creator</div></div>
+      </div>
+      <div class="exp-desc">Builds apps like RoamWise, writes books in Hinglish that make hard topics simple, and produces Kumaoni-fusion music &mdash; all solo, all from a Himalayan town. Follow the journey:</div>
+      <a class="tact red" style="display:block;text-align:center;margin-top:9px;text-decoration:none" href="https://youtube.com/@mohucool" target="_blank" rel="noopener">&#9654;&#65039; YouTube @mohucool</a>
+    </div>
+    <div class="exp">
+      <div class="exp-ic">&#128216;</div>
+      <div class="exp-name">AI Ki Pathshala</div>
+      <div class="exp-where">Hinglish &bull; 300+ pages</div>
+      <div class="exp-desc">The practical AI guide for Indian students &amp; families &mdash; ChatGPT, prompts, careers and side-income, explained in the language you actually think in.</div>
+      <div style="display:flex;gap:7px;margin-top:9px"><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://amzn.in/d/0b8CZwlG" target="_blank" rel="noopener">Amazon</a><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://store.pothi.com/book/mohit-pandey-ai-ki-pathshala/" target="_blank" rel="noopener">Pothi</a><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://dl.flipkart.com/dl/ai-ki-pathshala/p/itmaccd7f8e1e8d2?pid=9798903303670&lid=LSTBOK9798903303670KLYL4O&_refId=&_appId=CL" target="_blank" rel="noopener">Flipkart</a></div>
+    </div>
+    <div class="exp">
+      <div class="exp-ic">&#128218;</div>
+      <div class="exp-name">GYANVERSE</div>
+      <div class="exp-where">Class 9&ndash;12 exam companion</div>
+      <div class="exp-desc">Board-exam strategy, memory systems and subject cheat-sheets &mdash; the book built to turn average prep into ranks.</div>
+      <div style="display:flex;gap:7px;margin-top:9px"><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://store.pothi.com/book/mohit-pandey-gyanverse-class-9-12-flagship-exam-companion/" target="_blank" rel="noopener">Pothi &bull; Colour</a><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://store.pothi.com/book/mohit-pandey-gyanverse-class-9-12-flagship-exam-companion-0/" target="_blank" rel="noopener">Pothi &bull; B/W</a></div>
+    </div>
+    <div class="exp">
+      <div class="exp-ic">&#128302;</div>
+      <div class="exp-name">Yuga: The Silicon Age</div>
+      <div class="exp-where">Sci-fi novel &bull; set in 2047</div>
+      <div class="exp-desc">A mystery about an ancient AI called ORACLE hidden at Kasar Devi, Almora &mdash; where the Himalayas meet the machine age.</div>
+      <div style="display:flex;gap:7px;margin-top:9px"><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://store.pothi.com/book/mohit-pandey-yuga-silicon-age/" target="_blank" rel="noopener">Pothi &bull; Standard</a><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://store.pothi.com/book/mohit-pandey-yuga-silicon-age-0/" target="_blank" rel="noopener">Pothi &bull; Compact</a></div>
+    </div>
+    <div class="exp">
+      <div class="exp-ic">&#9889;</div>
+      <div class="exp-name">Volts &amp; Vengeance</div>
+      <div class="exp-where">The EV encyclopedia</div>
+      <div class="exp-desc">Electric vehicles, batteries and the road ahead &mdash; the complete EV encyclopedia, told with the same anime-flavoured clarity as everything GYANVERSE makes.</div>
+      <div style="display:flex;gap:7px;margin-top:9px"><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://amzn.in/d/00yltqaL" target="_blank" rel="noopener">Amazon</a><a class="tact" style="flex:1;text-align:center;text-decoration:none" href="https://store.pothi.com/book/mohit-pandey-volts-vengeance-ev-encyclopedia/" target="_blank" rel="noopener">Pothi</a></div>
+    </div>
+    <div class="exp" style="border-color:rgba(155,89,245,.4)">
+      <div class="exp-ic">&#128155;</div>
+      <div class="exp-name">Support the mission</div>
+      <div class="exp-where">Keep the Himalayan build alive</div>
+      <div class="exp-desc">Love RoamWise? The <b>&#8377;299 Supporter tier</b> puts your name in the credits and funds the next feature. Businesses: a sponsor slot reaches every trip search.</div>
+      <button class="tact red" style="width:100%;margin-top:9px" onclick="openPay()">&#128081; Become a Supporter</button>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer v v-home">
+  <div class="foot-inner">
+    <div>
+      <div class="foot-brand"><div class="logo-icon">RW</div><span class="logo-text">Roam<span>Wise</span> Pro</span></div>
+      <p class="foot-tag">The one-payment travel planner. Built in the Himalayas &#127956;&#65039; for travelers everywhere &mdash; itineraries, budgets and crowd-free routes for 195+ countries.</p>
+    </div>
+    <div>
+      <div class="foot-h">Product</div>
+      <a class="foot-link" onclick="scrollTo(0,document.getElementById('app').offsetTop-10)">Plan a trip</a>
+      <a class="foot-link" onclick="openPay()">Unlock Pro</a>
+      <a class="foot-link" onclick="openSettings()">Settings &amp; AI keys</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/blog/" target="_blank">Blog</a>
+    </div>
+    <div>
+      <div class="foot-h">Company</div>
+      <a class="foot-link" href="https://youtube.com/@mohucool" target="_blank" rel="noopener">YouTube @mohucool</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/about.html" target="_blank" rel="noopener">About</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/guides/" target="_blank" rel="noopener">Guides</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/contact.html" target="_blank" rel="noopener">Contact</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/careers/" target="_blank" rel="noopener">Careers</a>
+      <a class="foot-link" onclick="openLegal('privacy')">Privacy policy</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/terms.html" target="_blank" rel="noopener">Terms &amp; refunds</a>
+    </div>
+  </div>
+  <div class="foot-legal">
+    <span>&copy; 2026 RoamWise &bull; Made by Mohit Pandey, Almora, India<br>
+<span style="font-size:10px;color:var(--t3)">RoamWise&trade;, Journey Card&trade;, Shinobi XP&trade;, Sync Circle&trade; &mdash; original works. All features, designs, data models and content are protected; copying or derivative use is prohibited without written permission.</span></span>
+    <span>Prices are estimates &bull; Data: Wikipedia &amp; Open-Meteo</span>
+  </div>
+</footer>
+
+<!-- APP SHELL: bottom tabs + drawer -->
+<nav class="tabbar" id="tabbar"></nav>
+
+<div class="drawer-bk" id="drawerBk" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer">
+  <div class="dr-head"><div class="dr-title">Roam<span>Wise</span> Pro</div><button class="dr-x" onclick="closeDrawer()">&#215;</button></div>
+  <div id="drAcct">
+    <button class="dr-signin" onclick="closeDrawer();openAuth()">Sign in / Create account</button>
+  </div>
+  <div class="dr-xp" id="drXp"></div>
+  <div class="dr-grp open"><button class="dr-gh" onclick="drToggle(this)">🧭 Travel<span class="chev">›</span></button><div class="dr-gb">
+  <a class="dr-link" onclick="closeDrawer();tabGo('plan')"><span class="ic">✈️</span>Plan a trip</a>
+  <a class="dr-link" onclick="closeDrawer();cpFocusHero()"><span class="ic">🧭</span>Copilot chat</a>
+  <a class="dr-link" onclick="closeDrawer();openMapExplorer()"><span class="ic">🗺️</span>Live world map</a>
+  <a class="dr-link" onclick="closeDrawer();openGroupPlanner()"><span class="ic">🤝</span>Group planner</a>
+  <a class="dr-link" onclick="closeDrawer();openGroupChat()"><span class="ic">💬</span>Group chat</a>
+  <a class="dr-link" onclick="closeDrawer();tabGo('film')"><span class="ic">🎬</span>The Film</a>
+  <a class="dr-link" href="https://roamwise.co.in/creators/" onclick="event.preventDefault();rwOpenSite('creators/')" rel="noopener"><span class="ic">🤝</span>Creator collabs</a>
+  <a class="dr-link" onclick="closeDrawer();tabGo('store')"><span class="ic">🛍️</span>Store</a>
+  <a class="dr-link" onclick="closeDrawer();tabGo('extras')"><span class="ic">⭐</span>Ratings &amp; traveler wall</a>
+  <a class="dr-link" onclick="closeDrawer();openVault()"><span class="ic">✈️</span>My Trips (offline)</a>
+  <a class="dr-link" onclick="closeDrawer();tabGo('explore');scrollToId('treks')"><span class="ic">⛰️</span>Trek Vault</a>
+  <a class="dr-link" onclick="closeDrawer();showSaved()"><span class="ic">♥</span>Saved for later</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('jlog')"><span class="ic">🗺️</span>My Journey Card</a>
+</div></div>
+<div class="dr-grp"><button class="dr-gh" onclick="drToggle(this)">✨ Discover<span class="chev">›</span></button><div class="dr-gb">
+  <a class="dr-link" onclick="closeDrawer();scrollToId('exps')"><span class="ic">✨</span>Fresh Experiences</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('circuits')"><span class="ic">🏎️</span>Legendary Circuits</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('events')"><span class="ic">🏟️</span>Event Radar</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('hubspoke')"><span class="ic">🇮🇳</span>Hub &amp; Spoke India</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('ev')"><span class="ic">⚡</span>EV Vault</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('basecamp')"><span class="ic">⛺</span>Basecamp</a>
+  <a class="dr-link" onclick="closeDrawer();tabGo('explore');scrollToId('aipulse')"><span class="ic">🤖</span>AI Pulse</a>
+  <a class="dr-link" onclick="closeDrawer();openDna()"><span class="ic">🧬</span>Traveler DNA quiz</a>
+</div></div>
+<div class="dr-grp"><button class="dr-gh" onclick="drToggle(this)">👤 Account<span class="chev">›</span></button><div class="dr-gb">
+  <a class="dr-link" onclick="closeDrawer();openProfile()"><span class="ic">👤</span>My Profile</a>
+  <a class="dr-link" onclick="closeDrawer();openPay()"><span class="ic">👑</span><span id="drProLbl">Unlock Pro</span></a>
+  <a class="dr-link" onclick="closeDrawer();openMusic()"><span class="ic">🎵</span>My Music</a>
+  
+</div></div>
+<div class="dr-grp"><button class="dr-gh" onclick="drToggle(this)">🛠 App<span class="chev">›</span></button><div class="dr-gb">
+  <a class="dr-link" onclick="drThemePick()"><span class="ic">🎨</span>Theme<span id="drThemeVal" style="margin-left:auto;color:var(--t3);font-size:11px"></span></a>
+  <div id="drThemeList" style="display:none;padding:2px 0 2px 30px"></div>
+  <a class="dr-link" onclick="closeDrawer();openIconThemePicker()"><span class="ic">✨</span>Icon style<span style="margin-left:auto;color:var(--t3);font-size:11px">tap</span></a>
+  <a class="dr-link" onclick="drLangPick()"><span class="ic">🌐</span>Language<span id="drLangVal" style="margin-left:auto;color:var(--t3);font-size:11px"></span></a>
+  <div id="drLangList" style="display:none;padding:2px 0 2px 30px"></div>
+  <a class="dr-link" onclick="closeDrawer();openSettings()"><span class="ic">⚙️</span>Settings &amp; AI keys</a>
+  <a class="dr-link" onclick="closeDrawer();openBadges()"><span class="ic">🏅</span>My badges &amp; achievements</a>
+  <a class="dr-link" onclick="closeDrawer();openJourneyCert()"><span class="ic">🎖️</span>Journey certificate</a>
+  <a class="dr-link" onclick="closeDrawer();openNearMe()"><span class="ic">📍</span>Near me</a>
+  <a class="dr-link" onclick="closeDrawer();openFitnessStays()"><span class="ic">🏋️</span>Fitness-first stays</a>
+  <a class="dr-link" onclick="closeDrawer();openTribeTravel()"><span class="ic">🤝</span>Tribe travel</a>
+  <a class="dr-link" onclick="closeDrawer();openMoneyLayer()"><span class="ic">💰</span>Money groups</a>
+  <a class="dr-link" onclick="closeDrawer();openGreenTravel()"><span class="ic">🌱</span>Green travel</a>
+  <a class="dr-link" onclick="closeDrawer();openMemories()"><span class="ic">✍️</span>Trip memories &amp; blog</a>
+  <a class="dr-link" href="https://roamwise.co.in/help/" onclick="event.preventDefault();rwOpenSite('help/')" rel="noopener"><span class="ic">❓</span>Help &amp; FAQ</a>
+  <a class="dr-link" onclick="closeDrawer();openWizard()"><span class="ic">🧠</span>AI setup wizard (60 sec)</a>
+  <a class="dr-link" onclick="closeDrawer();shareApp('app')"><span class="ic">📤</span>Share RoamWise (+15 XP)</a>
+  <a class="dr-link" onclick="closeDrawer();requestFeature()"><span class="ic">💡</span>Request a feature</a>
+  <a class="dr-link" href="https://youtube.com/@mohucool" target="_blank" rel="noopener"><span class="ic">▶️</span>YouTube @mohucool</a>
+  <a class="dr-link" onclick="closeDrawer();scrollToId('creator')"><span class="ic">🏔️</span>About the creator</a>
+  <a class="dr-link" href="https://roamwise.co.in/careers/" onclick="event.preventDefault();rwOpenSite('careers/')"><span class="ic">💼</span>Careers &amp; internships</a>
+</div></div>
+<div class="dr-grp"><button class="dr-gh" onclick="drToggle(this)">⚖ Legal<span class="chev">›</span></button><div class="dr-gb">
+  <a class="dr-link" onclick="closeDrawer();openLegal('privacy')"><span class="ic">🔒</span>Privacy policy</a>
+  <a class="dr-link" onclick="closeDrawer();openLegal('terms')"><span class="ic">📄</span>Terms &amp; refunds</a>
+</div></div>
+<div class="dr-out">RoamWise Pro v3.1<br>Made in the Himalayas &#127956;&#65039; by Mohit Pandey</div>
+</aside>
+
+<!-- WIZARD -->
+<div class="overlay" id="wizOverlay">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-close" onclick="el('wizOverlay').classList.remove('open')">&#215;</button>
+    <div class="modal-head"><div class="modal-title">&#129504; 60-second AI setup</div><div class="modal-sub">Free keys &mdash; open, copy, paste, done</div></div>
+    <div class="modal-body" id="wizBody"></div>
+  </div>
+</div>
+
+<!-- DNA MODAL -->
+<div class="overlay" id="dnaOverlay">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-close" onclick="el('dnaOverlay').classList.remove('open')">&#215;</button>
+    <div class="modal-head"><div class="modal-title">&#129516; Traveler DNA</div><div class="modal-sub">30 seconds &mdash; the app tunes itself to you</div></div>
+    <div class="modal-body" id="dnaBody"></div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authOverlay">
+  <div class="modal" style="max-width:380px">
+    <button class="modal-close" onclick="closeAuth()">&#215;</button>
+    <div class="modal-head">
+      <div class="modal-title">Welcome to RoamWise</div>
+      <div class="modal-sub">One account &bull; Pro on all your devices</div>
+    </div>
+    <div class="modal-body">
+      <div class="auth-err" id="authErr"></div>
+      <div class="auth-providers">
+        <button class="auth-btn google" onclick="loginGoogle()"><svg width="17" height="17" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C41 35.4 44 30.2 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>Continue with Google</button>
+        <button class="auth-btn" style="background:#1877F2;color:#fff;border-color:#1877F2" onclick="loginSocial('facebook')"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>Continue with Facebook</button>
+        <button class="auth-btn" style="background:#000;color:#fff;border-color:#333" onclick="loginSocial('apple')"><svg width="15" height="17" viewBox="0 0 384 512"><path fill="#fff" d="M318 250c0-61 50-90 52-92-28-42-72-47-88-48-37-4-73 22-92 22-19 0-48-22-79-21-41 1-78 24-99 60-42 73-11 182 30 241 20 29 44 62 76 61 30-1 42-20 79-20s47 20 79 19c33 0 54-30 74-59 23-34 33-66 33-68-1 0-63-24-65-95zM259 74c17-20 28-48 25-74-24 1-53 16-70 36-15 18-29 46-25 72 27 2 53-14 70-34z"/></svg>Continue with Apple</button>
+      </div>
+      <div class="auth-div">or use email</div>
+      <div id="emailPane">
+        <input class="auth-inp" type="email" id="authEmail" placeholder="Email address" autocomplete="email">
+        <input class="auth-inp" type="password" id="authPass" placeholder="Password (min 6 chars)" autocomplete="current-password">
+        <button class="rzp-main-btn" style="margin-top:2px" onclick="loginEmail()"><span id="authAction">Sign in</span></button>
+        <div class="auth-sub" id="authToggleRow">New here? <a onclick="toggleAuthMode()">Create an account</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL MODAL -->
+<div class="overlay" id="legalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="el('legalOverlay').classList.remove('open')">&#215;</button>
+    <div class="modal-head"><div class="modal-title" id="legalTitle">Privacy Policy</div></div>
+    <div class="modal-body legal-body" id="legalBody"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLbox()">
+  <button class="lb-close" onclick="closeLbox()">&#215;</button>
+  <img id="lboxImg" src="" alt="">
+</div>
+
+<!-- PAY MODAL -->
+<div class="overlay" id="payOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closePay()">&#215;</button>
+    <div class="modal-head">
+      <span class="modal-crown">&#128081;</span>
+      <div class="modal-title" data-i18n="pay.title">RoamWise Pro</div>
+      <div class="modal-sub" data-i18n="pay.sub">Pay once &bull; Unlock forever</div>
+    </div>
+    <div class="modal-body">
+      <div class="pay-tabs">
+        <button class="pay-tab on" id="payTabIN" onclick="setPayRegion('in')">&#127470;&#127475; India &mdash; &#8377;100<small>PhonePe &middot; GPay &middot; WhatsApp</small></button>
+        <button class="pay-tab" id="payTabWW" onclick="setPayRegion('ww')">&#127757; Worldwide &mdash; $4.99<small>Card / PayPal / Apple Pay</small></button>
+      </div>
+      <div class="price-hero">
+        <div class="big-price" id="bigPrice">&#8377;100</div>
+        <div class="price-sub" id="priceSub">Founder offer &bull; One-time &bull; No subscription</div>
+        <div class="price-old" id="priceOld"><b>&#8377;100 one-time</b> &middot; founder price for the <b>first 1,000 members</b></div>
+        <div style="font-size:10.5px;color:var(--t3,#888);margin-top:5px;line-height:1.5" id="priceDisclaimer">After the first 1,000, Pro moves to regular pricing (planned yearly &amp; multi-month plans). Lock the one-time founder price now &mdash; it stays yours for life, no renewals.</div>
+      </div>
+      <div class="trust-row">
+        <span class="trust-badge" data-i18n="pay.refund">&#128737;&#65039; 7-day refund &mdash; no questions</span>
+        <span class="trust-badge" data-i18n="pay.secure">&#128274; Secure UPI / Card</span>
+        <span class="trust-badge" data-i18n="pay.noAuto">&#9989; One-time &mdash; never auto-charged</span>
+      </div>
+      <div class="features-grid">
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>Full itineraries</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>Budget tracker</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>WhatsApp share</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>Packing checklist</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>Compare table</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>Visa details</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>AI enhancement</div>
+        <div class="feat-item"><span class="feat-ck">&#10003;</span>Unlimited searches</div>
+      </div>
+      <!-- ===== TESTIMONIALS: replace the quote/who text below with REAL user quotes when you have them ===== -->
+      <div class="pay-testi" id="payTesti">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="quote" id="testiQuote">&ldquo;Planned our whole Manali trip in one evening &mdash; the budget split alone saved us so many arguments.&rdquo;</div>
+        <div class="who" id="testiWho">&mdash; Priya, group trip to Himachal</div>
+      </div>
+      <div id="payIndiaSec">
+      <div id="founderBanner" style="display:none;margin-bottom:12px;padding:13px 14px;border-radius:16px;color:#fff;background:linear-gradient(135deg,#C8913E,#8E5B1F);box-shadow:0 8px 26px rgba(200,145,62,.28)"></div>
+      <div id="planPicker"></div>
+      <div id="priceTerms" style="margin:10px 2px 4px;font-size:10.5px;line-height:1.65;color:var(--t3)">
+        <b style="color:var(--t2)">About these prices</b><br>
+        Every price shown is held for <b>one year</b> from your purchase date. After that they are reviewed annually and may go up or down depending on running costs and what the product does by then.<br>
+        <b style="color:var(--t2)">What you buy is safe:</b> a change never affects something you already paid for. A lifetime pass stays lifetime; a 3/5/10-year pass runs its full term at the price you paid; an active subscription keeps its rate until its next renewal, and you will be told before any renewal changes.<br>
+        The founder price is limited to the first 1,000 members or one year from launch, whichever comes first &mdash; and it will not return afterwards. All prices in INR, inclusive of applicable taxes.
+      </div>
+      <div id="payMethods" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <button class="tact" style="font-size:11px;padding:6px 10px" onclick="backToPlanPicker()">\u2190 Change plan</button>
+        <div id="planHeader" style="font-size:13px;font-weight:700;color:var(--gold2)"></div>
+      </div>
+      <div class="section-label">&#129399; Pay directly &mdash; zero middlemen, zero extra fees</div>
+      <div class="upi-apps">
+        <button class="upi-app phonepe" onclick="payVia('phonepe')"><span class="ua-ic" style="background:#fff"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#5F259F"/><text x="12" y="16.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="11" fill="#fff">&#2346;&#2375;</text></svg></span>PhonePe</button>
+        <button class="upi-app gpay" onclick="payVia('gpay')"><span class="ua-ic">G</span>Google&nbsp;Pay</button>
+        <button class="upi-app wapay" onclick="payVia('whatsapp')"><span class="ua-ic" style="background:#fff"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#25D366" d="M12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.8 1 3.8 1.5 5.8 1.5 6.6 0 12-5.4 12-12S18.6 0 12 0z"/><path fill="#fff" d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.3z"/></svg></span>WhatsApp</button>
+      </div>
+      <button class="upi-any" onclick="payVia('any')">&#128241; Any other UPI app &mdash; Paytm / BHIM / bank apps</button>
+      <div class="upi-note">Opens your app with <strong>&#8377;100 to coolmohit@ybl</strong> pre-filled. Straight UPI &mdash; the same rails, no gateway in between.</div>
+      <div class="divider-or">on a computer? scan with your phone</div>
+      <div class="qr-wrap">
+        <div class="qr-lbl" id="qrAmtLbl">&#128247; Scan &bull; &#8377;100 &bull; UPI: coolmohit@ybl</div>
+        <div class="qr-inner" id="qrcode"></div>
+        <div class="qr-apps">PhonePe &bull; WhatsApp Pay &bull; GPay &bull; Paytm &bull; BHIM</div>
+      </div>
+      <div class="utr-box">
+        <div class="utr-title">Step 2 &mdash; paste your UTR to unlock</div>
+        <div class="utr-sub">After paying, open the transaction in your app and copy the 12-digit <strong>UTR / UPI Ref No</strong>. Pro activates on your account the moment it&rsquo;s approved &mdash; usually within minutes.</div>
+        <div class="inp-row">
+          <input class="txn-inp" id="utrInput" placeholder="12-digit UTR number" autocomplete="off" inputmode="numeric">
+          <button class="txn-btn" id="utrBtn" onclick="submitUtr()">Submit &#10148;</button>
+        </div>
+        <div id="utrMsg" style="display:none;font-size:11px;margin-top:7px;padding:6px 8px;border-radius:6px;line-height:1.5"></div>
+      </div>
+      </div><!-- /payMethods -->
+      </div><!-- /payIndiaSec -->
+
+      <!-- INTERNATIONAL (Gumroad) -->
+      <div id="payIntlSec" style="display:none">
+        <div class="section-label">&#127757; Pay $4.99 once &mdash; works in every country</div>
+        <a class="intl-btn" id="gumroadBtn" href="#" target="_blank" rel="noopener" onclick="return openGumroad()">&#128179; Pay $4.99 &mdash; Card / PayPal / Apple Pay</a>
+        <div class="intl-note">Secure checkout via Gumroad &bull; Instant license key by email &bull; VAT/taxes handled automatically</div>
+        <div class="txn-sec" style="margin-top:14px">
+          <div class="txn-lbl">Enter your license key to unlock</div>
+          <div class="txn-note" style="margin-bottom:7px;text-align:left">Sent to your email right after payment &mdash; looks like <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:11px">XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX</code></div>
+          <div class="inp-row">
+            <input class="txn-inp" id="gumLicKey" placeholder="Paste license key" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+            <button class="txn-btn" id="gumVerifyBtn" onclick="verifyGumroad()">Verify &amp; Unlock &#128275;</button>
+          </div>
+          <div id="gumVerifyErr" style="display:none;color:#D84F4F;font-size:11px;margin-top:7px;line-height:1.5;padding:6px 8px;background:rgba(216,79,79,.08);border-radius:6px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="overlay" id="successOverlay">
+  <div class="success-card">
+    <span class="success-ico">&#127881;</span>
+    <div class="success-title">Welcome to Pro!</div>
+    <div class="success-sub">All features unlocked forever on this device.</div>
+    <div class="success-feats">
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>Full itineraries</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>Budget tracker</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>WhatsApp share</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>Packing list</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>Compare table</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>Visa details</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>AI enhancement</div>
+      <div class="suc-f"><span class="suc-ck">&#10003;</span>Unlimited</div>
+    </div>
+    <button class="success-close" onclick="closeSuccess()">Start exploring &rarr;</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal modal-lg">
+    <button class="modal-close" onclick="closeSettings()">&#215;</button>
+    <div class="modal-head" style="text-align:left;padding:16px 20px 12px">
+      <div class="modal-title" style="font-size:17px">&#9881; Settings</div>
+      <div class="modal-sub">AI provider (optional) &bull; API keys &bull; Payments</div>
+    </div>
+    <div class="modal-body">
+      <div class="key-section">
+        <div class="key-sec-title">AI Mode <small style="font-size:10px;font-weight:400;color:var(--t3);text-transform:none;letter-spacing:0">&mdash; Smart Search works without any key</small></div>
+        <div class="prov-select">
+          <button class="prov-btn on" data-p="smart" onclick="setProv('smart')"><span class="pn">&#127760; Smart Search</span><span class="ps ps-free">No key &bull; Always works</span></button>
+          <button class="prov-btn" data-p="gemini" onclick="setProv('gemini')"><span class="pn">&#10024; Gemini Flash</span><span class="ps ps-free">Google &bull; Free tier</span></button>
+          <button class="prov-btn" data-p="groq" onclick="setProv('groq')"><span class="pn">&#10024; Llama 3 (Groq)</span><span class="ps ps-free">Groq &bull; Free tier</span></button>
+          <button class="prov-btn" data-p="openrouter" onclick="setProv('openrouter')"><span class="pn">&#128640; OpenRouter</span><span class="ps ps-free">1 key &bull; many FREE models</span></button>
+          <button class="prov-btn" data-p="mistral" onclick="setProv('mistral')"><span class="pn">&#127467;&#127479; Mistral</span><span class="ps ps-free">Free tier</span></button>
+          <button class="prov-btn" data-p="anthropic" onclick="setProv('anthropic')"><span class="pn">&#10024; Claude Sonnet</span><span class="ps ps-paid">Anthropic &bull; $0.023/req</span></button>
+        </div>
+      </div>
+      <div class="key-section">
+        <div class="key-sec-title">API Keys <small style="font-size:10px;font-weight:400;color:var(--t3);text-transform:none;letter-spacing:0">&mdash; adds AI-enhanced descriptions to results</small></div>
+        <div id="tabPickWrap"></div>
+        <div id="keyBoxes"></div>
+
+      </div>
+
+      <!-- Owner setup moved to the Admin console (Config tab) — nothing here for users to fill. -->
+    </div>
+  </div>
+</div>
+
+
+<script src="destination-photos.js" defer></script>
+<script src="tusk-data.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
