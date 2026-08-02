@@ -905,3 +905,7 @@ html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after{an
 .money-exp{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .money-settle{font-size:14px;padding:8px 11px;background:rgba(232,186,108,.08);border-radius:9px;margin-bottom:6px}
 .money-square{font-size:13px;color:#4ADE80;padding:8px 0}
+
+/* ===== TEXT + ICON SIZE SCALING ===== */
+.rwi{transform:scale(var(--rw-icon-scale,1))}
+.tabbar button .ti{transform:scale(var(--rw-icon-scale,1))}
