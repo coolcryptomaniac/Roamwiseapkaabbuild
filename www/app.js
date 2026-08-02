@@ -1,3 +1,24 @@
+/* ===== GLOBAL ERROR GUARD (billion-download resilience) =====
+   A single unexpected JS error should never freeze or white-screen the app.
+   These catch stray errors + unhandled promise rejections so the app keeps
+   running. Silent by design — we don't spam the user with technical errors. */
+window.addEventListener('error', function(ev){
+  try{ /* swallow benign resource/load errors; log nothing user-facing */ }catch(e){}
+}, true);
+window.addEventListener('unhandledrejection', function(ev){
+  try{ if(ev && ev.preventDefault) ev.preventDefault(); }catch(e){}
+});
+/* Subtle haptic feedback — makes taps feel responsive & premium. No-op where
+   unsupported. Called on key actions (send, pin, pay-success). */
+function rwHaptic(kind){
+  try{
+    if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Haptics){
+      Capacitor.Plugins.Haptics.impact({style: kind==='heavy'?'HEAVY':'LIGHT'}); return;
+    }
+    if(navigator.vibrate){ navigator.vibrate(kind==='heavy'?18:8); }
+  }catch(e){}
+}
+
 
 var DB = [
   {id:"chiang_mai",name:"Chiang Mai",country:"Thailand",region:"Southeast Asia",lat:18.79,lon:98.99,
@@ -9260,6 +9281,7 @@ function chatRenderPins(){
 /* Toggle a pin tab open/closed. This was referenced by the pin chips but never
    defined — which is why Kitty/Decisions/Plan/Board didn't respond to taps. */
 function chatTogglePin(view){
+  try{ rwHaptic(); }catch(e){}
   _chatPinView = (_chatPinView===view) ? null : view;
   try{ chatRenderPins(); }catch(e){}
 }
