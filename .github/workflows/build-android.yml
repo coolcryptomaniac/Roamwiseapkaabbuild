@@ -27,6 +27,9 @@ jobs:
       - name: Sync web assets into Android project
         run: npx cap sync android
 
+      - name: Generate app icons & splash (real RoamWise icon, not placeholder)
+        run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
+
       - name: Ensure location permission in manifest
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
@@ -43,10 +46,7 @@ jobs:
           cat >> android/app/build.gradle <<'GRADLE'
 
           android {
-          compileSdk 36
               defaultConfig {
-              minSdk 24
-              targetSdk 36
                   versionCode 81
                   versionName "16.4"
               }
