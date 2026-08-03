@@ -12089,9 +12089,13 @@ function tuskSpeak(text){
   var say = tuskSpeakable(text);
   if(!say) return;
   if(window.RW && typeof RW.speak==='function'){ try{ RW.speak(say); return; }catch(e){} }
+  /* Capacitor Text-to-Speech plugin (works in the app where WebView speechSynthesis often doesn't) */
+  if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.TextToSpeech){
+    try{ Capacitor.Plugins.TextToSpeech.speak({ text: say, lang:'en-IN', rate:1.0 }); return; }catch(e){}
+  }
   text = say;
   try{
-    if(!window.speechSynthesis){ showToast('Voice notes need a newer browser \u2014 reading it instead'); return; }
+    if(!window.speechSynthesis){ showToast('\ud83d\udd0a Read-aloud isn\u2019t available here \u2014 the text is on screen above'); return; }
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
     /* slightly slower and lower than default: reads as a wry aside rather than
