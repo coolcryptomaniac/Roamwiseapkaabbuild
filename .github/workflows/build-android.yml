@@ -34,37 +34,35 @@ jobs:
       - name: Generate app icons & splash (real RoamWise icon, not placeholder)
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
-
-
-
       - name: Ensure Tailored RoamWise Permissions (Core App Mechanics Only)
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
           
-          # Clean injection function
           add_perm() {
             local PERM=$1
             grep -q "$PERM" $MANIFEST || \
               sed -i "s#<application#<uses-permission android:name=\"android.permission.$PERM\"/>\n    <application#" $MANIFEST
           }
 
-          # Core Network & Operations
+          # Core Network, Notification & Operation Elements
           add_perm "INTERNET"
           add_perm "ACCESS_NETWORK_STATE"
           add_perm "VIBRATE"
+          add_perm "POST_NOTIFICATIONS"
 
-          # Smart Features (Location & Voice Copilot)
+          # Smart Features (Location & Voice Copilot Speech Engine)
           add_perm "ACCESS_FINE_LOCATION"
           add_perm "ACCESS_COARSE_LOCATION"
           add_perm "RECORD_AUDIO"
 
-          # User Media & Marketing (Journey Cards & Push Engine)
+          # User Media & Journey Cards (Camera + Gallery Storage Links)
           add_perm "CAMERA"
           add_perm "READ_MEDIA_IMAGES"
-          add_perm "POST_NOTIFICATIONS"
 
           echo "---- RoamWise Manifest Verification Complete ----"
           grep -E "permission" $MANIFEST || true
+
+
     
       - name: Decode signing keystore
         run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > android/app/rw.keystore
