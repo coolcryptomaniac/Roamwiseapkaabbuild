@@ -6533,12 +6533,22 @@ var RW_ICON_PATHS = {
    declarations hoist but `var RW_TABS = {...}` does not, so calling
    renderTabbar() inline here silently produced an empty bar. DOMContentLoaded
    fires after all deferred script has executed, which is exactly what we want. */
-document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitBackButton(); }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} });
 /* ===== BACK BUTTON CONFIRMATION (report #4) =====
    In the app, pressing hardware back on the home screen closed instantly. Now:
    if a modal/overlay is open, back closes THAT; on the home screen, back asks to
    confirm exit (double-tap within 2s, or a dialog in Capacitor). */
 var _rwBackArmed=false;
+function rwInitStatusBar(){
+  try{
+    if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.StatusBar){
+      var SB=Capacitor.Plugins.StatusBar;
+      SB.setOverlaysWebView({overlay:false});
+      SB.setStyle({style:'DARK'});
+      SB.setBackgroundColor({color:'#07090F'});
+    }
+  }catch(e){}
+}
 function rwInitBackButton(){
   /* Capacitor hardware back */
   if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.App){

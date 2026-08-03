@@ -738,6 +738,12 @@ html.is-phone .inp,html.is-phone input,html.is-phone select,html.is-phone textar
 html.is-phone .nav-inner{height:50px}
 /* iOS/iPadOS: respect the notch & home indicator via safe-area insets */
 html.os-ios .nav,html.os-ipados .nav{padding-top:env(safe-area-inset-top)}
+/* Safe-area for ALL platforms (Android WebView/Capacitor + PWA) so the top bar
+   never runs under the status bar and the body clears the bottom nav buttons.
+   env() resolves to 0 where there's no inset, so this is safe everywhere. */
+.nav{padding-top:env(safe-area-inset-top)}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.free-bar{padding-top:calc(6px + env(safe-area-inset-top,0px))}
 html.os-ios body,html.os-ipados body{padding-bottom:env(safe-area-inset-bottom)}
 html.os-ios .overlay .sheet,html.os-ipados .overlay .sheet{padding-bottom:calc(env(safe-area-inset-bottom) + 12px)}
 /* Tablets: use the extra width, roomier cards */
