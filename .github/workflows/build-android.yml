@@ -46,11 +46,12 @@ jobs:
           cat >> android/app/build.gradle <<'GRADLE'
 
           android {
+          compileSdk 36
               defaultConfig {
               targetSdk 36
               minSdk 24
-                  versionCode 82
-                  versionName "16.5"
+                  versionCode 83
+                  versionName "16.6"
               }
               signingConfigs {
                   release {
