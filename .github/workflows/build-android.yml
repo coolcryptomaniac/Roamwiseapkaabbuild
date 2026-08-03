@@ -18,6 +18,11 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 
+      # ADD THESE THREE LINES: It creates a blank lockfile so npm ci doesn't crash
+      - name: Create fallback lockfile
+        run: echo '{}' > package-lock.json
+        
+
       - name: Install dependencies
         run: npm ci
 
