@@ -34,14 +34,38 @@ jobs:
       - name: Generate app icons & splash (real RoamWise icon, not placeholder)
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
-      - name: Ensure location permission in manifest
+
+
+
+      - name: Ensure Tailored RoamWise Permissions (Core App Mechanics Only)
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
-          grep -q ACCESS_FINE_LOCATION $MANIFEST || \
-            sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n\n    <application#' $MANIFEST
-          echo "---- permissions now in manifest ----"
-          grep -i location $MANIFEST || true
+          
+          # Clean injection function
+          add_perm() {
+            local PERM=$1
+            grep -q "$PERM" $MANIFEST || \
+              sed -i "s#<application#<uses-permission android:name=\"android.permission.$PERM\"/>\n    <application#" $MANIFEST
+          }
 
+          # Core Network & Operations
+          add_perm "INTERNET"
+          add_perm "ACCESS_NETWORK_STATE"
+          add_perm "VIBRATE"
+
+          # Smart Features (Location & Voice Copilot)
+          add_perm "ACCESS_FINE_LOCATION"
+          add_perm "ACCESS_COARSE_LOCATION"
+          add_perm "RECORD_AUDIO"
+
+          # User Media & Marketing (Journey Cards & Push Engine)
+          add_perm "CAMERA"
+          add_perm "READ_MEDIA_IMAGES"
+          add_perm "POST_NOTIFICATIONS"
+
+          echo "---- RoamWise Manifest Verification Complete ----"
+          grep -E "permission" $MANIFEST || true
+    
       - name: Decode signing keystore
         run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > android/app/rw.keystore
 
