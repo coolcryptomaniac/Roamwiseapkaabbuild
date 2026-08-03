@@ -19,12 +19,11 @@ jobs:
         uses: android-actions/setup-android@v4
 
       # ADD THESE THREE LINES: It creates a blank lockfile so npm ci doesn't crash
-      - name: Create fallback lockfile
-        run: echo '{}' > package-lock.json
+      
         
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Add Android platform
         run: npx cap add android || true
