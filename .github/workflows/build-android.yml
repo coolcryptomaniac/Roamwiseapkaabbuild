@@ -76,8 +76,8 @@ jobs:
               defaultConfig {
               targetSdk 36
               minSdk 24
-                  versionCode 85
-                  versionName "16.8"
+                  versionCode 86
+                  versionName "16.9"
               }
               signingConfigs {
                   release {
