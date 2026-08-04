@@ -58,7 +58,7 @@ jobs:
 
           # User Media & Journey Cards (Camera + Gallery Storage Links)
           add_perm "CAMERA"
-          add_perm "READ_MEDIA_IMAGES"
+          
 
           echo "---- RoamWise Manifest Verification Complete ----"
           grep -E "permission" $MANIFEST || true
