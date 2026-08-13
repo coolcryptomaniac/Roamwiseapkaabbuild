@@ -323,6 +323,59 @@ var ALL_COUNTRIES = ['Afghanistan','Albania','Algeria','Argentina','Armenia','Au
 var LS = localStorage;
 function lsGet(k){ return LS.getItem(k)||''; }
 function lsSet(k,v){ LS.setItem(k,v); }
+
+/* ================= PUSH + LOCAL NOTIFICATIONS (rw-v42) =================
+   PUSH: registers the device with Firebase Cloud Messaging (via Capacitor's
+   push-notifications plugin) and stores the token against the signed-in user.
+   This means notifications can be sent to all users FREE, straight from the
+   Firebase Console's Notification composer \u2014 no custom backend needed.
+   LOCAL: upgrades Tusk's "Remind me" from a setTimeout (dies if the app
+   closes) to a real OS-scheduled notification that fires even when closed.
+   ========================================================================== */
+function rwInitPush(){
+  if(!(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.PushNotifications)) return;
+  var PN=Capacitor.Plugins.PushNotifications;
+  try{
+    PN.checkPermissions().then(function(p){
+      if(p.receive==='granted') return true;
+      return PN.requestPermissions().then(function(r){ return r.receive==='granted'; });
+    }).then(function(ok){
+      if(!ok) return;
+      PN.register();
+      PN.addListener('registration', function(tok){
+        try{ rwSaveDeviceToken(tok.value); }catch(e){}
+      });
+      PN.addListener('registrationError', function(){ /* silent \u2014 push is a bonus, never blocks the app */ });
+      PN.addListener('pushNotificationReceived', function(n){
+        try{ showToast('\ud83d\udce3 '+(n.title||'RoamWise')+(n.body?': '+n.body:'')); }catch(e){}
+      });
+      PN.addListener('pushNotificationActionPerformed', function(){ try{ tabGo('home'); }catch(e){} });
+    }).catch(function(){});
+  }catch(e){}
+}
+function rwSaveDeviceToken(token){
+  if(!token || !user || typeof db==='undefined' || !db) return;
+  db.collection('users').doc(user.uid).set({ pushToken: token, pushTokenAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true}).catch(function(){});
+}
+/* Local notification, upgraded from the old setTimeout-only version. Falls
+   back to the JS timer + chime when running outside the app (web/PWA). */
+function rwLocalNotifySchedule(what, mins){
+  if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.LocalNotifications){
+    var LN=Capacitor.Plugins.LocalNotifications;
+    try{
+      LN.requestPermissions().then(function(){
+        return LN.schedule({ notifications:[{
+          id: Math.floor(Date.now()%1e8),
+          title:'RoamWise reminder', body: what,
+          schedule:{ at: new Date(Date.now()+mins*60000) }
+        }]});
+      });
+      return true;
+    }catch(e){ return false; }
+  }
+  return false;
+}
+
 /* ===== FIRST-LAUNCH WALKTHROUGH (onboarding) =====
    Shows once, introduces the key features, has a Skip option. Report-requested. */
 var RW_ONBOARD=[
@@ -541,7 +594,12 @@ var RW_UI_THEMES = [
   {id:'forest',   name:'Forest',   sub:'Deep green dark', dot:'#0A1410'},
   {id:'daylight', name:'Daylight', sub:'Warm light', dot:'#F7F6F3'},
   {id:'paper',    name:'Paper',    sub:'Sepia reading', dot:'#FBF7EF'},
-  {id:'minimal',  name:'Minimal',  sub:'Clean white', dot:'#FFFFFF'}
+  {id:'minimal',  name:'Minimal',  sub:'Clean white', dot:'#FFFFFF'},
+  /* --- Restyle options (rw-v40). Added as CHOICES so the existing look is
+     untouched — switch freely, nothing else in the app changes. --- */
+  {id:'nova',     name:'Nova',     sub:'Modern violet \u00b7 new', dot:'#7C6BFF'},
+  {id:'sunset',   name:'Sunset',   sub:'Warm coral \u00b7 new', dot:'#FF6B9D'},
+  {id:'crisp',    name:'Crisp',    sub:'Bright & clean \u00b7 new', dot:'#3B5BFF'}
 ];
 function rwSetTheme(id){
   if(id==='midnight'){ document.documentElement.removeAttribute('data-theme'); }
@@ -827,12 +885,35 @@ function fmtMoney(usd){
 })();
 
 var slider = el('budgetSlider');
-slider.addEventListener('input', updateBudget);
-function updateBudget(){
+slider.addEventListener('input', function(){ updateBudget(true); });
+/* BUG FIX (reported by team, Ladakh 40k case): the slider moves in fixed USD
+   steps, so at typical currency rates a single step could jump the DISPLAYED
+   INR value by 4000+, making round numbers like exactly 40,000 nearly
+   impossible to land on by dragging. Fix: a real "type an exact amount" field
+   that's always the source of truth for precision, alongside a finer slider
+   step for anyone who prefers to drag. */
+function updateBudget(fromSlider){
   var v = parseInt(slider.value);
   el('budgetDisplay').innerHTML = v>=10000 ? fmtMoney(10000)+'+' : fmtMoney(v);
   slider.style.setProperty('--pct', ((v-200)/9800*100).toFixed(1)+'%');
+  var cu = CURR.find(function(x){return x.c===AC;}) || {s:'\u20b9', r:1};
+  var ex = el('budgetExact'), sym = el('budgetExactSym');
+  if(sym) sym.textContent = cu.s;
+  if(ex && document.activeElement!==ex){ ex.value = Math.round(v*cu.r); }
 }
+(function(){
+  var ex = el('budgetExact');
+  if(ex){
+    ex.addEventListener('input', function(){
+      var cu = CURR.find(function(x){return x.c===AC;}) || {r:1};
+      var shown = parseFloat(ex.value); if(isNaN(shown) || shown<0) return;
+      var usd = Math.round(shown/cu.r);
+      usd = Math.max(200, Math.min(10000, usd));
+      slider.value = usd;
+      updateBudget(false);
+    });
+  }
+})();
 updateBudget();
 
 el('tagsContainer').addEventListener('click', function(e){
@@ -1687,7 +1768,8 @@ function compareModels(name, days){
   ov.classList.add('open');
   var body=el('cmpBody');
   if(!provs.length){ body.innerHTML='<div class="mode-box">No AI keys yet \u2014 run the 60-second wizard first.</div><button class="rzp-main-btn" onclick="el(\'cmpOverlay\').classList.remove(\'open\');openWizard()">\ud83e\ude84 Open the wizard</button>'; return; }
-  var prompt='Create a compact '+Math.min(days,5)+'-day itinerary for '+name+'. For each day give: a title and one line each for morning, afternoon, evening. Be specific with real place names. Max 140 words total.';
+  var _curSym=(CURR.find(function(x){return x.c===AC;})||{s:'\u20b9'}).s;
+  var prompt='Create a compact '+Math.min(days,5)+'-day itinerary for '+name+'. For each day give: a title and one line each for morning, afternoon, evening. Be specific with real place names. If you mention any cost, use the '+_curSym+' symbol only \u2014 never $ unless '+_curSym+' actually is $. Max 140 words total.';
   body.innerHTML = '<div class="mode-box">Racing '+provs.length+' AI engine'+(provs.length>1?'s':'')+' + the built-in Smart engine on: <b>'+name+'</b>\u2026</div>'
     + provs.map(function(p){ return '<div class="trek" style="margin-bottom:10px"><div class="trek-top"><div class="trek-name">'+p.toUpperCase()+'</div><span class="tbadge hid" id="cmpT_'+p+'">\u23f3</span></div><div style="font-size:11.5px;color:var(--t2);line-height:1.6" id="cmpB_'+p+'">running\u2026</div></div>'; }).join('')
     + '<div class="trek" style="margin-bottom:10px"><div class="trek-top"><div class="trek-name">\u26a1 SMART ENGINE (built-in)</div><span class="tbadge pop">0.0s</span></div><div style="font-size:11.5px;color:var(--t2);line-height:1.6">'+(typeof DAY_TEMPLATES!=='undefined'? DAY_TEMPLATES.slice(0,2).map(function(t,i){return '<b>Day '+(i+1)+' \u2014 '+t.title+':</b> '+t.morning;}).join('<br>')+'<br><i>\u2026instant, offline, zero cost</i>':'')+'</div></div>'
@@ -1937,6 +2019,12 @@ function genPdf(sample){
         .replace(/  +/g,' ').trim(); }
     pdf.text=function(s,x2,y2,o){ return _rawText(clean(s),x2,y2,o); };
     pdf.splitTextToSize=function(s,w){ return _rawSplit(clean(s),w); };
+    function lc(t){ t=String(t||'').trim(); if(!t) return t; return t.charAt(0).toLowerCase()+t.slice(1); }
+    var RW_QUOTES=['Some journeys take you to places. The best ones leave you with stories.',
+      'The best souvenirs are the stories you never planned to collect.',
+      'Years from now, you will not remember every mile. You will remember how it felt.',
+      'Adventure begins where the ordinary ends.',
+      'Every journey ends. The stories never do.'];
     var THT=themeFor(d), THK=THT.key, TH={deep:THT.deep, acc:THT.acc, line:THT.line};
     var GOLD='#C8913E', GOLD2='#E8BA6C', CRIM='#C4302B', INK='#1A1A22', PAP='#F7F3EA', MUT='#6B675C', DARK='#0E1018';
     function wm(){
@@ -1946,9 +2034,35 @@ function genPdf(sample){
         for(var sy=180;sy<760;sy+=200) pdf.text('SAMPLE',300,sy,{align:'center',angle:32}); }
     }
     function page(bg){ pdf.setFillColor(bg||PAP); pdf.rect(0,0,600,800,'F'); }
+    /* Full-bleed scenic background (Kafila-style): the destination photo fills
+       the whole page, darkened with a gradient band so text stays readable
+       wherever it sits. Falls back to the flat theme colour if no photo. */
+    function scenicPage(photo, darkTop, darkBottom){
+      if(!photo){ page(); return; }
+      try{
+        pdf.addImage(photo,'JPEG',0,0,600,800);
+        /* layered translucent bands: darker where text will sit (top+bottom),
+           lighter in the middle so the photo still reads as a photo */
+        var steps=[[0,140,0.72],[110,260,0.38],[540,800,0.72]];
+        if(darkTop===false) steps[0][2]=0.15;
+        if(darkBottom===false) steps[2][2]=0.15;
+        steps.forEach(function(b){
+          pdf.setFillColor(TH.deep[0],TH.deep[1],TH.deep[2]);
+          if(pdf.setGState && pdf.GState){ pdf.setGState(new pdf.GState({opacity:b[2]})); }
+          pdf.rect(0,b[0],600,b[1]-b[0],'F');
+        });
+        if(pdf.setGState && pdf.GState){ pdf.setGState(new pdf.GState({opacity:1})); }
+      }catch(e){ page(); }
+    }
     function frame(){ pdf.setDrawColor(GOLD); pdf.setLineWidth(2); pdf.rect(18,18,564,764); pdf.setLineWidth(.6); pdf.rect(26,26,548,748); }
-    function foot(pn){ pdf.setFillColor(DARK); pdf.rect(18,760,564,22,'F');
-      pdf.setTextColor(GOLD2); pdf.setFontSize(8);
+    function foot(pn){
+      /* Emotional punctuation on every page — the Kafila move. Deterministic
+         per page number so it's stable if the PDF regenerates. */
+      var q=RW_QUOTES[pn%RW_QUOTES.length];
+      pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFont('times','italic'); pdf.setFontSize(9.5);
+      pdf.text('\u201c'+q+'\u201d',300,748,{align:'center'});
+      pdf.setFillColor(DARK); pdf.rect(18,760,564,22,'F');
+      pdf.setFont('helvetica','normal'); pdf.setTextColor(GOLD2); pdf.setFontSize(8);
       pdf.text('\u{1F977} ROAMWISE \u00b7 www.roamwise.co.in \u00b7 crafted for '+name,300,774,{align:'center'});
       pdf.setTextColor('#8A8880'); pdf.text(String(pn),566,774); }
     var pn=1;
@@ -2060,10 +2174,7 @@ function genPdf(sample){
       var imgs=ALL[0], avatar=ALL[1], intel=ALL[2], mapDat=ALL[3];
       var hero=imgs[0], gemPics=imgs.slice(1,4).filter(Boolean), dayPics=imgs.slice(4);
       /* ---------- COVER ---------- */
-      pdf.setFillColor(TH.deep[0],TH.deep[1],TH.deep[2]); pdf.rect(0,0,600,800,'F');
-      if(hero){ try{ pdf.addImage(hero,'JPEG',40,250,520,300);
-        pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(2); pdf.rect(40,250,520,300);
-      }catch(e){} }
+      scenicPage(hero);   /* full-bleed destination photo, darkened top+bottom for text */
       frame();
       drawMotif(pdf,THK,TH.acc,300,150);
       pdf.setTextColor('#B8B4A8'); pdf.setFontSize(10); pdf.text('A  R O A M W I S E   P R E M I U M   I T I N E R A R Y',300,60,{align:'center'});
@@ -2086,6 +2197,54 @@ function genPdf(sample){
         if(PR.bio){ pdf.setFont('times','italic'); pdf.text('"'+String(PR.bio).slice(0,54)+'"',40,118); pdf.setFont('helvetica','normal'); } }
       if(evHit.length){ pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFontSize(10);
         pdf.text('HAPPENING DURING YOUR TRIP: '+evHit.map(function(e){return e.n;}).join('  +  '),300,132,{align:'center'}); }
+      foot(pn);
+      /* ---------- WHY THIS JOURNEY + AT-A-GLANCE (Kafila-style overview page) ---------- */
+      pdf.addPage(); pn++; scenicPage(gemPics[0]||hero); wm(); frame();
+      pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFont('times','bold'); pdf.setFontSize(24);
+      pdf.text('Why this journey?', 300, 62, {align:'center'});
+      pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(1.2); pdf.line(260,72,340,72);
+      var whyLines = [
+        'Not rushed. Not a checklist. '+d.name+', paced the way a good trip should be.',
+        'Every day here has room to breathe \\u2014 real mornings, a slow lunch, an evening',
+        'that doesn\\u2019t feel timed. This is the plan we\\u2019d hand a close friend.'
+      ];
+      pdf.setFont('times','italic'); pdf.setFontSize(13.5); pdf.setTextColor('#F5F2E8');
+      whyLines.forEach(function(ln,li){ pdf.text(ln,300,100+li*20,{align:'center'}); });
+      /* trip snapshot grid */
+      var snapY=190;
+      pdf.setFillColor(TH.deep[0],TH.deep[1],TH.deep[2]); pdf.roundedRect(44,snapY,512,120,10,10,'F');
+      var snaps=[
+        ['DURATION', days+' Days'],
+        ['STYLE', o.pace+' pace'],
+        ['IDEAL FOR', o.party],
+        ['DESTINATION', d.name]
+      ];
+      var sw2=512/snaps.length;
+      snaps.forEach(function(sn,si){
+        var sx=44+sw2*si+sw2/2;
+        pdf.setTextColor(GOLD2); pdf.setFont('helvetica','bold'); pdf.setFontSize(8.5);
+        pdf.text(sn[0], sx, snapY+42, {align:'center'});
+        pdf.setTextColor('#fff'); pdf.setFont('times','bold'); pdf.setFontSize(15);
+        pdf.text(sn[1], sx, snapY+66, {align:'center'});
+        if(si>0){ pdf.setDrawColor(80,80,90); pdf.setLineWidth(.6); pdf.line(44+sw2*si,snapY+20,44+sw2*si,snapY+100); }
+      });
+      /* perfect-for persona row */
+      var perY=snapY+140;
+      pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFont('helvetica','bold'); pdf.setFontSize(9.5);
+      pdf.text('PERFECT FOR', 300, perY, {align:'center'});
+      var personas=['Solo travellers','Couples','Friend groups','Slow-travel souls'];
+      var pw2=512/personas.length;
+      personas.forEach(function(pz,pzi){
+        var px=44+pw2*pzi+pw2/2;
+        /* solid dark fill so the pill reads clearly even on a bright/light
+           patch of the photo — an outline alone isn't enough contrast here */
+        pdf.setFillColor(TH.deep[0],TH.deep[1],TH.deep[2]);
+        pdf.roundedRect(44+pw2*pzi+8, perY+10, pw2-16, 26, 13, 13, 'F');
+        pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(1);
+        pdf.roundedRect(44+pw2*pzi+8, perY+10, pw2-16, 26, 13, 13);
+        pdf.setTextColor('#F5F2E8'); pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5);
+        pdf.text(pz, px, perY+27, {align:'center'});
+      });
       foot(pn);
       /* ---------- MAP & PINS PAGE ---------- */
       if(mapDat){
@@ -2135,27 +2294,50 @@ function genPdf(sample){
         try{ drawMotif(pdf,THK,TH.acc,505,58); }catch(e){}
         if(i===0 && notes){ pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFontSize(9);
           pdf.text('Special focus: '+notes, 100, 82); }
-        /* timeline */
-        var slots=[
-          ['07:30','\u2600\ufe0f Sunrise start', A? 'Beat every crowd \u2014 golden light + empty streets before the day begins.' : 'Sunrise walk \u2014 the city belongs to you for one hour.'],
-          ['09:00','\ud83c\udfdb Morning', (A&&A.morning)||T2.morning||'Headline sight at opening time.'],
-          ['11:30','\u2615 Pause', 'Coffee/chai stop \u2014 pick the busiest local caf\u00e9 you can find; busy = good.'],
-          ['13:30','\ud83c\udf7d Lunch + afternoon', (A&&A.afternoon)||T2.afternoon||'Neighbourhood deep-dive after a local lunch.'],
-          ['16:30','\ud83d\udcf8 Golden hour', 'Viewpoint or waterfront for the light; photos now, shopping after dark.'],
-          ['19:00','\ud83c\udf19 Evening', (A&&A.evening)||T2.evening||'Food street dinner \u2014 order what the longest queue orders.']
-        ];
-        var dp=dayPics[i], TXW=452;
-        if(dp){ try{ pdf.addImage(dp,'JPEG',384,102,172,116);
-          pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(1.5); pdf.rect(384,102,172,116); TXW=286; }catch(e){ TXW=452; dp=null; } }
-        var y=112; pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(1.4); pdf.line(58,y-4,58,y+slots.length*58-26);
-        slots.forEach(function(sg,si){
-          pdf.setFillColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.circle(58,y+6,4,'F');
-          pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFont('helvetica','bold'); pdf.setFontSize(10.5); pdf.text(sg[0],74,y);
-          pdf.setTextColor(INK); pdf.text(sg[1],112,y);
-          pdf.setFont('helvetica','normal'); pdf.setFontSize(11);
-          pdf.text(pdf.splitTextToSize(sg[2], (si<2&&dp)? TXW:452),74,y+15);
-          y+=58;
+        /* ---- NARRATIVE DAY (Kafila-style): story prose, then highlights,
+               then what's included today. A schedule tells; a story sells. ---- */
+        var mor=(A&&A.morning)||T2.morning||'the headline sight, at opening time';
+        var aft=(A&&A.afternoon)||T2.afternoon||'a neighbourhood deep-dive after a local lunch';
+        var eve=(A&&A.evening)||T2.evening||'a food street dinner where the queue is longest';
+        var dayNarr = (i===0)
+          ? 'The journey begins today. After settling in, we ease into '+lc(mor)+'. '
+            +'By afternoon, '+lc(aft)+'. As the light softens, '+lc(eve)+' \u2014 a gentle first taste of '+d.name+'.'
+          : 'After breakfast, we set out for '+lc(mor)+'. '
+            +'The afternoon opens up into '+lc(aft)+'. '
+            +'As evening settles over '+d.name+', '+lc(eve)+'.';
+        var dp=dayPics[i], TXW=452, ty=112;
+        if(dp){ try{ pdf.addImage(dp,'JPEG',384,102,172,132);
+          pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(1.5); pdf.rect(384,102,172,132); TXW=300; }catch(e){ TXW=452; dp=null; } }
+        /* the story */
+        pdf.setTextColor(INK); pdf.setFont('times','normal'); pdf.setFontSize(12.5);
+        var narrLines=pdf.splitTextToSize(dayNarr, TXW);
+        pdf.text(narrLines, 58, ty+6); ty += narrLines.length*17 + 16;
+        if(dp && ty < 250) ty = 250;
+        /* TODAY'S HIGHLIGHTS */
+        pdf.setFillColor(TH.deep[0],TH.deep[1],TH.deep[2]);
+        pdf.roundedRect(44,ty,512,2,1,1,'F');
+        ty += 16;
+        pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFont('helvetica','bold'); pdf.setFontSize(9.5);
+        pdf.text('TODAY\u2019S HIGHLIGHTS', 58, ty); ty += 16;
+        var hi=[['\u25c6', firstPlace(mor)||'Morning exploration', 'Best light, fewest people'],
+                ['\u25c6', firstPlace(aft)||'Afternoon discovery', 'The unhurried middle of the day'],
+                ['\u25c6', firstPlace(eve)||'Evening in '+d.name, 'Where the day slows down']];
+        hi.forEach(function(h){
+          pdf.setTextColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+          pdf.text(h[0], 58, ty);
+          pdf.setTextColor(INK); pdf.setFontSize(11); pdf.text(h[1], 72, ty);
+          pdf.setTextColor(MUT); pdf.setFont('helvetica','normal'); pdf.setFontSize(9.5);
+          pdf.text(h[2], 72, ty+12);
+          ty += 30;
         });
+        /* INCLUDED TODAY strip — concrete reassurance, the Kafila trust move */
+        ty += 4;
+        pdf.setFillColor(TH.deep[0],TH.deep[1],TH.deep[2]); pdf.roundedRect(44,ty,512,40,7,7,'F');
+        pdf.setTextColor(GOLD2); pdf.setFont('helvetica','bold'); pdf.setFontSize(8.5);
+        pdf.text('INCLUDED TODAY', 60, ty+15);
+        pdf.setTextColor('#D8D4C8'); pdf.setFont('helvetica','normal'); pdf.setFontSize(9.5);
+        pdf.text('Day plan & routing  \u00b7  Local food picks  \u00b7  Offline map pins  \u00b7  Budget guidance', 60, ty+29);
+        ty += 52;
         /* food + tip + budget band */
         var fd=(A&&A.food)||((d.food||[])[i%Math.max(1,(d.food||[]).length)]||'');
         pdf.setFillColor('#F3E2C0'); pdf.roundedRect(44,y-8,512,58,7,7,'F');
@@ -5540,6 +5722,10 @@ function buildItin(T, name, costMid, days){
       var acc = DAY_ACCENTS[i%DAY_ACCENTS.length];
       var glow = 'rgba('+parseInt(acc.slice(1,3),16)+','+parseInt(acc.slice(3,5),16)+','+parseInt(acc.slice(5,7),16)+',.16)';
       var segs = '';
+      var narrOpen = (i===0)
+        ? 'The journey begins here \u2014 settle in, then let '+(day.title||'today')+' unfold.'
+        : 'Day '+day.day+' opens into '+(day.title||'more of the trip')+'.';
+      segs += '<div class="day-narr" style="font-style:italic;color:var(--t2);font-size:12.5px;padding:2px 0 10px;border-bottom:1px dashed var(--b2,#2A2A36);margin-bottom:10px">'+narrOpen+'</div>';
       if(day.morning) segs += '<div class="day-seg"><div class="seg-time"><span class="seg-ic">\u{1F305}</span>Morning</div><div class="seg-desc">'+day.morning+'</div></div>';
       if(day.afternoon) segs += '<div class="day-seg"><div class="seg-time"><span class="seg-ic">\u2600\uFE0F</span>Afternoon</div><div class="seg-desc">'+day.afternoon+'</div></div>';
       if(day.evening) segs += '<div class="day-seg"><div class="seg-time"><span class="seg-ic">\u{1F306}</span>Evening</div><div class="seg-desc">'+day.evening+'</div></div>';
@@ -5548,7 +5734,9 @@ function buildItin(T, name, costMid, days){
         + '<div class="day-body" id="'+did+'"><div>'+segs+'</div>'+(day.tip?'<div class="day-tip">\u{1F4A1} '+day.tip+'</div>':'')+'</div></div>';
     }).join('');
     try{ badgeBump('trip'); }catch(e){}
-    cnt.innerHTML = (srcBadge||'') + H
+    var whyBanner = '<div style=\"text-align:center;padding:16px 14px;margin-bottom:14px;border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:14px;background:var(--bg2,#12151F)\">'
+      +'<div style=\"font-style:italic;color:var(--t1,#EDEAE2);font-size:13.5px;line-height:1.6\">Not rushed. Not a checklist. <b>'+esc2(name)+'</b>, paced the way a good trip should be.</div></div>';
+    cnt.innerHTML = (srcBadge||'') + whyBanner + H
       + rwGreenNudge(name, days)
       + '<button class="tact" style="display:block;width:100%;margin-top:12px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="openTripMap(window._lastItin?_lastItin.name:\'\',null)">\ud83d\uddfa\ufe0f See this trip on a map</button>'
       + '<button class="tact" style="display:block;width:100%;margin-top:8px;font-weight:800" onclick="openJourneyCert()">\ud83c\udfc5 Mint journey certificate</button>'
@@ -6615,7 +6803,7 @@ var RW_ICON_PATHS = {
    declarations hoist but `var RW_TABS = {...}` does not, so calling
    renderTabbar() inline here silently produced an empty bar. DOMContentLoaded
    fires after all deferred script has executed, which is exactly what we want. */
-document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} });
 /* ===== BACK BUTTON CONFIRMATION (report #4) =====
    In the app, pressing hardware back on the home screen closed instantly. Now:
    if a modal/overlay is open, back closes THAT; on the home screen, back asks to
@@ -7714,6 +7902,7 @@ function copilotSend(fromHero){
         +'CONFLICT/INDECISION: if people want different things, name the split, give each option its honest best case in one line, then recommend one with a reason \u2014 decisiveness with warmth beats fence-sitting. '
         +'NEVER INVENT: no made-up prices, timings, phone numbers, hotel names or distances. If you do not know or the guide text does not say, say \u201cI\u2019m not certain \u2014 worth checking before you book\u201d and give the safest general guidance instead. A wrong specific is far worse than an honest gap. If the question is ambiguous, ASK ONE short clarifying question with 2-3 concrete options rather than guessing. Never invent facts to sound dramatic; if you are unsure, say so plainly with a grin. Do NOT quote real Bollywood dialogues or put words in real actors\u2019 mouths \u2014 use your own filmi-flavoured lines. '
         +'Read the user intent and mood: if they sound excited, match it; if stressed or on a tight budget, be reassuring and practical, not theatrical. '
+        +'MONEY: the user\u2019s selected currency is '+((CURR.find(function(x){return x.c===AC;})||{s:'\u20b9',c:'INR'}).s)+' ('+AC+'). Always give prices in that symbol, never $ unless AC is literally USD. '
         +'Prefer the verified guide text below over your own recollection; if it contradicts you, trust it. No markdown headers, no bullet spam.\n'
         +facts+(hist? 'Conversation so far:\n'+hist+'\n':'')+'User: '+t+'\nCopilot:';
       aiCallAny(prompt, 260, function(err, txt){
@@ -7765,6 +7954,139 @@ function copilotSend(fromHero){
       }).catch(function(){ cpFinish(thinking, _keyPrompt, intents, t); });
     }
   }
+}
+
+
+/* ================= SMART TRAVEL MATCHING ENGINE (rw-v40) =================
+   Matches people by travel INTENT — founders, investors, creators and
+   travellers heading to similar places at similar times. Cross-device via
+   Firestore so it works between real people, not just on one phone.
+   Scoring is transparent (you can see WHY you matched), which beats a
+   black-box "compatibility %" nobody trusts. */
+var RW_MATCH_ROLES=[
+  {id:'founder',  label:'\ud83d\ude80 Founder',   why:'building something'},
+  {id:'investor', label:'\ud83d\udcbc Investor',  why:'looking at deals'},
+  {id:'creator',  label:'\ud83c\udfa5 Creator',   why:'making content'},
+  {id:'engineer', label:'\ud83d\udcbb Engineer',  why:'building / remote work'},
+  {id:'traveller',label:'\ud83c\udf0d Traveller', why:'just exploring'}
+];
+var RW_MATCH_INTENT=[
+  {id:'cofound',  label:'Meet co-founders'},
+  {id:'raise',    label:'Meet investors'},
+  {id:'invest',   label:'Meet founders to back'},
+  {id:'collab',   label:'Creative collabs'},
+  {id:'buddies',  label:'Travel buddies'},
+  {id:'work',     label:'Co-work / remote'}
+];
+function openMatchEngine(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('matchSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='matchSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  var me=rwMatchProfile();
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83e\udd1d Travel <em>matching</em></h2>'
+    +'<button class="tact" onclick="el(\'matchSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Find founders, investors, creators and travellers heading where you\u2019re heading. You choose what to share \u2014 nothing is public until you post it.</p>'
+    +'<div id="matchBody"></div>';
+  rwMatchRender(me);
+}
+function rwMatchProfile(){ try{ return JSON.parse(lsGet('rw_match_me')||'null'); }catch(e){ return null; } }
+function rwMatchRender(me){
+  var host=el('matchBody'); if(!host) return;
+  if(!me){
+    host.innerHTML='<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:18px;text-align:center">'
+      +'<div style="font-size:34px;margin-bottom:6px">\ud83e\udded</div>'
+      +'<div style="font-weight:800;margin-bottom:4px">Set up your travel card</div>'
+      +'<div style="font-size:13px;color:var(--t2);margin-bottom:14px">Takes 20 seconds. Say who you are and where you\u2019re headed \u2014 we\u2019ll surface people going the same way.</div>'
+      +'<button class="tact" style="font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:12px 20px" onclick="rwMatchSetup()">Create my card</button></div>';
+    return;
+  }
+  var role=RW_MATCH_ROLES.filter(function(r){return r.id===me.role;})[0]||RW_MATCH_ROLES[4];
+  host.innerHTML='<div style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:15px;margin-bottom:14px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'
+    +'<div><div style="font-weight:800;font-size:15px">'+role.label+'</div>'
+    +'<div style="font-size:12.5px;color:var(--t2);margin-top:3px">Heading to <b>'+esc2(me.dest||'anywhere')+'</b>'+(me.when?' \u00b7 '+esc2(me.when):'')+'</div>'
+    +'<div style="font-size:11.5px;color:var(--t3);margin-top:3px">'+esc2((me.intents||[]).map(function(i){var f=RW_MATCH_INTENT.filter(function(x){return x.id===i;})[0];return f?f.label:i;}).join(' \u00b7 '))+'</div></div>'
+    +'<button class="tact" style="padding:5px 10px;font-size:11px" onclick="rwMatchSetup()">Edit</button></div></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+    +'<button class="tact" style="flex:1;min-width:140px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwMatchPost()">\ud83d\udce3 Post my card</button>'
+    +'<button class="tact" style="flex:1;min-width:140px" onclick="rwMatchFind()">\ud83d\udd0d Find matches</button></div>'
+    +'<div id="matchResults"></div>';
+}
+function rwMatchSetup(){
+  var me=rwMatchProfile()||{};
+  var roleOpts=RW_MATCH_ROLES.map(function(r){ return {v:r.id, t:r.label}; });
+  rwForm('\ud83e\udded Your travel card', [
+    {key:'role', label:'I am a\u2026 ('+RW_MATCH_ROLES.map(function(r){return r.id;}).join(' / ')+')', value:me.role||'traveller'},
+    {key:'dest', label:'Heading to (city or region)', value:me.dest||'', placeholder:'e.g. Bangalore, Goa, Bali'},
+    {key:'when', label:'Roughly when?', value:me.when||'', placeholder:'e.g. Sep 2026'},
+    {key:'about', label:'One line about you', value:me.about||'', placeholder:'e.g. building a travel app, open to co-founders'},
+    {key:'contact', label:'How should matches reach you?', value:me.contact||'', placeholder:'email or @handle'}
+  ], function(v){
+    var prof={role:(v.role||'traveller').toLowerCase().trim(), dest:v.dest||'', when:v.when||'',
+              about:v.about||'', contact:v.contact||'', intents:me.intents||['buddies']};
+    try{ lsSet('rw_match_me', JSON.stringify(prof)); }catch(e){}
+    rwMatchRender(prof); showToast('Travel card saved');
+  });
+}
+/* Post my card so others can find me. Opt-in and explicit. */
+function rwMatchPost(){
+  var me=rwMatchProfile(); if(!me){ rwMatchSetup(); return; }
+  if(!me.dest){ showToast('Add a destination first'); return; }
+  if(!user){ showToast('Sign in first so matches can reach you'); return; }
+  if(typeof db==='undefined' || !db){ showToast('Connect to the internet to post your card'); return; }
+  db.collection('squads').add({
+    key:'match:'+(me.dest||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,24),
+    kind:'match', role:me.role, dest:me.dest, when:me.when, about:me.about,
+    contact:me.contact, intents:me.intents||[],
+    name:(user.displayName||'Traveller'), uid:user.uid,
+    created: firebase.firestore.FieldValue.serverTimestamp(),
+    expireAt: firebase.firestore.Timestamp.fromMillis(Date.now()+60*24*60*60*1000)
+  }).then(function(){ showToast('\ud83d\udce3 Card posted \u2014 people heading to '+me.dest+' can find you'); })
+    .catch(function(){ showToast('Could not post right now \u2014 try again'); });
+}
+/* Find people going the same way. Transparent scoring: you see WHY. */
+function rwMatchFind(){
+  var me=rwMatchProfile(); if(!me||!me.dest){ showToast('Set your destination first'); return; }
+  var host=el('matchResults'); if(host) host.innerHTML='<div class="note">\ud83d\udd0d Looking for people heading to '+esc2(me.dest)+'\u2026</div>';
+  if(typeof db==='undefined' || !db){ if(host) host.innerHTML='<div class="note">You\u2019re offline \u2014 matching needs a connection.</div>'; return; }
+  var key='match:'+(me.dest||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,24);
+  db.collection('squads').where('key','==',key).limit(30).get().then(function(qs){
+    var rows=[];
+    qs.forEach(function(d){ var x=d.data()||{}; if(x.uid!==(user&&user.uid)) rows.push(x); });
+    rwMatchShow(rows, me);
+  }).catch(function(){ if(host) host.innerHTML='<div class="note">Couldn\u2019t search right now \u2014 try again in a moment.</div>'; });
+}
+function rwMatchScore(them, me){
+  var pts=0, why=[];
+  if((them.dest||'').toLowerCase()===(me.dest||'').toLowerCase()){ pts+=3; why.push('same destination'); }
+  if(them.when && me.when && them.when.toLowerCase()===me.when.toLowerCase()){ pts+=2; why.push('same dates'); }
+  var mine=me.intents||[], theirs=them.intents||[];
+  var shared=mine.filter(function(i){ return theirs.indexOf(i)>=0; });
+  if(shared.length){ pts+=shared.length; why.push('both want '+shared.length+' of the same thing'+(shared.length>1?'s':'')); }
+  /* complementary pairs are the valuable ones */
+  var comp=[['founder','investor'],['investor','founder'],['founder','engineer'],['creator','founder']];
+  comp.forEach(function(c){ if(me.role===c[0] && them.role===c[1]){ pts+=3; why.push('complementary roles'); } });
+  return {pts:pts, why:why};
+}
+function rwMatchShow(rows, me){
+  var host=el('matchResults'); if(!host) return;
+  if(!rows.length){ host.innerHTML='<div class="note" style="text-align:center;padding:18px;color:var(--t3)">No one has posted for '+esc2(me.dest)+' yet. Post your card \u2014 be the first, and others will find you.</div>'; return; }
+  var scored=rows.map(function(r){ var s=rwMatchScore(r, me); return {r:r, s:s}; })
+                 .sort(function(a,b){ return b.s.pts-a.s.pts; });
+  host.innerHTML='<div style="font-size:12px;color:var(--t3);margin-bottom:8px">'+scored.length+' heading the same way</div>'
+    + scored.map(function(x){
+      var r=x.r, role=RW_MATCH_ROLES.filter(function(q){return q.id===r.role;})[0]||RW_MATCH_ROLES[4];
+      return '<div style="border:1px solid var(--b2,#2A2A36);border-radius:13px;padding:13px;margin-bottom:9px;background:var(--bg2,#12151F)">'
+        +'<div style="display:flex;justify-content:space-between;gap:8px"><div style="font-weight:800;font-size:14px">'+role.label+' \u00b7 '+esc2(r.name||'Traveller')+'</div>'
+        +'<div style="font-size:11px;color:var(--gold,#E8BA6C);font-weight:800">'+x.s.pts+' pts</div></div>'
+        +(r.about?'<div style="font-size:13px;color:var(--t2);margin-top:4px">'+esc2(r.about)+'</div>':'')
+        +'<div style="font-size:11px;color:var(--t3);margin-top:4px">'+esc2(r.dest||'')+(r.when?' \u00b7 '+esc2(r.when):'')+'</div>'
+        +(x.s.why.length?'<div style="font-size:11px;color:#4ADE80;margin-top:5px">\u2713 '+esc2(x.s.why.join(' \u00b7 '))+'</div>':'')
+        +(r.contact?'<div style="margin-top:8px"><a class="tact" style="padding:6px 12px;font-size:12px;text-decoration:none" href="'+(r.contact.indexOf('@')>=0&&r.contact.indexOf(' ')<0&&r.contact.indexOf('.')>0?'mailto:'+esc2(r.contact):'#')+'">\u2709\ufe0f '+esc2(r.contact)+'</a></div>':'')
+        +'</div>';
+    }).join('');
 }
 
 /* ================= TUSK RICH REPLY SYSTEM (rw-v38) =================
@@ -7869,9 +8191,13 @@ function rwRemindSet(what, mins){
   var when=Date.now()+mins*60000;
   var list=[]; try{ list=JSON.parse(lsGet('rw_reminders')||'[]'); }catch(e){}
   list.push({what:what, at:when}); try{ lsSet('rw_reminders', JSON.stringify(list.slice(-40))); }catch(e){}
-  try{ if(window.Notification && Notification.permission==='default') Notification.requestPermission(); }catch(e){}
-  setTimeout(function(){ rwRemindFire(what); }, mins*60000);
-  showToast('\u23f0 Reminder set for '+mins+' min from now');
+  /* real OS-scheduled notification (survives the app being closed) */
+  var native=false; try{ native=rwLocalNotifySchedule(what, mins); }catch(e){}
+  if(!native){
+    try{ if(window.Notification && Notification.permission==='default') Notification.requestPermission(); }catch(e){}
+    setTimeout(function(){ rwRemindFire(what); }, mins*60000);
+  }
+  showToast('\u23f0 Reminder set for '+mins+' min from now'+(native?' (works even if you close the app)':''));
 }
 function rwRemindFire(what){
   try{
