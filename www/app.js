@@ -6803,7 +6803,7 @@ var RW_ICON_PATHS = {
    declarations hoist but `var RW_TABS = {...}` does not, so calling
    renderTabbar() inline here silently produced an empty bar. DOMContentLoaded
    fires after all deferred script has executed, which is exactly what we want. */
-document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} try{ setTimeout(rwInitWebPush, 2200); }catch(e){} });
 /* ===== BACK BUTTON CONFIRMATION (report #4) =====
    In the app, pressing hardware back on the home screen closed instantly. Now:
    if a modal/overlay is open, back closes THAT; on the home screen, back asks to
@@ -7956,6 +7956,961 @@ function copilotSend(fromHero){
   }
 }
 
+
+
+
+
+
+
+
+/* ================= HOW-TO GUIDE with voice narration (rw-v46) =============
+   An interactive, step-by-step walkthrough of every major feature, with real
+   voice narration via the device speech engine (tuskSpeak). No video files —
+   this narrates live, works offline-ish, and stays in sync if features change.
+   ========================================================================== */
+var RW_GUIDE=[
+  {id:'tusk', icon:'\u26a1', title:'Ask Ailon Tusk anything',
+   steps:['Type how you actually talk \u2014 "chill 4 days near Rishikesh under 12k".',
+          'Tusk replies, then gives you buttons: map it, plan it, budget it, remind me.',
+          'Vague question? Tusk asks you one thing back instead of guessing.'],
+   say:'Start with Ailon Tusk. Type your trip the way you would say it out loud. For example: chill four days near Rishikesh under twelve thousand. Tusk answers, then offers buttons to map it, plan it, or set a reminder. If your question is too vague, Tusk asks you one short question instead of inventing an answer.',
+   go:'tabGo(\'copilot\')'},
+  {id:'arrival', icon:'\ud83d\ude82', title:'Arrival mode \u2014 your ticket starts the trip',
+   steps:['Booked a train? Enter the station you land at and the time.',
+          'You get advice for that exact hour \u2014 landing at 3am is different from 3pm.',
+          'Then: an itinerary built around your arrival, plus what\u2019s near the station.'],
+   say:'Arrival mode turns a train ticket into a trip. Enter the station you arrive at and the time you land. RoamWise gives you advice for that exact hour, because arriving at three in the morning needs a very different plan from arriving at three in the afternoon. Then it builds an itinerary around your arrival and shows you what is near the station.',
+   go:'openArrival()'},
+  {id:'group', icon:'\ud83d\udc65', title:'Plan with friends without the chaos',
+   steps:['Open a trip chat and invite the group.',
+          'Tap "When can everyone go?" \u2014 everyone marks their free windows, best overlap wins.',
+          '"Pick a train" lets everyone vote, then splits the fare automatically.',
+          'Add expenses as you go \u2014 the kitty settles who owes whom, to the rupee.'],
+   say:'Group trips die in long chat threads. In a RoamWise trip chat, tap When can everyone go, and everyone marks the dates that work. The best overlap wins automatically. Pick a train lets the group vote on options, and when you lock one, the fare is split for everyone straight away. Add expenses as you travel and the kitty works out exactly who owes whom.',
+   go:'tabGo(\'trips\')'},
+  {id:'beacon', icon:'\ud83d\udce1', title:'Beacon \u2014 find your people nearby',
+   steps:['Light your beacon and pick your tags: founder, artist, runner, yoga.',
+          'You see others lit within about a kilometre, shared interests highlighted.',
+          'Your exact location never leaves your phone \u2014 it\u2019s blurred to an area.',
+          'Beacons switch off by themselves after two hours. Go dark any time.'],
+   say:'Beacon helps you find your people wherever you land. Light your beacon and choose your tags, like founder, artist, runner, or yoga. You will see others who are lit within about a kilometre, with shared interests highlighted. Your exact location never leaves your phone. We blur it to a rough area first, beacons switch themselves off after two hours, and you can go dark at any time.',
+   go:'openBeacon()'},
+  {id:'passport', icon:'\ud83d\udee1\ufe0f', title:'Journey Passport \u2014 verified proof',
+   steps:['After a trip, stamp it. You get a permanent ID like RW-M3X7K-QP4TZ.',
+          'Anyone can check it at roamwise.co.in/verify.html.',
+          'It is a real record in the RoamWise network, not an editable image.'],
+   say:'The Journey Passport is verified proof of where you have actually been. After a trip, stamp it, and you get a permanent identifier. Anyone can check that identifier on the RoamWise verify page. Unlike a photo or a certificate, it cannot be edited, because it is a real record in the RoamWise network.',
+   go:'openPassport()'},
+  {id:'realms', icon:'\u2694\ufe0f', title:'Realms of Roam \u2014 the game',
+   steps:['Swear to a house: Himalaya, Tidewater, Ember, Verdant or Stonewatch.',
+          'Seven realms across India. The only way to claim one is to really go there.',
+          'Stamp a verified journey and the realm turns your house\u2019s colour.',
+          'No grinding, no shortcuts \u2014 real travel is the only move.'],
+   say:'Realms of Roam is a conquest game where the board is the real map of India. Swear to a house, then claim territory by actually travelling. The only way to take a realm is to go there and stamp a verified journey. You cannot grind it or buy it. Real travel is the only move in this game.',
+   go:'openRealms()'},
+  {id:'nearme', icon:'\ud83d\udccd', title:'Near me & Tatkal prep',
+   steps:['Near me finds food and sights around you, widening if the area is quiet.',
+          'Tatkal prep gives you a live countdown to the 10am and 11am windows.',
+          'Save passengers once and copy them in instead of typing under pressure.'],
+   say:'Near me finds food, sights and things to do around you, and widens the search automatically if you are somewhere quiet. Tatkal prep gives you a live countdown to the ten and eleven o clock booking windows, and lets you save your passengers once so you can paste them in instead of typing under pressure. RoamWise never logs into I R C T C for you, because automating it can get your account banned.',
+   go:'openNearMe()'}
+];
+function openGuide(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('guideSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='guideSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83c\udf93 How to use <em>RoamWise</em></h2>'
+    +'<button class="tact" onclick="rwGuideStop();el(\'guideSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Every feature, step by step \u2014 with narration if you\u2019d rather listen than read.</p>'
+    +'<button class="tact" style="width:100%;margin-bottom:14px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:13px" onclick="rwGuidePlayAll()">\ud83c\udfa7 Play the whole walkthrough</button>'
+    + RW_GUIDE.map(function(g,i){
+        return '<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:15px;margin-bottom:11px">'
+          +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+          +'<span style="font-size:24px">'+g.icon+'</span>'
+          +'<b style="flex:1;font-size:14.5px">'+g.title+'</b>'
+          +'<span style="font-size:11px;color:var(--t3)">'+(i+1)+'/'+RW_GUIDE.length+'</span></div>'
+          + g.steps.map(function(st,si){
+              return '<div style="display:flex;gap:9px;margin-bottom:6px">'
+                +'<span style="flex:0 0 18px;height:18px;border-radius:50%;background:var(--gold,#E8BA6C);color:#0A0A0C;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center">'+(si+1)+'</span>'
+                +'<span style="flex:1;font-size:12.5px;color:var(--t2);line-height:1.55">'+st+'</span></div>';
+            }).join('')
+          +'<div style="display:flex;gap:7px;margin-top:11px;flex-wrap:wrap">'
+          +'<button class="tact" style="flex:1;min-width:120px;font-size:12px" onclick="rwGuideSay('+i+')">\ud83d\udd0a Listen</button>'
+          +'<button class="tact" style="flex:1;min-width:120px;font-size:12px;font-weight:700" onclick="rwGuideStop();'+g.go+'">Try it \u2192</button>'
+          +'</div></div>';
+      }).join('');
+}
+function rwGuideSay(i){
+  var g=RW_GUIDE[i]; if(!g) return;
+  rwGuideStop();
+  try{ tuskSpeak(g.say); showToast('\ud83d\udd0a '+g.title); }catch(e){ showToast('Narration unavailable here'); }
+}
+var _guideQueue=null;
+function rwGuidePlayAll(){
+  rwGuideStop();
+  var i=0;
+  showToast('\ud83c\udfa7 Playing the walkthrough \u2014 tap \u2715 to stop');
+  function next(){
+    if(i>=RW_GUIDE.length){ _guideQueue=null; return; }
+    var g=RW_GUIDE[i++];
+    try{ tuskSpeak(g.title+'. '+g.say); }catch(e){}
+    /* pace roughly to the length of the narration */
+    _guideQueue=setTimeout(next, Math.max(9000, g.say.length*68));
+  }
+  next();
+}
+function rwGuideStop(){
+  if(_guideQueue){ clearTimeout(_guideQueue); _guideQueue=null; }
+  try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+  try{ if(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.TextToSpeech) Capacitor.Plugins.TextToSpeech.stop(); }catch(e){}
+}
+
+
+
+/* ===== WEB PUSH (rw-v48) — browser notifications, opt-in and guarded.
+   Off unless RW_CONFIG.features.webPush is true AND a VAPID key is set, so it
+   can never break production by accident. The Android app already gets push
+   via the native Capacitor plugin; this covers desktop + mobile web. */
+function rwInitWebPush(){
+  try{
+    var C=window.RW_CONFIG||{};
+    if(!C.features || !C.features.webPush || !C.vapidKey) return;   /* opt-in only */
+    if(window.Capacitor) return;                                    /* native app handles its own */
+    if(!('serviceWorker' in navigator) || !window.firebase || !firebase.messaging) return;
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').then(function(reg){
+      var m=firebase.messaging();
+      return m.requestPermission ? m.requestPermission().then(function(){ return m.getToken({vapidKey:C.vapidKey, serviceWorkerRegistration:reg}); })
+                                 : m.getToken({vapidKey:C.vapidKey, serviceWorkerRegistration:reg});
+    }).then(function(tok){
+      if(tok && user && typeof db!=='undefined' && db){
+        db.collection('users').doc(user.uid).set({webPushToken:tok}, {merge:true}).catch(function(){});
+      }
+    }).catch(function(){});
+  }catch(e){}
+}
+
+/* ============ REALMS: SEASONS, GLORY & VERIFIED CLAIMS (rw-v47) ============
+   Makes the game genuinely competitive AND safe to attach real prizes to.
+   THE FRAUD PROBLEM: a self-declared stamp is fine for a badge, worthless the
+   moment money is involved. So a stamp can now be GPS-VERIFIED — we check the
+   device's position against the geocoded place at the moment of stamping.
+   Only verified claims earn Glory and count for prizes. Unverified stamps still
+   live in your passport as personal memories, just worth zero on the ladder.
+   ========================================================================== */
+
+/* --- Season: monthly, everyone resets, so a newcomer can win --- */
+function rwSeason(){
+  var d=new Date();
+  var id=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  var names=['Frostfall','Thawtide','Bloomrise','Highsun','Monsoon Run','Cloudbreak',
+             'Emberfall','Longlight','Duskwind','Harvestmoon','Starfall','Deepwinter'];
+  var end=new Date(d.getFullYear(), d.getMonth()+1, 1);
+  return {id:id, name:names[d.getMonth()], endsIn:Math.ceil((end-d)/86400000)};
+}
+/* --- Difficulty: remote/hard realms are worth more, so the game rewards
+       genuinely adventurous travel rather than repeat trips to the nearest city --- */
+var RW_REALM_WEIGHT={north:5, east:4, hills:3, central:3, desert:3, south:2, west:2};
+function rwClaimGlory(rec){
+  if(!rec || !rec.verified) return 0;              /* unverified = zero */
+  var w=RW_REALM_WEIGHT[rwRealmOf(rec.place)||'']||2;
+  return 10*w;
+}
+/* --- Weekly bounties: a reason to open the app on a Tuesday --- */
+function rwBounties(){
+  var wk=Math.floor(Date.now()/(7*86400000));
+  var pool=[
+    {t:'Claim any realm you have never held', g:60, icon:'\ud83c\udff4'},
+    {t:'Verify a claim above 2,000m altitude country', g:80, icon:'\ud83c\udfd4\ufe0f'},
+    {t:'Take a realm currently held by a rival house', g:100, icon:'\u2694\ufe0f'},
+    {t:'Claim two realms in one week', g:90, icon:'\ud83d\udd25'},
+    {t:'Bring a friend \u2014 they light a beacon near you', g:50, icon:'\ud83d\udce1'},
+    {t:'Stamp a journey with a photo-worthy note', g:40, icon:'\u270d\ufe0f'}
+  ];
+  return [pool[wk%pool.length], pool[(wk+2)%pool.length], pool[(wk+4)%pool.length]];
+}
+/* --- Verified claim: prove you are actually there --- */
+async function rwVerifyHere(place){
+  /* returns {ok, km, why} — compares device position to the geocoded place */
+  var pos=null;
+  try{
+    if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Geolocation){
+      pos=await Capacitor.Plugins.Geolocation.getCurrentPosition({enableHighAccuracy:true,timeout:15000});
+    } else if(navigator.geolocation){
+      pos=await new Promise(function(res,rej){
+        navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+      });
+    }
+  }catch(e){ return {ok:false, why:'Location unavailable \u2014 allow location to earn Glory'}; }
+  if(!pos||!pos.coords) return {ok:false, why:'Could not read your location'};
+  var geo=null; try{ geo=await gcode(place); }catch(e){}
+  if(!geo) return {ok:false, why:'Could not place "'+place+'" on the map'};
+  var km=rwHaversine(pos.coords.latitude, pos.coords.longitude, geo.lat, geo.lon);
+  if(km<=60) return {ok:true, km:km};
+  return {ok:false, km:km, why:'You look about '+Math.round(km)+'km away. Claims must be made while you are there.'};
+}
+/* --- The competitive dashboard --- */
+function rwRealmsLadder(){
+  var host=el('realmLadder'); if(!host) return;
+  if(typeof db==='undefined'||!db){ host.innerHTML=''; return; }
+  var S=rwSeason();
+  db.collection('passports').limit(500).get().then(function(qs){
+    var people={}, houses={};
+    RW_HOUSES.forEach(function(H){ houses[H.id]=0; });
+    qs.forEach(function(d){
+      var r=d.data()||{};
+      var iso=r.issued&&r.issued.seconds? new Date(r.issued.seconds*1000) : null;
+      if(!iso) return;
+      var sid=iso.getFullYear()+'-'+String(iso.getMonth()+1).padStart(2,'0');
+      if(sid!==S.id) return;                       /* this season only */
+      var g=rwClaimGlory(r); if(!g) return;
+      var k=r.uid||'?';
+      if(!people[k]) people[k]={name:(r.name||'Traveller').split(' ')[0], g:0, n:0, house:r.house};
+      people[k].g+=g; people[k].n++;
+      if(r.house && houses[r.house]!==undefined) houses[r.house]+=g;
+    });
+    var top=Object.keys(people).map(function(k){ return people[k]; })
+              .sort(function(a,b){ return b.g-a.g; }).slice(0,10);
+    var myUid=(user&&user.uid)||'';
+    var meRank=Object.keys(people).sort(function(a,b){ return people[b].g-people[a].g; }).indexOf(myUid)+1;
+    var hRank=RW_HOUSES.slice().sort(function(a,b){ return houses[b.id]-houses[a.id]; });
+    host.innerHTML='<div style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:15px;margin-bottom:12px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+      +'<b style="font-size:15px">\ud83c\udfc6 Season of '+S.name+'</b>'
+      +'<span style="font-size:11.5px;color:'+(S.endsIn<=5?'#E05B5B':'var(--t3)')+';font-weight:700">'+S.endsIn+' days left</span></div>'
+      +'<div style="font-size:11.5px;color:var(--t2)">Everyone resets each month \u2014 a newcomer can top the ladder.'
+      + (meRank?' You\u2019re <b style="color:var(--gold,#E8BA6C)">#'+meRank+'</b> this season.':'')+'</div></div>'
+      +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:15px;margin-bottom:12px">'
+      +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:9px">HOUSES THIS SEASON</div>'
+      + hRank.map(function(H,i){
+          var pct=hRank[0]&&houses[hRank[0].id]? Math.round(houses[H.id]/houses[hRank[0].id]*100) : 0;
+          return '<div style="margin-bottom:8px"><div style="display:flex;gap:7px;font-size:12.5px;margin-bottom:3px">'
+            +'<span>'+H.sigil+'</span><b style="flex:1;color:'+H.color+'">'+H.name+'</b>'
+            +'<span style="color:var(--t3);font-weight:700">'+houses[H.id]+'</span></div>'
+            +'<div style="height:6px;border-radius:6px;background:var(--bg3,#1A1A20);overflow:hidden">'
+            +'<div class="rw-sheen" style="height:100%;width:'+Math.max(3,pct)+'%;background:'+H.color+'"></div></div></div>';
+        }).join('')+'</div>'
+      +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:15px;margin-bottom:12px">'
+      +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:9px">TOP TRAVELLERS</div>'
+      + (top.length? top.map(function(t,i){
+          var medal=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][i]||('#'+(i+1));
+          var H=RW_HOUSES.filter(function(x){return x.id===t.house;})[0];
+          return '<div style="display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--b1,rgba(255,255,255,.05))">'
+            +'<span style="width:26px;font-size:13px">'+medal+'</span>'
+            +'<span style="flex:1;font-size:13px"><b>'+esc2(t.name)+'</b>'+(H?' <span style="font-size:11px">'+H.sigil+'</span>':'')+'</span>'
+            +'<span style="font-size:12px;color:var(--gold,#E8BA6C);font-weight:800">'+t.g+'</span></div>';
+        }).join('') : '<div style="font-size:12.5px;color:var(--t3)">No verified claims yet this season. First one takes the crown.</div>')
+      +'</div>'
+      +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:15px;margin-bottom:12px">'
+      +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:9px">THIS WEEK\u2019S BOUNTIES</div>'
+      + rwBounties().map(function(b){
+          return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0">'
+            +'<span style="font-size:17px">'+b.icon+'</span>'
+            +'<span style="flex:1;font-size:12.5px;color:var(--t2)">'+b.t+'</span>'
+            +'<span style="font-size:11.5px;color:#4ADE80;font-weight:800">+'+b.g+'</span></div>';
+        }).join('')+'</div>'
+      +'<button class="tact" style="width:100%;font-weight:800" onclick="openRewards()">\ud83c\udf81 Season rewards &amp; rules</button>';
+  }).catch(function(){ host.innerHTML=''; });
+}
+/* --- Rewards page: honest about how prizes actually work --- */
+function openRewards(){
+  var S=rwSeason();
+  var ov=el('rewardsOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='rewardsOv'; ov.className='overlay'; ov.style.zIndex='3000';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('rewardsOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:430px"><div class="sheet-h"><b>\ud83c\udf81 Season rewards</b>'
+    +'<button onclick="rwOverlayClose(\'rewardsOv\')" class="tact">\u2715</button></div>'
+    +'<div style="font-size:12.5px;color:var(--t2);margin:4px 0 12px">Season of <b>'+S.name+'</b> \u00b7 ends in '+S.endsIn+' days</div>'
+    +'<div style="border:1px solid var(--gold,#E8BA6C);border-radius:12px;padding:13px;margin-bottom:10px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>\ud83e\udd47 Top traveller</span><b style="color:var(--gold,#E8BA6C)">\u20b95,000</b></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>\ud83e\udd48 Runner-up</span><b style="color:var(--gold,#E8BA6C)">\u20b93,000</b></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>\ud83e\udd49 Third</span><b style="color:var(--gold,#E8BA6C)">\u20b92,000</b></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>\ud83c\udfc5 Top 10</span><b>RoamWise goodies</b></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px"><span>\ud83c\udff4 Winning house</span><b>Sigil badge, all members</b></div></div>'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin:12px 0 6px">HOW TO WIN</div>'
+    +'<div style="font-size:12.5px;color:var(--t2);line-height:1.65">Glory comes only from <b>verified</b> claims \u2014 you must be at the place when you stamp it. Remote realms are worth more: the Frozen North pays 5\u00d7 what the coast does. Weekly bounties stack on top.</div>'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin:14px 0 6px">THE FINE PRINT</div>'
+    +'<div style="font-size:11.5px;color:var(--t3);line-height:1.6">Free to enter \u2014 no purchase, no entry fee, ever. Winners are decided purely on verified travel, so this is a contest of skill, not chance. Every prize is kept under \u20b910,000, so no TDS is deducted under Section 194B. Open to residents of India aged 18+. Faked or duplicate claims are removed and forfeit prizes. <a href="/legal/contest-rules.html" target="_blank" style="color:var(--gold,#E8BA6C)">Full official rules \u2197</a></div>'
+    +'</div>';
+  ov.classList.add('open');
+}
+
+/* ================= BEACON — nearby tribe matching (rw-v46) =================
+   SAFETY-FIRST BY DESIGN. Broadcasting a traveller's live position to strangers
+   is a stalking vector, so this deliberately does NOT do that:
+     - opt-in only, never automatic
+     - location is BLURRED to ~1km grid before it ever leaves the device
+     - beacons EXPIRE (2h default) — no continuous tracking, ever
+     - you choose your tags and your own contact handle; nothing is scraped
+     - one tap to go dark, and a report path
+   NOTE ON LINKEDIN/INSTAGRAM: their APIs do not expose profile interests to
+   third parties (LinkedIn returns only name/email/photo; IG Basic Display was
+   retired). So users optionally paste THEIR OWN profile link to share — which
+   is honest, consented, and works today.
+   ========================================================================== */
+var RW_TRIBE_TAGS=['\ud83d\ude80 Founder','\ud83d\udcbc Investor','\ud83d\udcbb Engineer','\ud83c\udfa8 Artist','\ud83c\udfa5 Creator',
+  '\ud83e\uddd8 Yoga','\ud83c\udfc3 Runner','\ud83e\uddd7 Trekker','\ud83c\udfb8 Musician','\ud83d\udcf7 Photographer',
+  '\ud83c\udf7d\ufe0f Foodie','\ud83c\udfc4 Surfer','\ud83d\udcda Writer','\ud83e\uddd1\u200d\ud83c\udf93 Student'];
+/* blur to ~1km so an exact position never leaves the device */
+function rwBlur(v){ return Math.round(v*100)/100; }
+function rwBeaconMine(){ try{ return JSON.parse(lsGet('rw_beacon')||'null'); }catch(e){ return null; } }
+
+function openBeacon(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('beaconSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='beaconSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  var mine=rwBeaconMine();
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udce1 <em>Beacon</em></h2>'
+    +'<button class="tact" onclick="el(\'beaconSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Find your people within about a kilometre \u2014 founders, artists, runners, yogis \u2014 wherever you land. Light a beacon, see who else is lit.</p>'
+    +'<div style="background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.4);border-radius:14px;padding:13px;margin-bottom:14px">'
+    +'<div style="font-size:12px;color:#4ADE80;font-weight:800;margin-bottom:4px">\ud83d\udd12 How we keep this safe</div>'
+    +'<div style="font-size:12px;color:var(--t2);line-height:1.6">Your exact location never leaves your phone \u2014 we blur it to a ~1km area first. Beacons switch off by themselves after 2 hours. You are only visible while your beacon is lit, and only to others who lit theirs.</div></div>'
+    + (mine? '' : '<div style="font-size:12.5px;color:var(--t3);margin-bottom:10px">Nothing is shared until you tap the button below.</div>')
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'
+    + (mine
+       ? '<button class="tact" style="flex:1;min-width:150px;font-weight:800;background:linear-gradient(135deg,#4ADE80,#22C55E);color:#0A0A0C;border:none" onclick="rwBeaconFind()">\ud83d\udd0d Who\u2019s nearby</button>'
+        +'<button class="tact" style="flex:1;min-width:150px" onclick="rwBeaconOff()">\ud83c\udf19 Go dark</button>'
+       : '<button class="tact" style="flex:1;min-width:180px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:13px" onclick="rwBeaconLight()">\ud83d\udce1 Light my beacon</button>')
+    +'</div><div id="beaconOut"></div>';
+  if(mine) rwBeaconFind();
+}
+function rwBeaconLight(){
+  if(!user){ showToast('Sign in first \u2014 beacons are tied to real accounts for safety'); try{ openAuth(); }catch(e){} return; }
+  var chosen=[];
+  var chips=RW_TRIBE_TAGS.map(function(t,i){
+    return '<button id="btag'+i+'" onclick="rwBeaconTag('+i+')" style="background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:20px;padding:7px 12px;color:var(--t1);font-size:12px;cursor:pointer;margin:3px">'+t+'</button>';
+  }).join('');
+  var ov=el('beaconSetupOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='beaconSetupOv'; ov.className='overlay'; ov.style.zIndex='3000';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('beaconSetupOv'); }; document.body.appendChild(ov); }
+  window._beaconTags=[];
+  ov.innerHTML='<div class="sheet" style="max-width:420px"><div class="sheet-h"><b>\ud83d\udce1 Light your beacon</b>'
+    +'<button onclick="rwOverlayClose(\'beaconSetupOv\')" class="tact">\u2715</button></div>'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin:8px 0 6px">I\u2019M INTO\u2026 (pick a few)</div>'
+    +'<div>'+chips+'</div>'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin:14px 0 6px">ONE LINE ABOUT YOU</div>'
+    +'<input id="beaconBio" placeholder="e.g. building a travel app, up for coffee" style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:10px;padding:11px;color:var(--t1);font:inherit">'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin:12px 0 6px">HOW SHOULD THEY REACH YOU?</div>'
+    +'<input id="beaconHandle" placeholder="@yourhandle, LinkedIn URL, or email" style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:10px;padding:11px;color:var(--t1);font:inherit">'
+    +'<div style="font-size:10.5px;color:var(--t3);margin-top:6px;line-height:1.5">Share only what you\u2019re comfortable with strangers seeing. You can go dark any time.</div>'
+    +'<button class="tact" style="width:100%;margin-top:14px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:13px" onclick="rwBeaconGo()">Light it for 2 hours</button></div>';
+  ov.classList.add('open');
+}
+function rwBeaconTag(i){
+  var t=RW_TRIBE_TAGS[i], list=window._beaconTags||[];
+  var at=list.indexOf(t); if(at>=0) list.splice(at,1); else list.push(t);
+  window._beaconTags=list;
+  var b=el('btag'+i); if(b){ var on=list.indexOf(t)>=0;
+    b.style.borderColor=on?'var(--gold,#E8BA6C)':'var(--b2,#2A2A36)';
+    b.style.background=on?'rgba(232,186,108,.14)':'var(--bg3,#1A1A20)'; }
+  try{ rwHaptic(); }catch(e){}
+}
+function rwBeaconGo(){
+  var tags=window._beaconTags||[];
+  if(!tags.length){ showToast('Pick at least one thing you\u2019re into'); return; }
+  var bio=(el('beaconBio')&&el('beaconBio').value||'').trim();
+  var handle=(el('beaconHandle')&&el('beaconHandle').value||'').trim();
+  showToast('\ud83d\udccd Getting your rough area\u2026');
+  function place(lat,lon){
+    if(typeof db==='undefined'||!db){ showToast('Need a connection to light a beacon'); return; }
+    var blat=rwBlur(lat), blon=rwBlur(lon);
+    var rec={ uid:user.uid, name:(user.displayName||'Traveller'), tags:tags, bio:bio, handle:handle,
+      lat:blat, lon:blon, house:rwHouse()||null,
+      expireAt: firebase.firestore.Timestamp.fromMillis(Date.now()+2*60*60*1000),
+      lit: firebase.firestore.FieldValue.serverTimestamp() };
+    db.collection('beacons').doc(user.uid).set(rec).then(function(){
+      try{ lsSet('rw_beacon', JSON.stringify({lat:blat,lon:blon,tags:tags,at:Date.now()})); }catch(e){}
+      try{ rwHaptic('heavy'); }catch(e){}
+      rwOverlayClose('beaconSetupOv');
+      showToast('\ud83d\udce1 Beacon lit for 2 hours');
+      openBeacon();
+    }).catch(function(){ showToast('Could not light your beacon \u2014 try again'); });
+  }
+  function fail(){ showToast('Need location access to find people near you'); }
+  if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Geolocation){
+    Capacitor.Plugins.Geolocation.getCurrentPosition({enableHighAccuracy:false,timeout:12000})
+      .then(function(p){ place(p.coords.latitude,p.coords.longitude); }).catch(fail);
+  } else if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(function(p){ place(p.coords.latitude,p.coords.longitude); }, fail,
+      {enableHighAccuracy:false,timeout:12000,maximumAge:300000});
+  } else fail();
+}
+function rwBeaconOff(){
+  if(user && typeof db!=='undefined' && db){ db.collection('beacons').doc(user.uid).delete().catch(function(){}); }
+  try{ lsSet('rw_beacon',''); }catch(e){}
+  showToast('\ud83c\udf19 Beacon off \u2014 you\u2019re invisible again');
+  openBeacon();
+}
+function rwBeaconFind(){
+  var host=el('beaconOut'); if(!host) return;
+  var mine=rwBeaconMine();
+  if(!mine){ host.innerHTML=''; return; }
+  if(typeof db==='undefined'||!db){ host.innerHTML='<div class="note">Offline \u2014 need a connection.</div>'; return; }
+  host.innerHTML='<div class="note">\ud83d\udd0d Looking for lit beacons near you\u2026</div>';
+  db.collection('beacons').limit(300).get().then(function(qs){
+    var now=Date.now(), rows=[];
+    qs.forEach(function(d){
+      var b=d.data()||{};
+      if(b.uid===user.uid) return;
+      var exp=b.expireAt&&b.expireAt.seconds? b.expireAt.seconds*1000 : 0;
+      if(exp && exp<now) return;                    /* expired = invisible */
+      if(typeof b.lat!=='number'||typeof b.lon!=='number') return;
+      var km=rwHaversine(mine.lat,mine.lon,b.lat,b.lon);
+      if(km>2.5) return;                            /* ~1km grid + tolerance */
+      var shared=(b.tags||[]).filter(function(t){ return (mine.tags||[]).indexOf(t)>=0; });
+      rows.push({b:b,km:km,shared:shared});
+    });
+    rows.sort(function(x,y){ return (y.shared.length-x.shared.length) || (x.km-y.km); });
+    if(!rows.length){
+      host.innerHTML='<div class="note" style="text-align:center;padding:20px;color:var(--t3)">No one else is lit nearby right now. Your beacon stays on for 2 hours \u2014 check back, or share RoamWise with whoever you\u2019re travelling with.</div>';
+      return;
+    }
+    host.innerHTML='<div style="font-size:12px;color:var(--t3);margin-bottom:9px">'+rows.length+' nearby right now</div>'
+      + rows.map(function(r){
+        var b=r.b;
+        return '<div style="border:1px solid var(--b2,#2A2A36);border-radius:14px;padding:14px;margin-bottom:9px;background:var(--bg2,#12151F)">'
+          +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:start">'
+          +'<b style="font-size:14.5px">'+esc2(b.name||'Traveller')+'</b>'
+          +'<span style="font-size:11px;color:var(--gold,#E8BA6C);font-weight:700">~'+(r.km<1?'under 1':r.km.toFixed(1))+' km</span></div>'
+          +(b.bio?'<div style="font-size:12.5px;color:var(--t2);margin-top:4px">'+esc2(b.bio)+'</div>':'')
+          +'<div style="margin-top:7px">'+(b.tags||[]).map(function(t){
+              var hot=r.shared.indexOf(t)>=0;
+              return '<span style="display:inline-block;font-size:11px;border-radius:20px;padding:3px 9px;margin:2px 3px 0 0;'
+                +(hot?'background:rgba(74,222,128,.15);color:#4ADE80;border:1px solid rgba(74,222,128,.5);font-weight:700'
+                     :'background:var(--bg3,#1A1A20);color:var(--t3);border:1px solid var(--b2,#2A2A36)')+'">'+t+'</span>';
+            }).join('')+'</div>'
+          +(r.shared.length?'<div style="font-size:11px;color:#4ADE80;margin-top:6px;font-weight:700">\u2713 '+r.shared.length+' shared interest'+(r.shared.length>1?'s':'')+'</div>':'')
+          +(b.handle?'<div style="margin-top:9px"><a class="tact" style="padding:6px 12px;font-size:12px;text-decoration:none" href="'+rwHandleHref(b.handle)+'" target="_blank" rel="noopener">\ud83d\udc4b '+esc2(b.handle)+'</a></div>':'')
+          +'<div style="margin-top:8px"><button class="tact" style="padding:4px 10px;font-size:11px;color:var(--t3)" onclick="rwBeaconReport(\''+esc2(b.uid||'')+'\')">Report</button></div>'
+          +'</div>';
+      }).join('');
+  }).catch(function(){ host.innerHTML='<div class="note">Could not search right now.</div>'; });
+}
+function rwHandleHref(h){
+  h=String(h||'').trim();
+  if(/^https?:\/\//i.test(h)) return h;
+  if(h.indexOf('@')>0 && h.indexOf('.')>0) return 'mailto:'+h;
+  if(h.charAt(0)==='@') return 'https://instagram.com/'+h.slice(1);
+  return '#';
+}
+function rwBeaconReport(uid){
+  if(!uid || typeof db==='undefined' || !db){ showToast('Could not report'); return; }
+  rwForm('Report this beacon', [{key:'why', label:'What\u2019s wrong?', placeholder:'Briefly \u2014 this goes to the RoamWise team'}], function(v){
+    db.collection('reports').add({ kind:'beacon', target:uid, why:v.why||'', by:(user&&user.uid)||null,
+      at: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(function(){ showToast('Reported \u2014 thank you, we look at every one'); })
+      .catch(function(){ showToast('Could not send the report'); });
+  });
+}
+
+/* ================= REALMS OF ROAM (rw-v45) — the travel conquest game =======
+   WHY THIS IS GENUINELY NEW: every travel app's "gamification" is fake points
+   for tapping buttons. Here the GAME BOARD IS THE REAL MAP OF INDIA, and the
+   only way to take territory is to ACTUALLY GO THERE and stamp a verified
+   Journey Passport. You cannot grind it, buy it, or fake it — a region is held
+   by the House whose members have really been there most recently.
+   That also makes it uncopyable for the same reason the passport is: the map
+   state lives in RoamWise's network, not in the code.
+   ========================================================================== */
+var RW_HOUSES=[
+  {id:'himal', name:'House Himalaya',  sigil:'\ud83c\udfd4\ufe0f', words:'The Peaks Remember',      color:'#7DD3FC', home:'north'},
+  {id:'tide',  name:'House Tidewater', sigil:'\ud83c\udf0a', words:'Salt in Every Story',   color:'#38BDF8', home:'west'},
+  {id:'ember', name:'House Ember',     sigil:'\ud83d\udd25', words:'We Ride at Dawn',       color:'#FB923C', home:'desert'},
+  {id:'verdant',name:'House Verdant',  sigil:'\ud83c\udf3f', words:'Green Grows the Road',  color:'#4ADE80', home:'south'},
+  {id:'stone', name:'House Stonewatch',sigil:'\ud83d\udfe4', words:'Older Than Kings',      color:'#C084FC', home:'central'}
+];
+var RW_REALMS=[
+  {id:'north',  name:'The Frozen North',   emoji:'\u2744\ufe0f', places:'Ladakh, Spiti, Sikkim, Tawang'},
+  {id:'hills',  name:'The Cloud Hills',    emoji:'\ud83c\udf2b\ufe0f', places:'Himachal, Uttarakhand, Meghalaya'},
+  {id:'west',   name:'The Salt Coast',     emoji:'\ud83c\udfd6\ufe0f', places:'Goa, Konkan, Gujarat coast'},
+  {id:'desert', name:'The Sunlands',       emoji:'\ud83c\udfdc\ufe0f', places:'Rajasthan, Kutch'},
+  {id:'south',  name:'The Green Reaches',  emoji:'\ud83c\udf34', places:'Kerala, Karnataka, Tamil Nadu'},
+  {id:'east',   name:'The River Marches',  emoji:'\ud83d\udea3', places:'Bengal, Odisha, Assam'},
+  {id:'central',name:'The Old Stones',     emoji:'\ud83c\udfef', places:'MP, Hampi, Maharashtra forts'}
+];
+/* region matching: a stamped place name decides which realm it belongs to */
+var RW_REALM_KEYS={
+  north:['ladakh','leh','spiti','sikkim','tawang','kaza','nubra','gangtok','arunachal','zanskar'],
+  hills:['himachal','uttarakhand','manali','shimla','kasol','mcleod','dharamshala','rishikesh','mussoorie','nainital','almora','meghalaya','shillong','darjeeling','bir','kausani','munsiyari','chopta','auli','dalhousie','khajjiar'],
+  west:['goa','konkan','gujarat','diu','daman','alibaug','ratnagiri','gokarna','dwarka','somnath','mumbai'],
+  desert:['rajasthan','jaisalmer','jodhpur','udaipur','jaipur','pushkar','bikaner','kutch','rann','mount abu','ajmer'],
+  south:['kerala','karnataka','tamil','munnar','alleppey','varkala','kochi','wayanad','coorg','chikmagalur','ooty','kodaikanal','pondicherry','madurai','mahabalipuram','bangalore','bengaluru','chennai','hampi'],
+  east:['bengal','odisha','assam','kolkata','puri','konark','guwahati','kaziranga','sundarban','majuli','digha'],
+  central:['madhya','hampi','maharashtra','khajuraho','orchha','pachmarhi','bhopal','indore','pune','nashik','ajanta','ellora','gwalior','satpura','panna']
+};
+function rwRealmOf(place){
+  var t=String(place||'').toLowerCase();
+  for(var i=0;i<RW_REALMS.length;i++){
+    var rid=RW_REALMS[i].id, keys=RW_REALM_KEYS[rid]||[];
+    for(var k=0;k<keys.length;k++){ if(t.indexOf(keys[k])>-1) return rid; }
+  }
+  return null;
+}
+function rwHouse(){ try{ return lsGet('rw_house')||''; }catch(e){ return ''; } }
+function rwHouseObj(){ var h=rwHouse(); return RW_HOUSES.filter(function(x){return x.id===h;})[0]||null; }
+
+function openRealms(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('realmsSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='realmsSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  var h=rwHouseObj();
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\u2694\ufe0f Realms of <em>Roam</em></h2>'
+    +'<button class="tact" onclick="el(\'realmsSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Seven realms. Five houses. The only way to take territory is to actually go there \u2014 every claim must be a verified journey. No grinding, no shortcuts.</p>'
+    + (h? rwRealmsHome(h) : rwRealmsPickHouse());
+  if(h){ rwRealmsLoadMap(); rwRealmsLadder(); }
+}
+function rwRealmsPickHouse(){
+  return '<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px">'
+    +'<div style="font-weight:800;font-size:15px;margin-bottom:3px">Choose your house</div>'
+    +'<div style="font-size:12.5px;color:var(--t2);margin-bottom:14px">This is permanent-ish \u2014 your journeys will earn glory for them. Pick the one that sounds like how you travel.</div>'
+    + RW_HOUSES.map(function(H){
+      return '<button onclick="rwRealmsJoin(\''+H.id+'\')" style="display:block;width:100%;text-align:left;margin-bottom:9px;padding:13px;border-radius:13px;cursor:pointer;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);color:var(--t1)">'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+        +'<span style="font-size:26px">'+H.sigil+'</span>'
+        +'<span style="flex:1"><b style="font-size:14.5px;color:'+H.color+'">'+H.name+'</b>'
+        +'<div style="font-size:11.5px;color:var(--t3);font-style:italic">\u201c'+H.words+'\u201d</div></span></div></button>';
+    }).join('')
+    +'</div>';
+}
+function rwRealmsJoin(id){
+  try{ lsSet('rw_house', id); }catch(e){}
+  var H=RW_HOUSES.filter(function(x){return x.id===id;})[0];
+  try{ rwHaptic('heavy'); }catch(e){}
+  showToast(H.sigil+' You have sworn to '+H.name);
+  openRealms();
+}
+function rwRealmsHome(H){
+  return '<div style="background:linear-gradient(135deg,'+H.color+'22,transparent);border:1px solid '+H.color+';border-radius:16px;padding:16px;margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;gap:12px">'
+    +'<span style="font-size:34px">'+H.sigil+'</span>'
+    +'<span style="flex:1"><b style="font-size:16px;color:'+H.color+'">'+H.name+'</b>'
+    +'<div style="font-size:12px;color:var(--t2);font-style:italic">\u201c'+H.words+'\u201d</div></span>'
+    +'<button class="tact" style="padding:5px 10px;font-size:11px" onclick="rwRealmsLeave()">Switch</button></div>'
+    +'<div id="realmGlory" style="font-size:12.5px;color:var(--t2);margin-top:10px"></div></div>'
+    +'<div id="realmLadder"></div>'
+    +'<div id="realmMap"><div class="note">Reading the map\u2026</div></div>'
+    +'<div style="margin-top:14px;background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:14px;padding:14px">'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:6px">HOW TO TAKE A REALM</div>'
+    +'<div style="font-size:12.5px;color:var(--t2);line-height:1.65">Travel there, then stamp it in your \ud83d\udee1\ufe0f Journey Passport. The stamp is verified against the RoamWise network, so a realm can only be held by someone who genuinely went. Most recent verified claims hold the territory.</div>'
+    +'<button class="tact" style="width:100%;margin-top:11px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="openPassport()">\ud83d\udee1\ufe0f Stamp a journey to claim</button></div>';
+}
+function rwRealmsLeave(){ try{ lsSet('rw_house',''); }catch(e){} openRealms(); }
+/* Build the live map from real verified passports across the whole network. */
+function rwRealmsLoadMap(){
+  var host=el('realmMap'); if(!host) return;
+  if(typeof db==='undefined' || !db){ host.innerHTML='<div class="note">Offline \u2014 the map needs a connection.</div>'; return; }
+  db.collection('passports').limit(400).get().then(function(qs){
+    var hold={}, glory={}, mine=0;
+    RW_REALMS.forEach(function(R){ hold[R.id]=null; });
+    RW_HOUSES.forEach(function(H){ glory[H.id]=0; });
+    var rows=[]; qs.forEach(function(d){ rows.push(d.data()); });
+    rows.sort(function(a,b){ return ((a.issued&&a.issued.seconds)||0)-((b.issued&&b.issued.seconds)||0); });
+    rows.forEach(function(r){
+      var rid=rwRealmOf(r.place); if(!rid) return;
+      var hid=r.house||null;
+      if(hid && glory[hid]!==undefined){ glory[hid]+=1; }
+      if(hid) hold[rid]={house:hid, by:(r.name||'a traveller').split(' ')[0], place:r.place};
+      if(user && r.uid===user.uid) mine++;
+    });
+    var myH=rwHouse();
+    var g=el('realmGlory');
+    if(g){
+      var ranked=RW_HOUSES.slice().sort(function(a,b){ return glory[b.id]-glory[a.id]; });
+      var pos=ranked.map(function(x){return x.id;}).indexOf(myH)+1;
+      var held=Object.keys(hold).filter(function(k){ return hold[k]&&hold[k].house===myH; }).length;
+      g.innerHTML='Glory <b>'+(glory[myH]||0)+'</b> \u00b7 holding <b>'+held+'</b> of '+RW_REALMS.length+' realms \u00b7 ranked <b>#'+(pos||'-')+'</b> of '+RW_HOUSES.length
+        +' \u00b7 your claims: <b>'+mine+'</b>';
+    }
+    host.innerHTML='<div style="display:grid;grid-template-columns:1fr;gap:8px">'
+      + RW_REALMS.map(function(R){
+        var h=hold[R.id];
+        var H=h? RW_HOUSES.filter(function(x){return x.id===h.house;})[0] : null;
+        var col=H?H.color:'#3A3A46';
+        return '<div style="border:1px solid '+col+';border-left:4px solid '+col+';border-radius:12px;padding:12px;background:var(--bg2,#12151F)">'
+          +'<div style="display:flex;align-items:center;gap:9px">'
+          +'<span style="font-size:20px">'+R.emoji+'</span>'
+          +'<span style="flex:1"><b style="font-size:13.5px">'+R.name+'</b>'
+          +'<div style="font-size:10.5px;color:var(--t3)">'+R.places+'</div></span>'
+          + (H? '<span style="text-align:right"><span style="font-size:18px">'+H.sigil+'</span>'
+                +'<div style="font-size:10px;color:'+H.color+';font-weight:700">held</div></span>'
+             : '<span style="font-size:10.5px;color:var(--t3);font-style:italic">unclaimed</span>')
+          +'</div>'
+          + (h? '<div style="font-size:11px;color:var(--t3);margin-top:6px">Last claimed by '+esc2(h.by)+' \u00b7 '+esc2(String(h.place||'').slice(0,42))+'</div>' : '')
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }).catch(function(){ host.innerHTML='<div class="note">Could not read the map right now.</div>'; });
+}
+
+/* ================= JOURNEY PASSPORT (rw-v45) =================
+   THE DEFENSIBILITY ANSWER, honestly framed:
+   Code cannot be made uncopyable — anyone can clone this repo. What CANNOT be
+   copied is the NETWORK: a passport is only real if the record exists in
+   RoamWise's own Firestore, written by an authenticated RoamWise account.
+   Clone the app and you can render the same UI, but every passport you issue
+   verifies as UNRECOGNISED, because verification queries the real network, not
+   the local code. The moat is the accumulated graph of verified journeys and
+   the single canonical verifier at roamwise.co.in/verify.html — both of which a
+   copycat starts with zero of, forever.
+   ========================================================================== */
+function rwPassportId(){
+  /* Human-readable, checkable, hard to guess: RW-<base36 time>-<random> */
+  var t=Date.now().toString(36).toUpperCase();
+  var r=''; var A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  for(var i=0;i<5;i++) r+=A[Math.floor(Math.random()*A.length)];
+  return 'RW-'+t+'-'+r;
+}
+function openPassport(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('passportSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='passportSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udee1\ufe0f Journey <em>passport</em></h2>'
+    +'<button class="tact" onclick="el(\'passportSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Verified proof of where you\u2019ve actually been. Each stamp is issued into the RoamWise network and can be checked by anyone \u2014 employers, hosts, communities, or fellow travellers.</p>'
+    +'<div style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:16px;margin-bottom:14px">'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="tact" style="flex:1;min-width:150px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwPassportIssue()">\u2795 Stamp a journey</button>'
+    +'<button class="tact" style="flex:1;min-width:150px" onclick="rwPassportVerifyAsk()">\ud83d\udd0d Verify a passport</button>'
+    +'</div></div>'
+    +'<div id="passportOut"><div class="note">Loading your stamps\u2026</div></div>';
+  rwPassportLoad();
+}
+function rwPassportIssue(){
+  if(!user){ showToast('Sign in first \u2014 a stamp has to be tied to a real account'); try{ openAuth(); }catch(e){} return; }
+  if(typeof db==='undefined' || !db){ showToast('You\u2019re offline \u2014 stamping needs a connection'); return; }
+  var last=(window._lastItin&&window._lastItin.name)||'';
+  rwForm('\ud83d\udee1\ufe0f Stamp a journey', [
+    {key:'place', label:'Where did you go?', value:last, placeholder:'e.g. Spiti Valley, Himachal'},
+    {key:'when', label:'When?', placeholder:'e.g. June 2026'},
+    {key:'note', label:'One line about it', placeholder:'e.g. 9 days, 4 passes, no wifi'}
+  ], function(v){
+    if(!v.place){ showToast('Where did you go?'); return; }
+    var id=rwPassportId();
+    showToast('\ud83d\udccd Checking you\u2019re actually there\u2026');
+    /* GPS verification: only a claim made AT the place earns Glory / prize
+       eligibility. Unverified stamps still save as a personal memory. */
+    rwVerifyHere(v.place).then(function(chk){
+      var rec={ id:id, place:v.place, when:v.when||'', note:v.note||'',
+        uid:user.uid, name:(user.displayName||'Traveller'), house:rwHouse()||null,
+        verified: !!chk.ok,
+        issued: firebase.firestore.FieldValue.serverTimestamp(),
+        issuer:'roamwise.co.in' };
+      return db.collection('passports').doc(id).set(rec).then(function(){
+        try{ badgeBump('passport'); rwHaptic('heavy'); }catch(e){}
+        if(chk.ok){
+          var g=rwClaimGlory(rec);
+          showToast('\ud83d\udee1\ufe0f Verified claim \u00b7 +'+g+' Glory');
+        } else {
+          showToast('\ud83d\udcd6 Saved to your passport \u2014 '+(chk.why||'not verified, so no Glory'));
+        }
+        rwPassportLoad();
+      });
+    }).catch(function(){ showToast('Could not stamp right now \u2014 try again'); });
+  });
+}
+function rwPassportLoad(){
+  var host=el('passportOut'); if(!host) return;
+  if(!user){ host.innerHTML='<div class="note" style="text-align:center;padding:20px;color:var(--t3)">Sign in to start your passport. Each stamp is permanent, verifiable, and yours.</div>'; return; }
+  if(typeof db==='undefined' || !db){ host.innerHTML='<div class="note">Offline \u2014 connect to see your stamps.</div>'; return; }
+  db.collection('passports').where('uid','==',user.uid).limit(50).get().then(function(qs){
+    var rows=[]; qs.forEach(function(d){ rows.push(d.data()); });
+    rows.sort(function(a,b){ return ((b.issued&&b.issued.seconds)||0)-((a.issued&&a.issued.seconds)||0); });
+    if(!rows.length){ host.innerHTML='<div class="note" style="text-align:center;padding:20px;color:var(--t3)">No stamps yet. Tap <b>Stamp a journey</b> after your next trip \u2014 it becomes permanent, verifiable proof you were there.</div>'; return; }
+    host.innerHTML='<div style="font-size:12px;color:var(--t3);margin-bottom:9px">'+rows.length+' verified journey'+(rows.length>1?'s':'')+'</div>'
+      + rows.map(function(r){
+        var d=r.issued&&r.issued.seconds? new Date(r.issued.seconds*1000).toLocaleDateString('en-IN',{month:'short',year:'numeric'}) : '';
+        return '<div style="border:1px solid var(--b2,#2A2A36);border-radius:14px;padding:14px;margin-bottom:10px;background:var(--bg2,#12151F);position:relative;overflow:hidden">'
+          +'<div style="position:absolute;top:-8px;right:-8px;font-size:52px;opacity:.07">\ud83d\udee1\ufe0f</div>'
+          +'<div style="font-weight:800;font-size:15px">'+esc2(r.place||'')+'</div>'
+          +'<div style="font-size:12px;color:var(--t2);margin-top:2px">'+esc2(r.when||d)+(r.note?' \u00b7 '+esc2(r.note):'')+'</div>'
+          +'<div style="display:flex;align-items:center;gap:6px;margin-top:9px;flex-wrap:wrap">'
+          +'<code style="font-size:11px;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:6px;padding:3px 7px;color:var(--gold,#E8BA6C)">'+esc2(r.id||'')+'</code>'
+          + (r.verified
+              ? '<span style="font-size:10.5px;color:#4ADE80;font-weight:700">\u2713 verified on location \u00b7 +'+rwClaimGlory(r)+' Glory</span>'
+              : '<span style="font-size:10.5px;color:var(--t3);font-weight:700">\u25cb personal memory \u00b7 no Glory</span>')
+          +'<button class="tact" style="padding:4px 10px;font-size:11px;margin-left:auto" onclick="rwPassportShare(\''+esc2(r.id||'')+'\',\''+esc2((r.place||'').replace(/\x27/g,''))+'\')">Share proof</button>'
+          +'</div></div>';
+      }).join('');
+  }).catch(function(){ host.innerHTML='<div class="note">Couldn\u2019t load your stamps \u2014 try again in a moment.</div>'; });
+}
+function rwPassportShare(id, place){
+  var url='https://www.roamwise.co.in/verify.html?id='+encodeURIComponent(id);
+  var txt='I travelled to '+place+' \u2014 verified on RoamWise.\nCheck it yourself: '+url;
+  if(navigator.share){ navigator.share({title:'RoamWise verified journey', text:txt, url:url}).catch(function(){}); return; }
+  try{ navigator.clipboard.writeText(txt); showToast('Proof link copied'); }catch(e){ showToast(url); }
+}
+function rwPassportVerifyAsk(){
+  rwForm('\ud83d\udd0d Verify a passport', [
+    {key:'id', label:'Passport ID', placeholder:'RW-XXXXX-XXXXX'}
+  ], function(v){ rwPassportVerify((v.id||'').trim().toUpperCase()); });
+}
+function rwPassportVerify(id){
+  var host=el('passportOut');
+  if(!id){ showToast('Paste a passport ID'); return; }
+  if(host) host.innerHTML='<div class="note">\ud83d\udd0d Checking '+esc2(id)+' against the RoamWise network\u2026</div>';
+  if(typeof db==='undefined' || !db){ if(host) host.innerHTML='<div class="note">Offline \u2014 verification needs a connection.</div>'; return; }
+  db.collection('passports').doc(id).get().then(function(d){
+    if(!d.exists){
+      if(host) host.innerHTML='<div style="border:1px solid #E05B5B;background:rgba(224,91,91,.08);border-radius:14px;padding:16px">'
+        +'<div style="font-weight:800;color:#E05B5B">\u2717 Not recognised</div>'
+        +'<div style="font-size:12.5px;color:var(--t2);margin-top:5px">No journey with ID <b>'+esc2(id)+'</b> exists in the RoamWise network. Either the ID is mistyped, or it was not issued by RoamWise.</div>'
+        +'<button class="tact" style="margin-top:10px" onclick="rwPassportLoad()">Back to my passport</button></div>';
+      return;
+    }
+    var r=d.data()||{};
+    var dt=r.issued&&r.issued.seconds? new Date(r.issued.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'unknown date';
+    if(host) host.innerHTML='<div style="border:1px solid #4ADE80;background:rgba(74,222,128,.07);border-radius:14px;padding:16px">'
+      +'<div style="font-weight:800;color:#4ADE80">\u2713 Verified journey</div>'
+      +'<div style="font-size:16px;font-weight:800;margin-top:7px">'+esc2(r.place||'')+'</div>'
+      +'<div style="font-size:12.5px;color:var(--t2);margin-top:3px">Traveller: '+esc2(r.name||'RoamWise member')+'</div>'
+      +'<div style="font-size:12.5px;color:var(--t2)">'+esc2(r.when||'')+(r.note?' \u00b7 '+esc2(r.note):'')+'</div>'
+      +'<div style="font-size:11.5px;color:var(--t3);margin-top:7px">Stamped '+dt+' \u00b7 issued by roamwise.co.in</div>'
+      +'<button class="tact" style="margin-top:10px" onclick="rwPassportLoad()">Back to my passport</button></div>';
+  }).catch(function(){ if(host) host.innerHTML='<div class="note">Verification failed \u2014 try again.</div>'; });
+}
+/* deep-link: /?verify=RW-... opens straight into a verification result */
+(function(){
+  try{
+    var m=location.search.match(/[?&]verify=([^&]+)/);
+    if(m){ setTimeout(function(){ openPassport(); setTimeout(function(){ rwPassportVerify(decodeURIComponent(m[1]).toUpperCase()); }, 500); }, 1200); }
+  }catch(e){}
+})();
+
+/* ===== TATKAL PREP (rw-v44) — the LEGITIMATE version of the "Tatkal hack".
+   DELIBERATE DESIGN DECISION: this does NOT auto-fill IRCTC, does NOT bypass
+   CAPTCHA, and does NOT script the booking. Automating IRCTC violates their
+   terms and gets USER ACCOUNTS BANNED — we will not hand our earliest users a
+   tool that does that. What actually loses people Tatkal seats is being
+   unprepared in the first 40 seconds, so we fix THAT: details ready to copy,
+   a synced countdown, and a pre-flight checklist. All on-device. */
+function openTatkal(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('tatkalSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='tatkalSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\u26a1 Tatkal <em>prep</em></h2>'
+    +'<button class="tact" onclick="rwTatkalStopTimer();el(\'tatkalSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Tatkal is won or lost in the first 40 seconds. Have everything ready to paste, and a countdown so you\u2019re logged in before the window opens.</p>'
+    +'<div id="tatkalClock" style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px"></div>'
+    +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px;margin-bottom:12px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em">PASSENGER LIST</div>'
+    +'<button class="tact" style="padding:5px 11px;font-size:11.5px" onclick="rwTatkalAddPax()">+ Add</button></div>'
+    +'<div id="tatkalPax"></div></div>'
+    +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px">'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:9px">PRE-FLIGHT CHECKLIST</div>'
+    +'<div id="tatkalCheck"></div></div>';
+  rwTatkalRenderPax(); rwTatkalRenderCheck(); rwTatkalStartTimer();
+}
+/* --- countdown to the next Tatkal window (10:00 AC / 11:00 non-AC IST) --- */
+var _tatkalTimer=null;
+function rwTatkalStopTimer(){ if(_tatkalTimer){ clearInterval(_tatkalTimer); _tatkalTimer=null; } }
+function rwTatkalStartTimer(){
+  rwTatkalStopTimer();
+  function tick(){
+    var host=el('tatkalClock'); if(!host){ rwTatkalStopTimer(); return; }
+    /* IST regardless of device timezone */
+    var now=new Date();
+    var ist=new Date(now.getTime() + (now.getTimezoneOffset()*60000) + (5.5*3600000));
+    function nextAt(h){
+      var t=new Date(ist); t.setHours(h,0,0,0);
+      if(t<=ist) t.setDate(t.getDate()+1);
+      return t;
+    }
+    var ac=nextAt(10), nac=nextAt(11);
+    var next = ac<nac ? {t:ac,label:'AC classes (10:00 IST)'} : {t:nac,label:'Sleeper / non-AC (11:00 IST)'};
+    var ms=next.t-ist, hh=Math.floor(ms/3600000), mm=Math.floor(ms%3600000/60000), ss=Math.floor(ms%60000/1000);
+    var soon = ms < 10*60000;
+    host.innerHTML='<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em">NEXT TATKAL WINDOW</div>'
+      +'<div style="font-size:34px;font-weight:900;color:'+(soon?'#4ADE80':'var(--gold,#E8BA6C)')+';margin:6px 0;font-variant-numeric:tabular-nums">'
+      + String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0')+'</div>'
+      +'<div style="font-size:12.5px;color:var(--t2)">'+next.label+'</div>'
+      +(soon?'<div style="font-size:12px;color:#4ADE80;font-weight:700;margin-top:6px">Log in to IRCTC NOW \u2014 be on the booking page before it opens</div>':'')
+      +'<div style="font-size:10.5px;color:var(--t3);margin-top:8px;line-height:1.5">Times are IST. RoamWise never books or logs in for you \u2014 automating IRCTC breaks their rules and can get your account banned.</div>';
+  }
+  tick(); _tatkalTimer=setInterval(tick,1000);
+}
+/* --- passenger master list (on-device only) --- */
+function rwTatkalPax(){ try{ return JSON.parse(lsGet('rw_tatkal_pax')||'[]'); }catch(e){ return []; } }
+function rwTatkalSetPax(a){ try{ lsSet('rw_tatkal_pax', JSON.stringify(a.slice(0,6))); }catch(e){} }
+function rwTatkalAddPax(){
+  rwForm('Add passenger', [
+    {key:'name', label:'Full name (as on ID)'},
+    {key:'age', label:'Age', type:'number'},
+    {key:'gender', label:'Gender (M/F/T)'},
+    {key:'berth', label:'Berth preference', placeholder:'Lower / Upper / Side lower / No preference'}
+  ], function(v){
+    if(!v.name){ showToast('Name is required'); return; }
+    var list=rwTatkalPax(); list.push({name:v.name, age:v.age, gender:(v.gender||'').toUpperCase(), berth:v.berth||''});
+    rwTatkalSetPax(list); rwTatkalRenderPax();
+  });
+}
+function rwTatkalDelPax(i){ var l=rwTatkalPax(); l.splice(i,1); rwTatkalSetPax(l); rwTatkalRenderPax(); }
+function rwTatkalRenderPax(){
+  var host=el('tatkalPax'); if(!host) return;
+  var list=rwTatkalPax();
+  if(!list.length){ host.innerHTML='<div style="font-size:12.5px;color:var(--t3)">Add your regular travellers once. When Tatkal opens you copy them in instead of typing under pressure.</div>'; return; }
+  host.innerHTML=list.map(function(p,i){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--b1,rgba(255,255,255,.06))">'
+      +'<div style="flex:1"><b style="font-size:13.5px">'+esc2(p.name)+'</b>'
+      +'<div style="font-size:11.5px;color:var(--t3)">'+esc2(String(p.age||''))+(p.gender?' \u00b7 '+esc2(p.gender):'')+(p.berth?' \u00b7 '+esc2(p.berth):'')+'</div></div>'
+      +'<button class="tact" style="padding:4px 9px;font-size:11px" onclick="rwTatkalCopyPax('+i+')">Copy</button>'
+      +'<button class="tact" style="padding:4px 8px;font-size:11px" onclick="rwTatkalDelPax('+i+')">\u2715</button></div>';
+  }).join('')
+  +'<button class="tact" style="width:100%;margin-top:10px;font-weight:700" onclick="rwTatkalCopyAll()">\ud83d\udccb Copy all passengers</button>';
+}
+function rwTatkalCopyPax(i){
+  var p=rwTatkalPax()[i]; if(!p) return;
+  var txt=p.name+'\t'+(p.age||'')+'\t'+(p.gender||'')+(p.berth?'\t'+p.berth:'');
+  try{ navigator.clipboard.writeText(txt); showToast('Copied \u2014 paste into IRCTC'); }catch(e){ showToast('Copy failed'); }
+}
+function rwTatkalCopyAll(){
+  var txt=rwTatkalPax().map(function(p){ return p.name+'\t'+(p.age||'')+'\t'+(p.gender||'')+(p.berth?'\t'+p.berth:''); }).join('\n');
+  if(!txt){ showToast('No passengers saved yet'); return; }
+  try{ navigator.clipboard.writeText(txt); showToast('All passengers copied'); }catch(e){ showToast('Copy failed'); }
+}
+/* --- checklist --- */
+var RW_TATKAL_STEPS=[
+  'IRCTC username &amp; password remembered (test-login the night before)',
+  'Passenger details saved in IRCTC\u2019s own Master List',
+  'Payment ready \u2014 UPI app open, or saved card / IRCTC eWallet topped up',
+  'Train number &amp; class decided in advance (don\u2019t browse at 10:00)',
+  'Boarding &amp; destination stations confirmed',
+  'Strong network \u2014 switch to mobile data if wifi is flaky',
+  'Logged in and sitting on the booking page 2 minutes early'
+];
+function rwTatkalRenderCheck(){
+  var host=el('tatkalCheck'); if(!host) return;
+  var done={}; try{ done=JSON.parse(lsGet('rw_tatkal_check')||'{}'); }catch(e){}
+  host.innerHTML=RW_TATKAL_STEPS.map(function(t,i){
+    var on=!!done[i];
+    return '<button onclick="rwTatkalToggle('+i+')" style="display:flex;align-items:flex-start;gap:9px;width:100%;text-align:left;background:none;border:none;padding:7px 0;cursor:pointer;color:var(--t1)">'
+      +'<span style="font-size:15px;flex:0 0 auto">'+(on?'\u2705':'\u2b1c')+'</span>'
+      +'<span style="font-size:12.5px;line-height:1.5;'+(on?'color:var(--t3);text-decoration:line-through':'')+'">'+t+'</span></button>';
+  }).join('');
+}
+function rwTatkalToggle(i){
+  var done={}; try{ done=JSON.parse(lsGet('rw_tatkal_check')||'{}'); }catch(e){}
+  done[i]=!done[i]; try{ lsSet('rw_tatkal_check', JSON.stringify(done)); }catch(e){}
+  try{ rwHaptic(); }catch(e){}
+  rwTatkalRenderCheck();
+}
+
+/* ============ ARRIVAL MODE — "your ticket is the start, not the end" (rw-v44)
+   The strategic wedge vs ixigo/ConfirmTkt/IRCTC: on those apps the journey ENDS
+   when the ticket is booked. Here, the arrival station + time is the TRIGGER
+   for a full trip. We deliberately do NOT book tickets (that needs authorised
+   IRCTC partner access) — we own everything around the ticket instead, and
+   deep-link out for the booking itself.
+   ========================================================================== */
+var RW_STATIONS=[
+  {q:'New Delhi (NDLS)', city:'Delhi'},{q:'Haridwar (HW)', city:'Haridwar'},
+  {q:'Rishikesh (RKSH)', city:'Rishikesh'},{q:'Madgaon Goa (MAO)', city:'Goa'},
+  {q:'Bengaluru (SBC)', city:'Bangalore'},{q:'Mumbai CSMT', city:'Mumbai'},
+  {q:'Varanasi (BSB)', city:'Varanasi'},{q:'Jaipur (JP)', city:'Jaipur'},
+  {q:'Kalka (KLK)', city:'Shimla'},{q:'Chennai Central (MAS)', city:'Chennai'},
+  {q:'Kochi (ERS)', city:'Kochi'},{q:'Guwahati (GHY)', city:'Guwahati'}
+];
+function openArrival(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('arrivalSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='arrivalSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  sec.style.display='';
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\ude82 Arrival <em>mode</em></h2>'
+    +'<button class="tact" onclick="el(\'arrivalSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<p class="xsec-sub">Booked a train? Tell us where you land and when \u2014 we\u2019ll build the trip around your arrival, not around a search box.</p>'
+    +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px;margin-bottom:14px">'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:7px">ARRIVING AT</div>'
+    +'<input id="arrStation" list="arrStationList" placeholder="Station or city \u2014 e.g. Haridwar (HW)" style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:10px;padding:11px;color:var(--t1);font:inherit;margin-bottom:10px">'
+    +'<datalist id="arrStationList">'+RW_STATIONS.map(function(x){return '<option value="'+x.q+'">';}).join('')+'</datalist>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<div style="flex:1;min-width:110px"><div style="font-size:11px;color:var(--t3);font-weight:700;margin-bottom:5px">ARRIVAL TIME</div>'
+    +'<input id="arrTime" type="time" value="06:00" style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:10px;padding:10px;color:var(--t1);font:inherit"></div>'
+    +'<div style="flex:1;min-width:110px"><div style="font-size:11px;color:var(--t3);font-weight:700;margin-bottom:5px">HOW MANY DAYS</div>'
+    +'<input id="arrDays" type="number" min="1" max="14" value="3" style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:10px;padding:10px;color:var(--t1);font:inherit"></div></div>'
+    +'<button class="tact" style="width:100%;margin-top:12px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:13px" onclick="rwArrivalGo()">Build my trip from this arrival \u2192</button>'
+    +'</div>'
+    +'<div id="arrivalOut"></div>';
+}
+function rwArrivalGo(){
+  var st=(el('arrStation')&&el('arrStation').value||'').trim();
+  var tm=(el('arrTime')&&el('arrTime').value)||'06:00';
+  var dy=parseInt((el('arrDays')&&el('arrDays').value)||'3',10)||3;
+  if(!st){ showToast('Which station are you arriving at?'); return; }
+  var city=st.replace(/\s*\([A-Z]+\)\s*$/,'').trim();
+  var known=RW_STATIONS.filter(function(x){ return x.q.toLowerCase()===st.toLowerCase(); })[0];
+  if(known) city=known.city;
+  var hr=parseInt(tm.split(':')[0],10);
+  var slot = hr<5?'pre-dawn' : hr<9?'early morning' : hr<12?'late morning' : hr<16?'afternoon' : hr<20?'evening' : 'late night';
+  var out=el('arrivalOut');
+  out.innerHTML='<div style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:16px;margin-bottom:12px">'
+    +'<div style="font-weight:800;font-size:15px;margin-bottom:4px">\ud83d\ude82 Landing in '+esc2(city)+' at '+esc2(tm)+'</div>'
+    +'<div style="font-size:12.5px;color:var(--t2);line-height:1.6">'+esc2(rwArrivalAdvice(slot, city))+'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="tact" style="flex:1;min-width:150px;font-weight:800" onclick="rwArrivalPlan(\''+city.replace(/'/g,"\\'")+'\','+dy+',\''+tm+'\')">\ud83d\uddd3\ufe0f Build '+dy+'-day itinerary</button>'
+    +'<button class="tact" style="flex:1;min-width:150px" onclick="rwArrivalNear(\''+city.replace(/'/g,"\\'")+'\')">\ud83d\udccd What\u2019s near the station</button>'
+    +'<button class="tact" style="flex:1;min-width:150px" onclick="openFitnessStays()">\ud83c\udfcb\ufe0f Gyms &amp; stays nearby</button>'
+    +'<button class="tact" style="flex:1;min-width:150px" onclick="rwArrivalBookOut(\''+city.replace(/'/g,"\\'")+'\')">\ud83c\udfab Book the train</button>'
+    +'</div>';
+}
+/* Genuinely useful, non-obvious arrival guidance — the thing a booking app
+   never tells you. Deliberately generic-but-true rather than invented specifics. */
+function rwArrivalAdvice(slot, city){
+  if(slot==='pre-dawn'||slot==='late night')
+    return 'You land when most of '+city+' is asleep. Pre-book your stay for the night BEFORE you arrive so you can check in straight away \u2014 arriving at 3am without a booked room is the classic Indian-rail mistake. Prepaid taxi counters and station retiring rooms are your friends here.';
+  if(slot==='early morning')
+    return 'The best possible arrival slot. Drop bags, get chai, and hit the main sight before the crowds and heat \u2014 you effectively gain a whole extra day.';
+  if(slot==='late morning')
+    return 'Check in first, eat a proper lunch, then start with something indoors or shaded \u2014 the midday sun will eat your energy otherwise.';
+  if(slot==='afternoon')
+    return 'Treat today as a soft start: settle in, walk the local market, eat well. Save the big sights for a full morning tomorrow.';
+  return 'You arrive as '+city+' switches to evening mode \u2014 perfect for a food street and an early night, so tomorrow starts properly.';
+}
+function rwArrivalPlan(city, days, tm){
+  var q='I arrive in '+city+' by train at '+tm+'. Plan '+days+' days starting from that arrival \u2014 account for the arrival time on day 1 (do not plan a full morning if I land in the afternoon).';
+  var inp=el('heroInput')||el('cpInput');
+  if(inp){ inp.value=q; try{ copilotSend(!!el('heroInput')); }catch(e){} }
+  var a=el('arrivalSection'); if(a) a.style.display='none';
+}
+function rwArrivalNear(city){
+  try{ openNearMe(); }catch(e){}
+  setTimeout(function(){
+    var mi=el('nearManualInp');
+    if(mi){ mi.value=city+' railway station'; try{ rwNearMeManualGo(); }catch(e){} }
+    else { try{ rwNearMeManual('Searching around '+city+' station.'); setTimeout(function(){ var m2=el('nearManualInp'); if(m2){ m2.value=city+' railway station'; rwNearMeManualGo(); } },250); }catch(e){} }
+  }, 400);
+}
+/* We don't book tickets (that needs authorised IRCTC partner access) — we send
+   users out to the real booking sites, honestly labelled. */
+function rwArrivalBookOut(city){
+  var ov=el('bookOutOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='bookOutOv'; ov.className='overlay'; ov.style.zIndex='3000';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('bookOutOv'); }; document.body.appendChild(ov); }
+  function lk(name, url, note){
+    return '<a href="'+url+'" target="_blank" rel="noopener" class="tact" style="display:flex;align-items:center;gap:10px;text-decoration:none;padding:13px;margin-bottom:8px;border-radius:12px">'
+      +'<span style="flex:1"><b style="font-size:14px">'+name+'</b><div style="font-size:11.5px;color:var(--t3)">'+note+'</div></span><span>\u2197</span></a>';
+  }
+  ov.innerHTML='<div class="sheet" style="max-width:400px"><div class="sheet-h"><b>\ud83c\udfab Book your train</b>'
+    +'<button onclick="rwOverlayClose(\'bookOutOv\')" class="tact">\u2715</button></div>'
+    +'<p style="font-size:12px;color:var(--t2);margin:2px 0 12px">RoamWise plans the trip \u2014 booking happens on the official platforms, so you always get real fares and real availability.</p>'
+    + lk('IRCTC', 'https://www.irctc.co.in/', 'The official Indian Railways booking site')
+    + lk('ixigo trains', 'https://www.ixigo.com/trains', 'PNR status, availability prediction')
+    + lk('ConfirmTkt', 'https://www.confirmtkt.com/', 'Confirmation-chance prediction')
+    +'<div style="font-size:11px;color:var(--t3);margin-top:6px;line-height:1.5">Come back after booking and tap \ud83d\ude82 Arrival mode \u2014 we\u2019ll build the trip around your arrival time.</div></div>';
+  ov.classList.add('open');
+}
 
 /* ================= SMART TRAVEL MATCHING ENGINE (rw-v40) =================
    Matches people by travel INTENT — founders, investors, creators and
@@ -9228,6 +10183,7 @@ function tripChatOpen(roomId, roomName){
       +'<button class="chat-tool" onclick="chatShareMeet()">\ud83d\udccd Meet point</button>'
       +'<button class="chat-tool" onclick="chatNewPoll()">\ud83d\uddf3\ufe0f Poll</button>'
       +'<button class="chat-tool" onclick="chatWhenAsk()">\ud83d\udcc5 When can everyone go?</button>'
+      +'<button class="chat-tool" onclick="chatTrainAsk()">\ud83d\ude82 Pick a train</button>'
       +'<button class="chat-tool" onclick="chatMarkPaid()">\u2705 Mark paid</button>'
       +'<button class="chat-tool" onclick="chatInvite()">\ud83d\udc65 Invite</button>'
       +'</div>'
@@ -9552,6 +10508,8 @@ var CHAT_KINDS = {
   text:    {icon:'', label:''},
   tusk:    {icon:'\u26a1', label:'Ailon Tusk'},
   when:    {icon:'\ud83d\udcc5', label:'When can everyone go?'},
+  train:   {icon:'\ud83d\ude82', label:'Which train?'},
+  trainvote:{icon:'', label:''},
   whenvote:{icon:'', label:''},
   budget:  {icon:'\ud83d\udcb0', label:'Budget'},
   plan:    {icon:'\ud83d\uddd3\ufe0f', label:'Itinerary'},
@@ -9819,6 +10777,91 @@ function chatKittyHTML(){
 function chatSettle(toUid, amount){
   chatPost('settle', {from:user.uid, to:toUid, amount:amount},
     (user.displayName||'Someone').split('@')[0]+' settled \u20b9'+amount.toLocaleString('en-IN'));
+}
+
+
+/* ===== GROUP TRAIN PICKER (rw-v44) — pillar 2 of the rail strategy.
+   On IRCTC/ixigo, group travel means one person books and everyone argues in
+   WhatsApp afterwards. Here: propose 2-4 train options with fares, everyone
+   votes inline, the winner auto-posts as a decision AND drops the fare into
+   the kitty split so nobody chases anyone for money. Reuses the existing
+   poll + settle-engine plumbing. */
+function chatTrainAsk(){
+  rwForm('\ud83d\ude82 Which train should we take?', [
+    {key:'route', label:'Route', placeholder:'e.g. Delhi \u2192 Haridwar', value:''},
+    {key:'o1', label:'Option 1 (train + time + fare)', placeholder:'e.g. Shatabdi 12017, 06:45, \u20b9805'},
+    {key:'o2', label:'Option 2', placeholder:'e.g. Jan Shatabdi 12055, 15:20, \u20b9420'},
+    {key:'o3', label:'Option 3 (optional)', placeholder:''},
+    {key:'o4', label:'Option 4 (optional)', placeholder:''}
+  ], function(v){
+    var options=[v.o1,v.o2,v.o3,v.o4].map(function(x){return (x||'').trim();}).filter(Boolean);
+    if(options.length<2){ showToast('Give at least two train options'); return; }
+    chatPost('train', {route:v.route||'Our train', options:options},
+      '\ud83d\ude82 '+(v.route||'Which train?'));
+  });
+}
+function chatTrainVote(msgId, idx){
+  if(!_chatRoom || !user) return;
+  chatPost('trainvote', {poll:msgId, pick:idx}, '\ud83d\ude82 voted');
+  try{ rwHaptic(); }catch(e){}
+}
+function chatTrainTally(msg){
+  var opts=(msg.payload&&msg.payload.options)||[];
+  var byUser={};
+  _chatMsgs.forEach(function(m){
+    if(m.kind==='trainvote' && m.payload && m.payload.poll===msg._id){
+      byUser[m.uid]={pick:m.payload.pick, name:m.name||'Someone'};
+    }
+  });
+  var counts=opts.map(function(){return 0;}), names=opts.map(function(){return [];});
+  Object.keys(byUser).forEach(function(u){
+    var pk=byUser[u].pick;
+    if(counts[pk]!==undefined){ counts[pk]++; names[pk].push(byUser[u].name.split(' ')[0]); }
+  });
+  var people=Object.keys(byUser).length, best=-1, max=0;
+  counts.forEach(function(c,i){ if(c>max){ max=c; best=i; } });
+  var mine=(byUser[user&&user.uid]||{}).pick;
+  return {counts:counts,names:names,people:people,best:best,max:max,mine:mine,opts:opts};
+}
+/* pull a ₹ fare out of the free-text option so we can split it automatically */
+function rwFareOf(text){
+  var m=String(text||'').match(/(?:\u20b9|rs\.?\s*)\s*([\d,]+)/i);
+  return m ? parseInt(m[1].replace(/,/g,''),10) : 0;
+}
+function chatTrainBody(msg){
+  var t=chatTrainTally(msg);
+  var rows=t.opts.map(function(o,i){
+    var isBest=i===t.best && t.max>0, picked=t.mine===i, fare=rwFareOf(o);
+    return '<button onclick="chatTrainVote(\''+msg._id+'\','+i+')" style="display:block;width:100%;text-align:left;margin-bottom:7px;padding:10px 12px;border-radius:11px;cursor:pointer;'
+      +'background:'+(picked?'rgba(232,186,108,.14)':'var(--bg3,#1A1A20)')+';'
+      +'border:1px solid '+(isBest?'var(--gold,#E8BA6C)':(picked?'rgba(232,186,108,.5)':'var(--b2,#2A2A36)'))+';color:var(--t1,#EDEAE2)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
+      +'<span style="font-weight:700;font-size:13px">'+(picked?'\u25c9 ':'\u25cb ')+esc2(o)+'</span>'
+      +'<span style="font-size:11px;color:'+(isBest?'var(--gold,#E8BA6C)':'var(--t3,#7A7870)')+';font-weight:700">'+t.counts[i]+'/'+t.people+(isBest?' \u2b50':'')+'</span></div>'
+      +(t.names[i].length?'<div style="font-size:10.5px;color:var(--t3,#7A7870);margin-top:3px">'+esc2(t.names[i].join(', '))+'</div>':'')
+      +(fare?'<div style="font-size:10.5px;color:#4ADE80;margin-top:3px">\u20b9'+fare+' each \u00b7 splits automatically if chosen</div>':'')
+      +'</button>';
+  }).join('');
+  var lock = t.max>0
+    ? '<button class="chat-tool" style="width:100%;margin-top:6px;justify-content:center" onclick="chatTrainLock(\''+msg._id+'\')">\u2705 Lock this train &amp; split the fare</button>'
+    : '<div style="font-size:11.5px;color:var(--t3,#7A7870);margin-top:6px">Tap the train that works for you.</div>';
+  return '<div style="margin-top:6px">'+rows+lock+'</div>';
+}
+function chatTrainLock(msgId){
+  var msg=_chatMsgs.filter(function(m){return m._id===msgId;})[0]; if(!msg) return;
+  var t=chatTrainTally(msg);
+  if(t.best<0||!t.max){ showToast('Nobody has voted yet'); return; }
+  var choice=t.opts[t.best], fare=rwFareOf(choice);
+  chatPost('decision', {q:(msg.payload&&msg.payload.route)||'Train', choice:choice},
+    '\u2705 Train locked: '+choice+' ('+t.max+' of '+t.people+')');
+  if(fare>0 && user){
+    /* drop it straight into the kitty so the fare is already split */
+    chatPost('expense', {amount:fare*Math.max(1,t.people), what:'Train tickets \u2014 '+choice.slice(0,40)},
+      '\ud83d\udcb0 Train fare added to the kitty');
+    showToast('Train locked \u00b7 \u20b9'+fare+' each added to the split');
+  } else {
+    showToast('Train locked \u2705');
+  }
 }
 
 /* ============ "WHEN CAN EVERYONE GO?" — group date finder (rw-v39) ============
@@ -10233,7 +11276,15 @@ function chatBubble(id, m, mine){
       +'<div style="font-size:12.5px;margin-top:2px">'+esc2(p.q||'')+' \u2192 <b>'+esc2(p.choice||'')+'</b></div></div></div>';
   }
   if(kind==='vote'){ return ''; }
-  if(kind==='whenvote'){ return ''; }   /* availability updates are silent — the card shows the tally */
+  if(kind==='whenvote'){ return ''; }
+  if(kind==='trainvote'){ return ''; }
+  if(kind==='train'){
+    var pt=m.payload||{};
+    return '<div class="tk-card" style="background:var(--bg2,#12121C);border:1px solid var(--b2,#2A2A36);border-radius:14px;padding:13px;margin:7px 0">'
+      +'<div style="font-size:12px;font-weight:800;color:var(--gold,#E8BA6C);margin-bottom:2px">\ud83d\ude82 '+esc2(pt.route||'Which train?')+'</div>'
+      +'<div style="font-size:10.5px;color:var(--t3,#7A7870);margin-bottom:8px">Asked by '+esc2((m.name||'Someone').split(' ')[0])+' \u00b7 tap the one that works</div>'
+      + chatTrainBody(m) + '</div>';
+  }   /* availability updates are silent — the card shows the tally */
   if(kind==='when'){
     var pw=m.payload||{};
     return '<div class="tk-card" style="background:var(--bg2,#12121C);border:1px solid var(--b2,#2A2A36);border-radius:14px;padding:13px;margin:7px 0">'
