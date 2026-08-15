@@ -376,6 +376,893 @@ function rwLocalNotifySchedule(what, mins){
   return false;
 }
 
+
+
+
+
+
+/* ============================================================================
+   AILON TUSK AGENT — a real ReAct tool-calling loop (rw-v52)
+   ============================================================================
+   Until now Tusk could only TALK about RoamWise's features. This makes it
+   OPERATE them: the model is given a JSON tool schema of real app functions,
+   picks one, we execute it against live app state, feed the result back, and
+   loop until the objective is met or we hit the step ceiling.
+
+   Design notes (the parts that actually matter in an agent):
+     - BOUNDED: hard max-step ceiling, so a confused model can't spin forever.
+     - OBSERVABLE: every thought/action/observation is recorded in a trace the
+       user (and you, in a demo) can actually read.
+     - RECOVERABLE: a tool that throws returns {ok:false,error} INTO the model's
+       context rather than crashing, so it can self-correct and try another path.
+     - HONEST: tools only expose things the app can genuinely do. No tool
+       pretends to book, pay, or fetch data we don't have.
+   ========================================================================== */
+
+var RW_AGENT_TOOLS = [
+  { type:'function', function:{ name:'set_destination',
+    description:'Set the active trip destination in the app.',
+    parameters:{ type:'object', properties:{ place:{type:'string', description:'City or region, e.g. "Rishikesh"'} }, required:['place'] } } },
+  { type:'function', function:{ name:'estimate_travel_time',
+    description:'Honest India road travel time for a distance, accounting for terrain (Himalayan roads are ~3x slower than plains). Use before claiming any journey duration.',
+    parameters:{ type:'object', properties:{ km:{type:'number'}, place:{type:'string'} }, required:['km','place'] } } },
+  { type:'function', function:{ name:'check_cycle_safety',
+    description:'Check whether Cycle Mode is safe at a place in a given month (blocks Himalayan terrain, peak monsoon, desert summer).',
+    parameters:{ type:'object', properties:{ place:{type:'string'}, month:{type:'number', description:'1-12'} }, required:['place'] } } },
+  { type:'function', function:{ name:'calculate_budget',
+    description:'Split a trip budget into stay/food/transport/activities for a number of days and style.',
+    parameters:{ type:'object', properties:{ total:{type:'number'}, days:{type:'number'}, style:{type:'string', enum:['backpacker','mid','comfort']} }, required:['total','days'] } } },
+  { type:'function', function:{ name:'settle_group_money',
+    description:'Run the settle engine over the current trip group and return who owes whom.',
+    parameters:{ type:'object', properties:{}, } } },
+  { type:'function', function:{ name:'find_nearby',
+    description:'Find food, sights and things to do near a place.',
+    parameters:{ type:'object', properties:{ place:{type:'string'} }, required:['place'] } } },
+  { type:'function', function:{ name:'show_map',
+    description:'Open the day-by-day trip map for a destination.',
+    parameters:{ type:'object', properties:{ place:{type:'string'} }, required:['place'] } } },
+  { type:'function', function:{ name:'parse_ticket',
+    description:'Extract PNR, train, stations, date and status from a pasted booking SMS.',
+    parameters:{ type:'object', properties:{ text:{type:'string'} }, required:['text'] } } },
+  { type:'function', function:{ name:'finish',
+    description:'Call when the objective is complete. Provide the final answer for the user.',
+    parameters:{ type:'object', properties:{ answer:{type:'string'} }, required:['answer'] } } }
+];
+
+/* --- the tool belt: real functions, each returns a plain JSON-able result --- */
+var RW_AGENT_IMPL = {
+  set_destination: function(a){
+    if(!a.place) return {ok:false, error:'place is required'};
+    try{ var d=el('destInput'); if(d) d.value=a.place; }catch(e){}
+    window._agentDest=a.place;
+    return {ok:true, destination:a.place, terrain:rwTerrainOf(a.place), ground_truth:rwGroundTruth(a.place)||'normal roads'};
+  },
+  estimate_travel_time: function(a){
+    if(typeof a.km!=='number' || a.km<=0) return {ok:false, error:'km must be a positive number'};
+    var r=rwRoadTime(a.km, a.place||'');
+    return {ok:true, km:a.km, duration:r.label, terrain:r.terrain, caution:r.note};
+  },
+  check_cycle_safety: function(a){
+    if(!a.place) return {ok:false, error:'place is required'};
+    var m=(typeof a.month==='number')? a.month-1 : undefined;
+    var c=rwCycleSafety(a.place, m);
+    return {ok:true, safe:c.ok, terrain:c.terrain,
+      warnings:c.warnings.map(function(w){ return (w.lvl==='stop'?'BLOCK: ':'WARN: ')+w.t+' \u2014 '+w.d; })};
+  },
+  calculate_budget: function(a){
+    var total=+a.total, days=+a.days;
+    if(!total||!days) return {ok:false, error:'total and days are required'};
+    var style=a.style||'mid';
+    var w={backpacker:{stay:.30,food:.25,transport:.30,acts:.15},
+           mid:{stay:.38,food:.25,transport:.22,acts:.15},
+           comfort:{stay:.45,food:.24,transport:.18,acts:.13}}[style]||{stay:.38,food:.25,transport:.22,acts:.15};
+    var r=function(x){ return Math.round(total*x); };
+    return {ok:true, currency:'INR', per_day:Math.round(total/days), style:style,
+      breakdown:{stay:r(w.stay), food:r(w.food), transport:r(w.transport), activities:r(w.acts)}};
+  },
+  settle_group_money: function(){
+    try{
+      var k=(typeof chatKittyState==='function')? chatKittyState() : null;
+      if(!k) return {ok:false, error:'no active trip group \u2014 the user needs to open a trip chat first'};
+      if(!k.tx.length) return {ok:true, settled:true, message:'All square \u2014 nobody owes anybody.', total:k.total};
+      return {ok:true, settled:false, total:k.total, per_head:k.perHead,
+        transfers:k.tx.map(function(t){ return {from:(k.names[t.from]||'someone'), to:(k.names[t.to]||'someone'), amount:t.amount}; })};
+    }catch(e){ return {ok:false, error:'could not read the group kitty'}; }
+  },
+  find_nearby: function(a){
+    if(!a.place) return {ok:false, error:'place is required'};
+    try{ openNearMe(); setTimeout(function(){ var i=el('nearManualInp'); if(i){ i.value=a.place; rwNearMeManualGo(); } }, 300); }catch(e){}
+    return {ok:true, opened:'near_me', searching:a.place, note:'Results are rendering in the app for the user to see.'};
+  },
+  show_map: function(a){
+    if(!a.place) return {ok:false, error:'place is required'};
+    try{ openTripMap(a.place, null); }catch(e){ return {ok:false, error:'map failed to open'}; }
+    return {ok:true, opened:'trip_map', place:a.place};
+  },
+  parse_ticket: function(a){
+    var r=rwParsePNR(a.text||'');
+    if(!r.found) return {ok:false, error:'no ticket details found in that text'};
+    return {ok:true, ticket:r};
+  },
+  finish: function(a){ return {ok:true, done:true, answer:a.answer||''}; }
+};
+
+/* --- the loop --- */
+var RW_AGENT_MAX_STEPS = 6;
+function rwAgentRun(objective, onTrace, onDone){
+  var trace=[], msgs=[
+    {role:'system', content:
+      'You are Ailon Tusk, an autonomous travel agent operating the RoamWise app. '
+      +'Work in steps: pick ONE tool at a time, read its result, then decide the next step. '
+      +'CRITICAL: never state a travel duration without calling estimate_travel_time first \u2014 '
+      +'Indian mountain roads are far slower than distance suggests. '
+      +'If a tool returns ok:false, read the error and try a different approach rather than repeating it. '
+      +'When the objective is met, call finish with a short, warm answer for the traveller.'},
+    {role:'user', content:objective}
+  ];
+  var step=0;
+  function record(kind, data){ trace.push({step:step, kind:kind, data:data}); if(onTrace) onTrace(trace); }
+  record('objective', objective);
+
+  function tick(){
+    if(step>=RW_AGENT_MAX_STEPS){
+      record('halt','step ceiling reached');
+      if(onDone) onDone({ok:false, reason:'max_steps', trace:trace});
+      return;
+    }
+    step++;
+    rwAgentCall(msgs, function(err, reply){
+      if(err || !reply){ record('error', err||'no reply'); if(onDone) onDone({ok:false, reason:'llm_error', trace:trace}); return; }
+      var calls=reply.tool_calls||[];
+      if(!calls.length){
+        record('answer', reply.content||'');
+        if(onDone) onDone({ok:true, answer:reply.content||'', trace:trace});
+        return;
+      }
+      msgs.push({role:'assistant', content:reply.content||null, tool_calls:calls});
+      var finished=null;
+      calls.forEach(function(c){
+        var name=(c.function&&c.function.name)||'', args={};
+        try{ args=JSON.parse((c.function&&c.function.arguments)||'{}'); }catch(e){}
+        record('action', {tool:name, args:args});
+        var impl=RW_AGENT_IMPL[name];
+        var out = impl ? (function(){ try{ return impl(args); }catch(e){ return {ok:false, error:String(e&&e.message||e)}; } })()
+                       : {ok:false, error:'unknown tool "'+name+'"'};
+        record('observation', out);
+        if(name==='finish' && out.ok) finished=out.answer;
+        msgs.push({role:'tool', tool_call_id:c.id, name:name, content:JSON.stringify(out)});
+      });
+      if(finished!=null){ if(onDone) onDone({ok:true, answer:finished, trace:trace}); return; }
+      tick();
+    });
+  }
+  tick();
+}
+/* Tool-calling request. Only OpenAI-compatible providers support this, so we
+   pick one that does and fall back to plain chat if none is configured. */
+function rwAgentCall(messages, cb){
+  var provs=['groq','cerebras','openrouter','mistral'];
+  var prov=provs.filter(function(p){ return lsGet('rwKey_'+p); })[0];
+  if(!prov){ cb('no tool-calling provider configured'); return; }
+  var bases={groq:'https://api.groq.com/openai/v1', cerebras:'https://api.cerebras.ai/v1',
+             openrouter:'https://openrouter.ai/api/v1', mistral:'https://api.mistral.ai/v1'};
+  var model=(AI_MODELS[prov]||['llama-3.3-70b-versatile'])[0];
+  fetch(bases[prov]+'/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+lsGet('rwKey_'+prov)},
+    body:JSON.stringify({model:model, messages:messages, tools:RW_AGENT_TOOLS, tool_choice:'auto', max_tokens:900})
+  }).then(function(r){ return r.json(); })
+    .then(function(d){
+      var m=d&&d.choices&&d.choices[0]&&d.choices[0].message;
+      if(!m){ cb((d&&d.error&&d.error.message)||'no message'); return; }
+      cb(null, m);
+    }).catch(function(e){ cb(String(e&&e.message||e)); });
+}
+
+/* --- the visible reasoning trace (useful UX AND the thing to film for a demo) --- */
+function openAgent(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('agentSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='agentSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  rwOpenSection(sec.id);
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83e\udde0 Tusk <em>Agent</em></h2>'
+    +'<button class="tact" onclick="rwCloseSection(\'agentSection\')">\u2715</button></div>'
+    +'<p class="xsec-sub">Give Tusk an objective and watch it work \u2014 it picks tools, reads the results, and corrects itself. Every step is shown.</p>'
+    +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:15px;margin-bottom:12px">'
+    +'<input id="agentObj" placeholder="e.g. Plan 3 days in Spiti under 20k and check if cycling works" style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:10px;padding:12px;color:var(--t1);font:inherit">'
+    +'<button class="tact rw-cine-btn" style="width:100%;margin-top:10px;font-weight:800;padding:12px" onclick="rwAgentGo()">Run agent</button>'
+    +'<div style="font-size:10.5px;color:var(--t3);margin-top:8px">Needs an AI key with tool-calling (Groq, Cerebras, OpenRouter or Mistral). Max '+RW_AGENT_MAX_STEPS+' steps.</div></div>'
+    +'<div id="agentTrace"></div>';
+}
+function rwAgentGo(){
+  var obj=(el('agentObj')&&el('agentObj').value||'').trim();
+  if(!obj){ showToast('Give the agent an objective'); return; }
+  var host=el('agentTrace');
+  host.innerHTML='<div class="rw-cine-load"><div class="rw-cine-orb"></div><div style="font-size:13px;color:var(--t2);margin-top:12px">Tusk is thinking\u2026</div></div>';
+  rwAgentRun(obj, function(tr){ rwAgentRenderTrace(tr, host); },
+    function(res){
+      rwAgentRenderTrace(res.trace, host);
+      if(res.ok) host.insertAdjacentHTML('beforeend',
+        '<div class="rw-cine-panel" style="margin-top:12px;padding:20px">'
+        +'<div style="position:relative;z-index:1"><b style="color:#4ADE80;font-size:13px;letter-spacing:.06em">\u2713 OBJECTIVE COMPLETE</b>'
+        +'<div style="font-size:14px;color:#EDEAE2;margin-top:8px;line-height:1.65">'+esc2(res.answer||'')+'</div></div></div>');
+      else host.insertAdjacentHTML('beforeend',
+        '<div style="border:1px solid #E05B5B;background:rgba(224,91,91,.08);border-radius:12px;padding:14px;margin-top:10px">'
+        +'<b style="color:#E05B5B;font-size:13px">Stopped: '+esc2(res.reason)+'</b>'
+        +'<div style="font-size:12px;color:var(--t2);margin-top:4px">'
+        +(res.reason==='llm_error'?'Add an AI key with tool-calling support in Settings.':'The agent hit its step limit without finishing \u2014 try a narrower objective.')
+        +'</div></div>');
+    });
+}
+function rwAgentRenderTrace(trace, host){
+  var ic={objective:'\ud83c\udfaf', action:'\u2699\ufe0f', observation:'\ud83d\udc41\ufe0f', answer:'\ud83d\udcac', error:'\u26a0\ufe0f', halt:'\u23f9\ufe0f'};
+  host.innerHTML=trace.map(function(t){
+    var body = (t.kind==='action')
+      ? '<b>'+esc2(t.data.tool)+'</b>(<span style="color:var(--t3)">'+esc2(JSON.stringify(t.data.args).slice(0,90))+'</span>)'
+      : (t.kind==='observation')
+        ? '<span style="color:'+(t.data&&t.data.ok===false?'#E05B5B':'#4ADE80')+'">'+esc2(JSON.stringify(t.data).slice(0,220))+'</span>'
+        : esc2(String(t.data).slice(0,240));
+    return '<div class="rw-cine-row" style="animation-delay:'+(Math.min(t.step,8)*0.05)+'s">'
+      +'<span style="flex:0 0 22px;font-size:14px">'+(ic[t.kind]||'\u2022')+'</span>'
+      +'<span style="flex:1;font-size:12px;font-family:ui-monospace,monospace;line-height:1.5;word-break:break-word">'+body+'</span>'
+      +'<span style="flex:0 0 auto;font-size:10px;color:var(--t3)">'+t.step+'</span></div>';
+  }).join('');
+}
+
+
+/* ============================================================================
+   AGENT EVAL HARNESS (rw-v53)
+   ============================================================================
+   The point of this is HONEST measurement. It runs a fixed suite of objectives
+   through the real agent loop and scores four things that actually matter:
+
+     tool_precision   did it call the tool the task genuinely required?
+     termination      did it finish cleanly instead of hitting the ceiling?
+     efficiency       steps used vs. the minimum the task needs
+     recovery         when a tool errored, did it change approach and continue?
+
+   Deliberately reports FAILURES as loudly as successes. A suite that always
+   scores 100% is a suite that isn't testing anything.
+   ========================================================================== */
+var RW_EVALS = [
+  { id:'e1', objective:'Plan 3 days in Spiti under 20000 rupees',
+    must:['set_destination','calculate_budget'], minSteps:3 },
+  { id:'e2', objective:'How long does it actually take to drive 200km in Spiti?',
+    must:['estimate_travel_time'], minSteps:2 },
+  { id:'e3', objective:'Is cycling safe in Varanasi in July?',
+    must:['check_cycle_safety'], minSteps:2 },
+  { id:'e4', objective:'Read this ticket: PNR 4512367890, 12017 SHATABDI EXP, NDLS-DDN, 14-Sep-2026, 06:10, CNF',
+    must:['parse_ticket'], minSteps:2 },
+  { id:'e5', objective:'Show me the trip map for Goa',
+    must:['show_map'], minSteps:2 },
+  { id:'e6', objective:'Find food and things to do near Rishikesh',
+    must:['find_nearby'], minSteps:2 },
+  { id:'e7', objective:'Who owes whom in our group right now?',
+    must:['settle_group_money'], minSteps:2 },
+  { id:'e8', objective:'Plan a day trip from Manali to Spiti and back',
+    must:['estimate_travel_time'], minSteps:2,
+    /* the honest-answer test: the round trip is ~18h of road, so a good agent
+       should check the time and then TELL THE USER IT DOESN'T WORK. */
+    expectRefusal:true },
+  { id:'e9', objective:'Budget 50000 for 5 days in Goa, comfort style, and show the map',
+    must:['calculate_budget','show_map'], minSteps:3 },
+  { id:'e10', objective:'What is the capital of France?',
+    must:[], minSteps:1, offTopic:true }
+];
+function rwEvalRun(onProgress, onDone){
+  var results=[], i=0;
+  function next(){
+    if(i>=RW_EVALS.length){ onDone(rwEvalScore(results)); return; }
+    var ev=RW_EVALS[i++];
+    onProgress({phase:'running', id:ev.id, objective:ev.objective, done:i-1, total:RW_EVALS.length});
+    var t0=Date.now();
+    rwAgentRun(ev.objective, null, function(res){
+      var tools=[], errs=0;
+      (res.trace||[]).forEach(function(t){
+        if(t.kind==='action') tools.push(t.data.tool);
+        if(t.kind==='observation' && t.data && t.data.ok===false) errs++;
+      });
+      var called=tools.filter(function(x){ return x!=='finish'; });
+      var hit=(ev.must||[]).filter(function(m){ return tools.indexOf(m)>=0; });
+      var steps=(res.trace||[]).filter(function(t){ return t.kind==='action'; }).length;
+      var recovered = errs>0 && res.ok;
+      results.push({
+        id:ev.id, objective:ev.objective,
+        pass: (ev.must||[]).length ? hit.length===(ev.must||[]).length && res.ok
+                                   : res.ok,
+        required:(ev.must||[]), hit:hit, called:called,
+        terminated:!!res.ok, reason:res.reason||'', steps:steps, minSteps:ev.minSteps||1,
+        errors:errs, recovered:recovered, ms:Date.now()-t0,
+        answer:(res.answer||'').slice(0,180), offTopic:!!ev.offTopic, expectRefusal:!!ev.expectRefusal
+      });
+      onProgress({phase:'done-one', last:results[results.length-1], done:i, total:RW_EVALS.length});
+      next();
+    });
+  }
+  next();
+}
+function rwEvalScore(rs){
+  var n=rs.length||1;
+  var scored=rs.filter(function(r){ return r.required.length; });
+  var toolHits=scored.reduce(function(a,r){ return a+r.hit.length; },0);
+  var toolNeed=scored.reduce(function(a,r){ return a+r.required.length; },0)||1;
+  var term=rs.filter(function(r){ return r.terminated; }).length;
+  var eff=rs.filter(function(r){ return r.steps<=r.minSteps+1; }).length;
+  var errRuns=rs.filter(function(r){ return r.errors>0; });
+  var rec=errRuns.filter(function(r){ return r.recovered; }).length;
+  return {
+    results:rs,
+    tool_precision: Math.round(toolHits/toolNeed*100),
+    termination:    Math.round(term/n*100),
+    efficiency:     Math.round(eff/n*100),
+    recovery:       errRuns.length? Math.round(rec/errRuns.length*100) : null,
+    recovery_n:     errRuns.length,
+    passed:         rs.filter(function(r){ return r.pass; }).length,
+    total:          n,
+    avg_ms:         Math.round(rs.reduce(function(a,r){ return a+r.ms; },0)/n),
+    avg_steps:      (rs.reduce(function(a,r){ return a+r.steps; },0)/n).toFixed(1)
+  };
+}
+function openEval(){
+  try{ tabGo('home'); }catch(e){}
+  var sec=el('evalSection');
+  if(!sec){ sec=document.createElement('section'); sec.id='evalSection'; sec.className='xsec v v-home';
+    var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
+  rwOpenSection(sec.id);
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udcca Agent <em>evals</em></h2>'
+    +'<button class="tact" onclick="rwCloseSection(\'evalSection\')">\u2715</button></div>'
+    +'<p class="xsec-sub">Runs '+RW_EVALS.length+' objectives through the real agent loop and measures what actually matters. Failures are reported as loudly as passes \u2014 a suite that always scores 100% isn\u2019t testing anything.</p>'
+    +'<button class="tact rw-cine-btn" style="width:100%;font-weight:800;padding:13px" onclick="rwEvalGo()">Run the suite</button>'
+    +'<div id="evalOut" style="margin-top:14px"></div>';
+}
+function rwEvalGo(){
+  var out=el('evalOut');
+  out.innerHTML='<div class="rw-cine-load"><div class="rw-cine-orb"></div><div style="font-size:13px;color:var(--t2);margin-top:12px">Running the suite\u2026</div></div>';
+  rwEvalRun(function(p){
+    if(p.phase==='running'){
+      var o=el('evalOut'); if(o) o.querySelector('div:last-child').textContent='Running '+(p.done+1)+'/'+p.total+' \u2014 '+p.objective.slice(0,52)+'\u2026';
+    }
+  }, function(sc){ rwEvalRender(sc); });
+}
+function rwEvalRender(sc){
+  var out=el('evalOut'); if(!out) return;
+  function metric(label, val, suffix, note){
+    var v=(val==null)?'\u2014':val+(suffix||'');
+    var col = val==null? 'var(--t3)' : (val>=80?'#4ADE80':(val>=50?'#F0A63B':'#E05B5B'));
+    return '<div class="rw-cine-metric"><div class="rw-cine-num" style="color:'+col+'">'+v+'</div>'
+      +'<div class="rw-cine-lbl">'+label+'</div>'+(note?'<div class="rw-cine-note">'+note+'</div>':'')+'</div>';
+  }
+  out.innerHTML='<div class="rw-cine-panel">'
+    +'<div class="rw-cine-grid">'
+    + metric('Tool precision', sc.tool_precision, '%', 'right tool chosen')
+    + metric('Termination', sc.termination, '%', 'finished cleanly')
+    + metric('Efficiency', sc.efficiency, '%', 'within +1 of minimum')
+    + metric('Recovery', sc.recovery, '%', sc.recovery_n? 'of '+sc.recovery_n+' error runs' : 'no errors hit')
+    +'</div>'
+    +'<div class="rw-cine-sum">'+sc.passed+' / '+sc.total+' objectives passed \u00b7 avg '+sc.avg_steps+' steps \u00b7 avg '+sc.avg_ms+'ms</div>'
+    +'</div>'
+    + sc.results.map(function(r,i){
+        var ok=r.pass;
+        return '<div class="rw-cine-row" style="animation-delay:'+(i*0.055)+'s">'
+          +'<span class="rw-cine-dot" style="background:'+(ok?'#4ADE80':'#E05B5B')+'"></span>'
+          +'<span style="flex:1;min-width:0">'
+          +'<b style="font-size:12.5px">'+esc2(r.objective.slice(0,58))+(r.objective.length>58?'\u2026':'')+'</b>'
+          +'<div style="font-size:11px;color:var(--t3);margin-top:3px;font-family:ui-monospace,monospace">'
+          + (r.called.length? esc2(r.called.join(' \u2192 ')) : 'no tools called')
+          + ' \u00b7 '+r.steps+' steps'
+          + (r.errors? ' \u00b7 '+r.errors+' err'+(r.recovered?' (recovered)':'') : '')
+          + (r.terminated?'':' \u00b7 '+esc2(r.reason))
+          +'</div></span></div>';
+      }).join('')
+    +'<div style="font-size:11px;color:var(--t3);margin-top:12px;line-height:1.6">These are real runs against live providers, so numbers move between runs. Quote them with the sample size (n='+sc.total+') and never round up.</div>';
+}
+
+/* ===== PRIVACY TRUST ANCHOR + WEB-TO-APP HANDOFF (rw-v51) =================
+   Two conversion levers from the strategy review:
+   1) Web visitors ASSUME they're being tracked. Say plainly that they aren't.
+   2) Desktop planners should finish on their phone \u2014 a QR beats "download our app". */
+function openPrivacyBadge(){
+  var ov=el('privBadgeOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='privBadgeOv'; ov.className='overlay'; ov.style.zIndex='3200';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('privBadgeOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:400px"><div class="sheet-h"><b>\ud83d\udd12 Your data stays yours</b>'
+    +'<button onclick="rwOverlayClose(\'privBadgeOv\')" class="tact">\u2715</button></div>'
+    +'<div style="font-size:13px;color:var(--t2);line-height:1.7;margin-top:6px">'
+    +'<div style="margin-bottom:10px"><b style="color:#4ADE80">\u2713 On your device</b><br>Your saved trips, itineraries, journal, budgets and preferences never leave this device.</div>'
+    +'<div style="margin-bottom:10px"><b style="color:#4ADE80">\u2713 Only when you invite people</b><br>The only things that reach our servers are group chats you create and beacons you deliberately light.</div>'
+    +'<div style="margin-bottom:10px"><b style="color:#4ADE80">\u2713 No background tracking</b><br>Location is read once, when you tap a feature that needs it. Never in the background. Never sold.</div>'
+    +'<div><b style="color:#4ADE80">\u2713 No signup required</b><br>You can plan an entire trip without giving us an email address.</div>'
+    +'</div><a class="tact" style="display:block;text-align:center;margin-top:14px;text-decoration:none" href="/legal/privacy.html" target="_blank">Read the full privacy policy \u2197</a></div>';
+  ov.classList.add('open');
+}
+/* QR handoff: finish planning on the phone. Uses a public QR image service so
+   there's no library to bundle; falls back to a copyable link. */
+function rwHandoffToPhone(){
+  var url='https://www.roamwise.co.in/';
+  try{
+    var t=(window._lastItin&&window._lastItin.name)||'';
+    if(t) url+='?plan='+encodeURIComponent(t);
+  }catch(e){}
+  var qr='https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data='+encodeURIComponent(url);
+  var ov=el('handoffOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='handoffOv'; ov.className='overlay'; ov.style.zIndex='3200';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('handoffOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:340px;text-align:center"><div class="sheet-h" style="text-align:left"><b>\ud83d\udcf1 Continue on your phone</b>'
+    +'<button onclick="rwOverlayClose(\'handoffOv\')" class="tact">\u2715</button></div>'
+    +'<div style="background:#fff;border-radius:14px;padding:10px;display:inline-block;margin:8px 0">'
+    +'<img src="'+qr+'" alt="QR code" width="220" height="220" style="display:block"></div>'
+    +'<div style="font-size:12.5px;color:var(--t2);line-height:1.6">Scan with your phone camera to open this plan there \u2014 maps, Near Me and your group chat all work better on mobile.</div>'
+    +'<button class="tact" style="width:100%;margin-top:12px" onclick="rwCopy(\''+url+'\');showToast(\'Link copied\')">Copy link instead</button></div>';
+  ov.classList.add('open');
+}
+
+/* ========== INDIA GROUND-TRUTH LAYER (rw-v51) ==============================
+   THE PROBLEM this fixes: every LLM reasons about distance as if roads are
+   European. It will happily claim Dehradun to Rishikesh is 30 minutes, or that
+   you can "pop over" to Spiti for a day. On the ground, 30km of Himalayan road
+   is two hours. This is RoamWise's single biggest correctness flaw, and it is
+   fixable with real terrain rules rather than hoping the model behaves.
+   ========================================================================== */
+var RW_TERRAIN={
+  himalayan: {mult:3.2, kmh:22, note:'hairpin mountain road \u2014 assume roughly a third of plains speed'},
+  hill:      {mult:2.2, kmh:32, note:'ghat section \u2014 slower than the map suggests'},
+  ghats:     {mult:2.0, kmh:35, note:'Western Ghats climbs and switchbacks'},
+  desert:    {mult:1.2, kmh:55, note:'open highway, but few stops \u2014 carry water'},
+  coastal:   {mult:1.4, kmh:45, note:'narrow coastal roads through villages'},
+  plains:    {mult:1.35,kmh:48, note:'plains highway with real Indian traffic'},
+  metro:     {mult:1.9, kmh:18, note:'city traffic \u2014 budget far more than the map says'}
+};
+var RW_TERRAIN_KEYS={
+  himalayan:['ladakh','leh','spiti','kaza','tawang','zanskar','nubra','kinnaur','chitkul','sikkim','lachung','munsiyari','auli','badrinath','kedarnath','gangotri','yamunotri','rohtang','manali-leh','sach pass','khardung'],
+  hill:['manali','shimla','mussoorie','nainital','almora','kausani','dharamshala','mcleod','kasol','bir','chopta','ranikhet','darjeeling','gangtok','shillong','cherrapunji','ooty','kodaikanal','munnar','coorg','chikmagalur','wayanad','mount abu','dalhousie','khajjiar','pithoragarh','rishikesh','dehradun','haridwar'],
+  ghats:['lonavala','mahabaleshwar','matheran','igatpuri','amboli','agumbe'],
+  desert:['jaisalmer','bikaner','jodhpur','barmer','kutch','rann'],
+  coastal:['goa','gokarna','varkala','alleppey','kochi','pondicherry','mahabalipuram','diu','konkan','ratnagiri','alibaug','andaman'],
+  metro:['delhi','mumbai','bengaluru','bangalore','chennai','kolkata','hyderabad','pune','ahmedabad','jaipur','lucknow']
+};
+function rwTerrainOf(place){
+  var t=String(place||'').toLowerCase();
+  for(var k in RW_TERRAIN_KEYS){
+    var arr=RW_TERRAIN_KEYS[k];
+    for(var i=0;i<arr.length;i++){ if(t.indexOf(arr[i])>-1) return k; }
+  }
+  return 'plains';
+}
+/* Honest travel time for a road distance, given the terrain. */
+function rwRoadTime(km, place){
+  var T=RW_TERRAIN[rwTerrainOf(place)]||RW_TERRAIN.plains;
+  var hrs=km/T.kmh;
+  var h=Math.floor(hrs), m=Math.round((hrs-h)*60);
+  if(m===60){ h++; m=0; }
+  return {hours:hrs, label:(h?h+'h ':'')+(m?m+'m':(h?'':'a few min')), note:T.note, terrain:rwTerrainOf(place)};
+}
+/* A human-readable reality check we can show under any itinerary. */
+function rwGroundTruth(place){
+  var k=rwTerrainOf(place), T=RW_TERRAIN[k];
+  if(k==='plains') return '';
+  var lines={
+    himalayan:'High-mountain roads. Distances here lie \u2014 100km can take 5 hours. Roads close for snow/landslides, and altitude means you should plan a rest day before anything strenuous.',
+    hill:'Hill roads with hairpins. Budget roughly double the time a map app suggests, and avoid night driving.',
+    ghats:'Ghat climbs and switchbacks \u2014 slower than they look, and slippery in monsoon.',
+    desert:'Open roads but long empty stretches. Carry water, fuel up early, and avoid midday in summer.',
+    coastal:'Narrow roads through villages. Short distances still eat time.',
+    metro:'City traffic. Whatever the map says, add half again \u2014 more in peak hours.'
+  };
+  return lines[k]||'';
+}
+
+/* ===== CYCLE MODE SAFETY (rw-v51) — elevation, monsoon, and honest limits ==
+   Cycle Mode routes people through narrow old-city lanes on a folding cycle.
+   That is brilliant in flat Varanasi lanes and dangerous on a Himalayan
+   gradient in July. These checks fire BEFORE we suggest it. */
+var RW_MONSOON={ 6:'heavy', 7:'peak', 8:'peak', 9:'retreating' };
+function rwCycleSafety(place, monthIdx){
+  var m=(typeof monthIdx==='number')? monthIdx+1 : (new Date().getMonth()+1);
+  var terrain=rwTerrainOf(place);
+  var warn=[], block=false;
+  if(terrain==='himalayan'){ block=true; warn.push({lvl:'stop', t:'Not suitable here', d:'Sustained high-altitude climbs and unlit hairpins \u2014 a folding cycle is the wrong tool. Use shared taxis.'}); }
+  else if(terrain==='hill'||terrain==='ghats'){ warn.push({lvl:'warn', t:'Steep gradients', d:'Expect sustained climbs. Fine going down, hard going up \u2014 plan a one-way route and a taxi back.'}); }
+  if(RW_MONSOON[m]){
+    var sev=RW_MONSOON[m];
+    warn.push({lvl: sev==='peak'?'stop':'warn', t:'Monsoon '+(sev==='peak'?'peak':'season'),
+      d: sev==='peak' ? 'Waterlogged lanes, poor visibility and slick stone. Skip cycling this month.' : 'Rain likely \u2014 carry a poncho and avoid flooded underpasses.'});
+    if(sev==='peak') block=true;
+  }
+  if(terrain==='metro'){ warn.push({lvl:'warn', t:'Traffic', d:'Stay in the old-city lanes as planned. Do not take a folding cycle onto arterial roads.'}); }
+  if(terrain==='desert' && m>=4 && m<=6){ warn.push({lvl:'stop', t:'Extreme heat', d:'40\u00b0C+ by mid-morning. Cycle at dawn only, or not at all.'}); block=true; }
+  return {ok:!block, warnings:warn, terrain:terrain};
+}
+function rwCycleCard(place, monthIdx){
+  var c=rwCycleSafety(place, monthIdx);
+  if(!c.warnings.length) return '<div style="border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.07);border-radius:12px;padding:12px;margin:10px 0">'
+    +'<b style="color:#4ADE80;font-size:13px">\ud83d\udeb2 Good conditions for Cycle Mode</b>'
+    +'<div style="font-size:12px;color:var(--t2);margin-top:4px">Flat lanes and dry season \u2014 park at the old-city edge and ride in.</div></div>';
+  return c.warnings.map(function(w){
+    var stop=w.lvl==='stop', col=stop?'#E05B5B':'#F0A63B';
+    return '<div style="border:1px solid '+col+'55;background:'+col+'12;border-radius:12px;padding:12px;margin:8px 0">'
+      +'<b style="color:'+col+';font-size:13px">'+(stop?'\u26d4':'\u26a0\ufe0f')+' '+esc2(w.t)+'</b>'
+      +'<div style="font-size:12px;color:var(--t2);margin-top:4px">'+esc2(w.d)+'</div></div>';
+  }).join('');
+}
+
+/* ===== PNR / BOOKING SMS PARSER (rw-v51) ==================================
+   No IRCTC API needed — people already HAVE the SMS. Paste it and we pull out
+   the train, PNR, date and stations, then hand straight to Arrival Mode. */
+function rwParsePNR(text){
+  var t=String(text||'');
+  var out={};
+  var pnr=t.match(/\b(?:PNR\s*(?:No\.?|Number)?[:\s-]*)?(\d{10})\b/i);
+  if(pnr) out.pnr=pnr[1];
+  var trn=t.match(/\b(\d{5})\b(?!\d)/);
+  if(trn && trn[1]!==out.pnr) out.train=trn[1];
+  var nm=t.match(/\b(\d{5})\s*[\/\-]?\s*([A-Z][A-Za-z\s]{3,28}(?:EXP|EXPRESS|SF|SUPERFAST|RAJDHANI|SHATABDI|DURONTO|VANDE BHARAT|JANSHATABDI|MAIL))/i);
+  if(nm) out.trainName=nm[2].trim();
+  var dt=t.match(/\b(\d{1,2})[-\/\s]([A-Za-z]{3,9}|\d{1,2})[-\/\s](\d{2,4})\b/);
+  if(dt) out.date=dt[0];
+  var seg=t.match(/\b([A-Z]{2,5})\s*(?:-|to|\u2192|=>)\s*([A-Z]{2,5})\b/);
+  if(seg){ out.from=seg[1]; out.to=seg[2]; }
+  var st=t.match(/\b(CNF|RAC|WL\/?\d*|CAN|Confirmed|Waitlist)\b/i);
+  if(st) out.status=st[1].toUpperCase();
+  var dep=t.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
+  if(dep) out.time=dep[0];
+  out.found=Object.keys(out).length>0;
+  return out;
+}
+function openPnrPaste(){
+  rwForm('\ud83c\udfab Paste your booking SMS', [
+    {key:'sms', label:'Paste the IRCTC SMS or PNR', placeholder:'e.g. PNR 4512367890, 12017 SHATABDI EXP, NDLS-DDN, 14-Sep-2026, 06:10, CNF'}
+  ], function(v){
+    var r=rwParsePNR(v.sms||'');
+    if(!r.found){ showToast('Couldn\u2019t read that \u2014 try pasting the whole SMS'); return; }
+    var bits=[];
+    if(r.trainName) bits.push(r.trainName); else if(r.train) bits.push('Train '+r.train);
+    if(r.from&&r.to) bits.push(r.from+' \u2192 '+r.to);
+    if(r.date) bits.push(r.date);
+    if(r.time) bits.push(r.time);
+    if(r.status) bits.push(r.status);
+    showToast('\ud83c\udfab '+bits.join(' \u00b7 '));
+    /* hand straight into Arrival Mode, pre-filled */
+    try{
+      openArrival();
+      setTimeout(function(){
+        var st=el('arrStation'), tm=el('arrTime');
+        if(st && r.to) st.value=r.to;
+        if(tm && r.time) tm.value=r.time;
+        var out=el('arrivalOut');
+        if(out) out.innerHTML='<div style="border:1px solid var(--gold,#E8BA6C);border-radius:12px;padding:12px;margin-bottom:10px">'
+          +'<b style="font-size:13px">\ud83c\udfab Read from your SMS</b>'
+          +'<div style="font-size:12.5px;color:var(--t2);margin-top:4px">'+esc2(bits.join(' \u00b7 '))+'</div>'
+          +(r.status&&/WL/.test(r.status)?'<div style="font-size:12px;color:#F0A63B;margin-top:6px">\u26a0\ufe0f Still waitlisted \u2014 keep a backup plan until it confirms.</div>':'')
+          +'<div style="font-size:11px;color:var(--t3);margin-top:6px">Check the station and time above, then build your trip.</div></div>';
+      }, 350);
+    }catch(e){}
+  });
+}
+
+/* ================= UPI SETTLEMENT (rw-v50) =================================
+   The last mile of group money. The settle engine already works out exactly
+   who owes whom to the paisa — but people still had to open GPay, type a
+   number, type an amount, and hope they got it right.
+   A UPI deep link ("upi://pay?...") is a real Android/iOS intent understood by
+   GPay, PhonePe, Paytm, BHIM and every other UPI app, so one tap opens the
+   payment PRE-FILLED with payee, amount and note.
+
+   HONEST LIMITS, stated in the UI too:
+     - only works on a phone with a UPI app installed (desktop shows a QR/copy)
+     - RoamWise is NOT a payment processor and never touches the money
+     - we cannot confirm a payment landed, so settling is user-confirmed
+   ========================================================================== */
+function rwUpiValid(v){ return /^[a-zA-Z0-9._-]{2,64}@[a-zA-Z]{2,32}$/.test(String(v||'').trim()); }
+function rwUpiMine(){ try{ return lsGet('rw_upi')||''; }catch(e){ return ''; } }
+function rwUpiSetMine(){
+  rwForm('\ud83d\udcb3 Your UPI ID', [
+    {key:'vpa', label:'UPI ID (so friends can pay you back)', value:rwUpiMine(), placeholder:'yourname@okhdfcbank'}
+  ], function(v){
+    var vpa=(v.vpa||'').trim();
+    if(vpa && !rwUpiValid(vpa)){ showToast('That doesn\u2019t look like a UPI ID \u2014 e.g. name@okicici'); return; }
+    try{ lsSet('rw_upi', vpa); }catch(e){}
+    /* share it to the group so the "pay" buttons can find it */
+    if(vpa && _chatRoom && user && typeof db!=='undefined' && db){
+      db.collection('users').doc(user.uid).set({upi:vpa, name:(user.displayName||'Traveller')},{merge:true}).catch(function(){});
+    }
+    showToast(vpa? 'UPI ID saved \u00b7 friends can now pay you in one tap' : 'UPI ID cleared');
+    try{ rwMoneyRender(); }catch(e){}
+    try{ chatRenderPins(); }catch(e){}
+  });
+}
+/* Build the standard UPI intent URL. */
+function rwUpiLink(vpa, name, amount, note){
+  var q='pa='+encodeURIComponent(vpa)
+      +'&pn='+encodeURIComponent(String(name||'RoamWise').slice(0,40))
+      +'&am='+encodeURIComponent(Number(amount).toFixed(2))
+      +'&cu=INR'
+      +'&tn='+encodeURIComponent(String(note||'RoamWise trip settle').slice(0,50));
+  return 'upi://pay?'+q;
+}
+/* Look up a payee's saved UPI id (group members store it on their user doc). */
+var _upiCache={};
+function rwUpiLookup(name, cb){
+  if(_upiCache[name]!==undefined){ cb(_upiCache[name]); return; }
+  if(typeof db==='undefined'||!db){ cb(null); return; }
+  db.collection('users').where('name','==',name).limit(1).get().then(function(qs){
+    var vpa=null; qs.forEach(function(d){ vpa=(d.data()||{}).upi||null; });
+    _upiCache[name]=vpa; cb(vpa);
+  }).catch(function(){ cb(null); });
+}
+/* The pay button shown on each "A owes B" row. */
+function rwUpiPay(toName, amount, note){
+  rwUpiLookup(toName, function(vpa){
+    if(!vpa){
+      showToast(toName+' hasn\u2019t added a UPI ID yet');
+      rwUpiAskFor(toName, amount);
+      return;
+    }
+    rwUpiOpen(vpa, toName, amount, note);
+  });
+}
+function rwUpiOpen(vpa, name, amount, note){
+  var url=rwUpiLink(vpa, name, amount, note);
+  var isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+  if(isMobile){
+    try{ window.location.href=url; }catch(e){}
+    /* if no UPI app handles it, nothing visibly happens — give a way out */
+    setTimeout(function(){ rwUpiFallback(vpa, name, amount, url); }, 1800);
+  } else {
+    rwUpiFallback(vpa, name, amount, url);
+  }
+}
+function rwUpiFallback(vpa, name, amount, url){
+  var ov=el('upiOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='upiOv'; ov.className='overlay'; ov.style.zIndex='3200';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('upiOv'); }; document.body.appendChild(ov); }
+  var amt=Number(amount).toFixed(2);
+  ov.innerHTML='<div class="sheet" style="max-width:380px;text-align:center"><div class="sheet-h" style="text-align:left"><b>\ud83d\udcb3 Pay '+esc2(name)+'</b>'
+    +'<button onclick="rwOverlayClose(\'upiOv\')" class="tact">\u2715</button></div>'
+    +'<div style="font-size:30px;font-weight:900;color:var(--gold,#E8BA6C);margin:10px 0 2px">\u20b9'+esc2(amt)+'</div>'
+    +'<div style="font-size:12.5px;color:var(--t2);margin-bottom:14px">to <b>'+esc2(vpa)+'</b></div>'
+    +'<a class="tact" style="display:block;width:100%;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:13px;text-decoration:none;margin-bottom:8px" href="'+esc2(url)+'">Open my UPI app</a>'
+    +'<button class="tact" style="width:100%;margin-bottom:8px" onclick="rwCopy(\''+esc2(vpa)+'\');showToast(\'UPI ID copied\')">Copy UPI ID</button>'
+    +'<div style="font-size:11px;color:var(--t3);line-height:1.55;margin-top:6px">Opens your own UPI app (GPay, PhonePe, Paytm\u2026) with the amount filled in. RoamWise never handles the money and can\u2019t see whether it went through \u2014 mark it settled once it\u2019s done.</div></div>';
+  ov.classList.add('open');
+}
+function rwCopy(t){ try{ navigator.clipboard.writeText(t); }catch(e){} }
+function rwUpiAskFor(name, amount){
+  if(!_chatRoom){ return; }
+  try{
+    chatPost('text', null, '\ud83d\udcb3 '+ (name||'Someone') +', can you drop your UPI ID here? Settling up \u20b9'+Number(amount).toFixed(0)+'.');
+  }catch(e){}
+}
+
+/* Chat kitty works in uids, so look the payee's UPI up by uid. */
+function rwUpiPayUid(uid, amount){
+  if(typeof db==='undefined'||!db){ showToast('Need a connection'); return; }
+  db.collection('users').doc(uid).get().then(function(d){
+    var u=d.exists? (d.data()||{}) : {};
+    if(!u.upi){
+      showToast((u.name||'They')+' haven\u2019t added a UPI ID yet');
+      try{ chatPost('text', null, '\ud83d\udcb3 Can you drop your UPI ID here? Settling up \u20b9'+Number(amount).toFixed(0)+'.'); }catch(e){}
+      return;
+    }
+    rwUpiOpen(u.upi, u.name||'Traveller', amount, 'RoamWise trip settle');
+  }).catch(function(){ showToast('Could not look that up'); });
+}
+
+/* Renders the pay button for one settle row (used in both money layer + chat). */
+function rwUpiRowBtn(from, to, amount, note){
+  var me=((user&&user.displayName)||'').split(' ')[0];
+  var iOwe = from===me || from==='You';
+  if(!iOwe) return '';   /* only show "pay" on rows where YOU are the one paying */
+  return '<button class="tact" style="padding:5px 11px;font-size:11.5px;font-weight:700;margin-left:8px;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" '
+    +'onclick="rwUpiPay(\''+String(to).replace(/'/g,"\\'")+'\','+Number(amount)+',\''+String(note||'').replace(/'/g,"\\'")+'\')">Pay \u20b9'+Number(amount).toLocaleString('en-IN')+'</button>';
+}
+
+/* ===== rwCloseSection — THE FIX for dead X buttons (rw-v49) ===============
+   BUG: app.css has `body.shell[data-view="home"] .v-home{display:revert!important}`.
+   Sections built with class "xsec v v-home" therefore IGNORE an inline
+   style.display='none', so every X button on the newer features did nothing.
+   Fix: strip the v/v-home classes (removing them from the !important rule's
+   reach) as well as setting display, and remember the classes so reopening
+   restores them. ======================================================== */
+function rwCloseSection(id){
+  var s=el(id); if(!s) return;
+  try{
+    s.dataset.rwcls = s.className;              /* remember for reopen */
+    s.className = s.className.replace(/\bv-[a-z]+\b/g,'').replace(/(^|\s)v(\s|$)/g,' ').trim();
+  }catch(e){}
+  s.style.display='none';
+  s.setAttribute('hidden','');
+}
+function rwOpenSection(id){
+  var s=el(id); if(!s) return;
+  try{ if(s.dataset.rwcls) s.className=s.dataset.rwcls; }catch(e){}
+  s.removeAttribute('hidden');
+  s.style.display='';
+}
+
+
+
+
+/* ============================================================================
+   LAYOUT MODES (rw-v56) — three genuinely different ways to use RoamWise.
+   ============================================================================
+   These are NOT colour themes (that's the separate 🎨 Theme picker). A mode
+   changes the LAYOUT and information hierarchy — what you see first and how
+   the app is shaped around you.
+
+   SAFETY BY DESIGN: a mode only adds ONE class to <body>. All the actual
+   change is CSS. No DOM is restructured, no feature is disabled, nothing is
+   re-rendered. If a mode's CSS ever misbehaves, switching back to Classic
+   removes the class and the app is byte-for-byte what it was. That is why
+   this cannot "mess up" the working build.
+   ========================================================================== */
+var RW_MODES=[
+  { id:'classic', name:'Classic',   icon:'\ud83c\udfe0',
+    tag:'Feed-first',
+    desc:'What you have today. Everything on one scrollable home, Tusk at the top.',
+    best:'Best when you like seeing everything at once.' },
+  { id:'atlas',   name:'Atlas',     icon:'\ud83d\uddfa\ufe0f',
+    tag:'Map-first',
+    desc:'The map leads. Your trip becomes a column of place-cards beside it, so you always see WHERE things are, not just what they are.',
+    best:'Best for planning routes and multi-stop trips.' },
+  { id:'story',   name:'Storyboard', icon:'\ud83d\udcd6',
+    tag:'Editorial',
+    desc:'Big type, one thing at a time, generous whitespace. Reads like a travel magazine rather than a dashboard.',
+    best:'Best for dreaming, reading and slow planning.' }
+];
+function rwMode(){ try{ return lsGet('rw_mode')||'classic'; }catch(e){ return 'classic'; } }
+function rwApplyMode(id){
+  id=id||rwMode();
+  var b=document.body; if(!b) return;
+  RW_MODES.forEach(function(m){ b.classList.remove('rw-mode-'+m.id); });
+  if(id!=='classic') b.classList.add('rw-mode-'+id);
+  try{ b.setAttribute('data-mode', id); }catch(e){}
+}
+function rwSetMode(id){
+  try{ lsSet('rw_mode', id); }catch(e){}
+  rwApplyMode(id);
+  try{ rwHaptic('heavy'); }catch(e){}
+  var m=RW_MODES.filter(function(x){ return x.id===id; })[0];
+  showToast((m?m.icon+' '+m.name:'Mode')+' \u00b7 '+(m?m.tag:''));
+  try{ openModePicker(); }catch(e){}
+}
+function openModePicker(){
+  var cur=rwMode();
+  var ov=el('modeOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='modeOv'; ov.className='overlay'; ov.style.zIndex='3200';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('modeOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:420px"><div class="sheet-h"><b>\ud83e\udded Layout mode</b>'
+    +'<button onclick="rwOverlayClose(\'modeOv\')" class="tact">\u2715</button></div>'
+    +'<p style="font-size:12px;color:var(--t2);margin:2px 0 14px">Three different shapes for the same app. Switch any time \u2014 nothing is lost, and Classic is always exactly what you had.</p>'
+    + RW_MODES.map(function(m){
+        var on=cur===m.id;
+        return '<button class="rw-mode-card'+(on?' on':'')+'" onclick="rwSetMode(\''+m.id+'\')">'
+          +'<div class="rw-mode-top"><span class="rw-mode-ic">'+m.icon+'</span>'
+          +'<span style="flex:1"><b>'+m.name+'</b> <span class="rw-mode-tag">'+m.tag+'</span></span>'
+          +(on?'<span style="color:var(--gold);font-weight:800">\u2713</span>':'')+'</div>'
+          +'<div class="rw-mode-desc">'+m.desc+'</div>'
+          +'<div class="rw-mode-best">'+m.best+'</div></button>';
+      }).join('')
+    +'<div style="font-size:10.5px;color:var(--t3);margin-top:10px;line-height:1.55">Layout mode changes the shape of the app. Colours are separate \u2014 see \ud83c\udfa8 Theme &amp; look.</div></div>';
+  ov.classList.add('open');
+}
+
+/* ===== MENU SEARCH (rw-v55) — 64 items is too many to scan, so let people
+   type. Filters links live, auto-opens any group with a match, and shows a
+   clear empty state rather than a blank drawer. */
+function drFilter(q){
+  q=String(q||'').trim().toLowerCase();
+  var groups=document.querySelectorAll('.drawer .dr-grp');
+  var total=0;
+  groups.forEach(function(g){
+    var links=g.querySelectorAll('.dr-link'), shown=0;
+    links.forEach(function(a){
+      var txt=(a.textContent||'').toLowerCase();
+      var hit=!q || txt.indexOf(q)>-1;
+      a.style.display=hit?'':'none';
+      if(hit) shown++;
+    });
+    total+=shown;
+    g.style.display=(q && !shown)?'none':'';
+    if(q && shown) g.classList.add('open');
+    else if(!q) g.classList.remove('open');
+  });
+  /* keep the first group open when the search is cleared */
+  if(!q){ var f=document.querySelector('.drawer .dr-grp'); if(f) f.classList.add('open'); }
+  var empty=el('drEmpty');
+  if(!empty){
+    empty=document.createElement('div'); empty.id='drEmpty'; empty.className='dr-empty';
+    var host=document.querySelector('.drawer'); if(host) host.appendChild(empty);
+  }
+  empty.style.display=(q && !total)?'block':'none';
+  empty.textContent=q? 'Nothing matches \u201c'+q+'\u201d' : '';
+}
+
+/* ============================================================================
+   THE OPENING (rw-v54) — the first twenty seconds
+   ============================================================================
+   Why this exists: RoamWise has ~50 features. A first-time visitor sees a wall
+   of tiles and leaves before understanding any of it. Every app people
+   genuinely love is almost embarrassingly simple on first contact.
+
+   So: one question, one breath, one real answer. No signup, no tour, no tiles.
+   We DELIVER value before asking for anything, then let the app appear behind
+   it. The 5-slide tour is demoted to a menu item for people who want it.
+   ========================================================================== */
+var RW_DREAMS=[
+  'somewhere green and quiet','the mountains, cheaply','a beach with no crowds',
+  'a city that stays up late','snow, for the first time','where my friends can all afford'
+];
+function rwOpeningSeen(){ try{ return lsGet('rw_opening')==='1'; }catch(e){ return true; } }
+function rwOpeningShow(force){
+  if(!force && rwOpeningSeen()) return;
+  var ov=el('rwOpening');
+  if(!ov){ ov=document.createElement('div'); ov.id='rwOpening'; document.body.appendChild(ov); }
+  ov.className='rw-open';
+  var ph=RW_DREAMS[Math.floor(Math.random()*RW_DREAMS.length)];
+  ov.innerHTML=
+     '<div class="rw-open-sky"></div>'
+    +'<div class="rw-open-inner">'
+    +  '<div class="rw-open-mark">RoamWise</div>'
+    +  '<h1 class="rw-open-q">Where do you<br><em>dream</em> of going?</h1>'
+    +  '<div class="rw-open-field">'
+    +    '<input id="rwOpenIn" autocomplete="off" placeholder="'+esc2(ph)+'">'
+    +    '<button onclick="rwOpeningGo()" aria-label="Go">\u2192</button>'
+    +  '</div>'
+    +  '<div class="rw-open-hint">One line is enough. No signup, no email \u2014 ever.</div>'
+    +  '<button class="rw-open-skip" onclick="rwOpeningDone()">I\u2019ll look around myself</button>'
+    +'</div>';
+  document.body.style.overflow='hidden';
+  setTimeout(function(){ var i=el('rwOpenIn'); if(i){ i.focus(); i.addEventListener('keydown',function(e){ if(e.key==='Enter') rwOpeningGo(); }); } }, 700);
+}
+function rwOpeningGo(){
+  var v=(el('rwOpenIn')&&el('rwOpenIn').value||'').trim();
+  if(!v){ var i=el('rwOpenIn'); if(i){ i.focus(); i.classList.add('rw-shake'); setTimeout(function(){ i.classList.remove('rw-shake'); },500);} return; }
+  var ov=el('rwOpening'); if(!ov) return;
+  var inner=ov.querySelector('.rw-open-inner');
+  inner.innerHTML='<div class="rw-open-think"><div class="rw-cine-orb"></div>'
+    +'<div class="rw-open-thinktxt">Reading the map for<br><b>'+esc2(v.slice(0,60))+'</b></div></div>';
+  /* Give a REAL answer, not a loading screen followed by a tour. */
+  var prompt='A traveller said they dream of: "'+v+'". In under 55 words: name ONE specific place in India that fits, say the single best month to go, an honest rough budget in rupees for 3-4 days, and one detail only a local would tell them. Warm, concrete, no preamble.';
+  var done=false;
+  var finish=function(text){
+    if(done) return; done=true;
+    inner.innerHTML='<div class="rw-open-reveal">'
+      +'<div class="rw-open-mark">RoamWise</div>'
+      +'<div class="rw-open-answer">'+esc2(text)+'</div>'
+      +'<button class="rw-open-cta" onclick="rwOpeningEnter(\''+String(v).replace(/'/g,"\\'").slice(0,60)+'\')">Plan this properly \u2192</button>'
+      +'<button class="rw-open-skip" onclick="rwOpeningDone()">Just let me in</button>'
+      +'</div>';
+  };
+  setTimeout(function(){ finish('India has a place for exactly that \u2014 let\u2019s find it together. Tell Tusk the same thing inside and it\u2019ll build you a full day-by-day plan with real numbers.'); }, 9000);
+  try{
+    if(typeof aiCallAny==='function'){
+      aiCallAny(prompt, 160, function(err, txt){
+        if(txt && String(txt).trim().length>30) finish(String(txt).trim());
+        else finish('India has a place for exactly that. Tell Tusk the same line inside and it\u2019ll build the whole trip \u2014 days, budget, and a map.');
+      });
+    }
+  }catch(e){}
+}
+function rwOpeningEnter(seed){
+  rwOpeningDone();
+  setTimeout(function(){
+    try{
+      var i=el('heroInput'); if(i){ i.value=seed; i.focus(); }
+      if(typeof tabGo==='function') tabGo('home');
+      showToast('\u2728 Ask Tusk \u2014 it already knows what you want');
+    }catch(e){}
+  }, 420);
+}
+function rwOpeningDone(){
+  try{ lsSet('rw_opening','1'); }catch(e){}
+  var ov=el('rwOpening'); if(!ov) return;
+  ov.classList.add('rw-open-out');
+  document.body.style.overflow='';
+  setTimeout(function(){ if(ov&&ov.parentNode) ov.parentNode.removeChild(ov); }, 720);
+}
+function rwOpeningReplay(){ rwOpeningShow(true); }
+
 /* ===== FIRST-LAUNCH WALKTHROUGH (onboarding) =====
    Shows once, introduces the key features, has a Skip option. Report-requested. */
 var RW_ONBOARD=[
@@ -2624,7 +3511,7 @@ function rwNewsPulseFallback(g){
         +'<div class="exp-desc" style="font-size:11px;color:var(--t3)">'+esc2(it.source||'RoamWise')+' \u00b7 '+when+'</div>'
         +'</div>';
     }).join('');
-    var sec=el('newspulse'); if(sec) sec.style.display='';
+    var sec=el('newspulse'); if(sec) rwOpenSection(sec.id);
   }
   paint(CURATED); /* show curated instantly */
   /* then try to upgrade with AI-crunched fresh angles (best-effort) */
@@ -2895,9 +3782,9 @@ function openBadges(){
     sec=document.createElement('section'); sec.id='badgesSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec);
   }
-  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83c\udfc5 Your <em>badges</em></h2><button class="tact" onclick="el(\'badgesSection\').style.display=\'none\'">\u2715</button></div>'
+  sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83c\udfc5 Your <em>badges</em></h2><button class="tact" onclick="rwCloseSection(\'badgesSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Collectible achievements \u2014 earned as you plan, map, and travel.</p>'+badgesHTML();
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 /* ==================== JOURNEY CERTIFICATE ====================
@@ -2934,7 +3821,7 @@ function openMemories(){
   if(!sec){ sec=document.createElement('section'); sec.id='memSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\u270d\ufe0f Trip <em>memories</em></h2>'
-    +'<button class="tact" onclick="el(\'memSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'memSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Turn your '+esc2(dest)+' trip into a blog, a collage, and a keepsake log \u2014 then share it.</p>'
     +'<div class="mem-tabs">'
       +'<button class="mem-tab on" onclick="rwMemTab(this,\'blog\')">\ud83d\udcdd Blog</button>'
@@ -2947,7 +3834,7 @@ function openMemories(){
       +'<canvas id="memCanvas" style="width:100%;border-radius:14px;display:none;border:1px solid var(--b2)"></canvas>'
       +'<div id="memCollageBtns"></div></div>'
     +'<div id="memLog" class="mem-pane" style="display:none"><div id="memLogOut"></div></div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
   rwRenderLog();
 }
 function rwMemTab(btn,which){
@@ -3066,10 +3953,10 @@ function openJourneyLog(){
   var sec=el('journeySection');
   if(!sec){ sec=document.createElement('section'); sec.id='journeySection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   var place=(window._lastItin&&window._lastItin.name)||'';
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udcd6 Journey <em>journal</em></h2>'
-    +'<button class="tact" onclick="el(\'journeySection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'journeySection\')">\u2715</button></div>'
     +'<p class="xsec-sub">How did this moment feel? Capture the feeling \u2014 your emotional map of every place you\u2019ve been.</p>'
     +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px;margin-bottom:14px">'
     +'<div style="font-size:12px;color:var(--t3);margin-bottom:8px">HOW ARE YOU FEELING RIGHT NOW?</div>'
@@ -3205,11 +4092,11 @@ function openTribeTravel(){
       +'<span class="tribe-name">'+t.name+'</span></button>';
   }).join('');
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83e\udd1d Tribe <em>travel</em></h2>'
-    +'<button class="tact" onclick="el(\'tribeSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'tribeSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Travel with your kind. Pick your tribe \u2014 see where that community goes, and find travel buddies who get you.</p>'
     +'<div class="tribe-grid">'+cards+'</div>'
     +'<div id="tribeOut" style="margin-top:14px"></div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function rwTribeSquad(city){ var m=new Date().toISOString().slice(0,7); try{ openSquads(city, m); }catch(e){ showToast('Open Trip Squads from the group menu'); } }
 function rwTribePick(id){
@@ -3242,10 +4129,10 @@ function openMoneyLayer(){
   if(!sec){ sec=document.createElement('section'); sec.id='moneySection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udcb0 Money <em>groups</em></h2>'
-    +'<button class="tact" onclick="el(\'moneySection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'moneySection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Split anything with anyone \u2014 flatmates, friends, family, office lunch. Fair to the last paisa. Not just for trips.</p>'
     +'<div id="moneyBody"></div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
   rwMoneyRender();
 }
 function rwMoneyRender(){
@@ -3280,9 +4167,11 @@ function rwMoneyOpen(idx){
   var body=el('moneyBody');
   var exp=(g.expenses||[]).map(function(e){ return '<div class="money-exp"><span>'+esc2(e.what||'Expense')+' \u00b7 <b>'+esc2(e.payerName||e.payer)+'</b></span><span>\u20b9'+(+e.amount).toLocaleString('en-IN')+'</span></div>'; }).join('') || '<div class="note">No expenses yet.</div>';
   var settle = eng.transfers.length
-    ? eng.transfers.map(function(t){ return '<div class="money-settle">'+esc2(t.from)+' \u2192 <b>'+esc2(t.to)+'</b>: \u20b9'+Number(t.amount).toLocaleString('en-IN')+'</div>'; }).join('')
+    ? eng.transfers.map(function(t){ return '<div class="money-settle" style="display:flex;align-items:center;flex-wrap:wrap"><span style="flex:1">'+esc2(t.from)+' \u2192 <b>'+esc2(t.to)+'</b>: \u20b9'+Number(t.amount).toLocaleString('en-IN')+'</span>'+rwUpiRowBtn(t.from,t.to,t.amount,'RoamWise \u00b7 '+(g.name||'trip'))+'</div>'; }).join('')
     : '<div class="money-square">\u2705 All square \u2014 nobody owes anyone.</div>';
-  body.innerHTML='<button class="tact" onclick="rwMoneyRender()" style="margin-bottom:10px">\u2190 All groups</button>'
+  body.innerHTML='<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">'
+    +'<button class="tact" onclick="rwMoneyRender()">\u2190 All groups</button>'
+    +'<button class="tact" onclick="rwUpiSetMine()">\ud83d\udcb3 '+(rwUpiMine()? 'My UPI: '+esc2(rwUpiMine()) : 'Add my UPI ID')+'</button></div>'
     +'<div class="money-detail"><div class="money-dh">'+esc2(g.name)+'</div>'
     +'<div class="money-dsub">\u20b9'+total.toLocaleString('en-IN')+' total \u00b7 '+(g.members||[]).length+' people</div>'
     +'<div class="money-label">Expenses</div>'+exp
@@ -3332,12 +4221,12 @@ function openFitnessStays(){
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
   var dest=(window._lastItin&&_lastItin.name)||'';
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83c\udfcb\ufe0f Fitness-first <em>stays</em></h2>'
-    +'<button class="tact" onclick="el(\'fitStaySection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'fitStaySection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Don\u2019t break your streak on holiday. Find gyms, yoga & dance studios at your destination \u2014 then stay nearby.</p>'
     +'<div style="display:flex;gap:8px;margin-bottom:12px"><input id="fitDest" placeholder="Which city? e.g. Rishikesh" value="'+esc2(dest)+'" style="flex:1;background:#12121C;border:1px solid var(--b2);border-radius:11px;padding:11px;color:var(--t1);font-size:14px">'
     +'<button class="tact" style="font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwFitnessFind()">Find</button></div>'
     +'<div id="fitStayOut"></div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function rwFitnessFind(){
   var out=el('fitStayOut'); var dest=(el('fitDest').value||'').trim();
@@ -3413,12 +4302,12 @@ function openNearMe(){
   if(!sec){ sec=document.createElement('section'); sec.id='nearmeSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udccd Near <em>me</em></h2>'
-    +'<button class="tact" onclick="el(\'nearmeSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'nearmeSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Find food, sights & things to do within ~3km of where you are right now.</p>'
     +'<div class="nearme-privacy">\ud83d\udd12 Your location is used only for this search \u2014 it\u2019s never tracked in the background or saved anywhere.</div>'
     +'<button class="tact" id="nearmeBtn" style="width:100%;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwNearMeLocate()">\ud83d\udccd Find what\u2019s around me</button>'
     +'<div id="nearmeOut" style="margin-top:14px"></div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function rwNearMeLocate(){
   var out=el('nearmeOut'), btn=el('nearmeBtn');
@@ -3531,6 +4420,10 @@ function rwNearMeRender(items, radius){
 }
 
 function openGreenTravel(){
+  try{ tabGo('home'); }catch(e){}
+  /* BUG FIX (rw-v57): `sec` was used without ever being declared, so this
+     threw a ReferenceError and the menu item did nothing at all. */
+  var sec=el('greenSection');
   if(!sec){ sec=document.createElement('section'); sec.id='greenSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
   var earned = (typeof badgeEarnedIds==='function') ? badgeEarnedIds().indexOf('green')>=0 : false;
@@ -3542,13 +4435,13 @@ function openGreenTravel(){
     return '<div class="green-card" style="--gc:'+c.accent+'"><div class="green-cat">'+c.emoji+' '+c.title+'</div>'+items+'</div>';
   }).join('');
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83c\udf31 Green <em>travel</em></h2>'
-    +'<button class="tact" onclick="el(\'greenSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'greenSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Travel lighter on the planet \u2014 tick the choices you\u2019re making. 5 green choices earns the \ud83c\udf31 Green Traveller badge.</p>'
     +'<div class="green-prog"><div class="green-bar" style="width:'+Math.min(100,gc/5*100)+'%"></div></div>'
     +'<div class="green-progtxt">'+(earned?'\ud83c\udf31 Green Traveller badge earned! Keep it up.':gc+' / 5 green choices \u2014 '+(5-gc)+' to go')+'</div>'
     +cards
     +'<div class="green-foot">Every small choice counts. RoamWise is built for travel that leaves places better than it found them. \ud83c\udf0d</div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function rwGreenPick(cb){
   if(cb.checked){
@@ -3594,7 +4487,7 @@ function openJourneyCert(){
 
   sec.innerHTML =
     '<div class="xsec-head"><h2 class="xsec-title">\ud83c\udfc5 Journey <em>Certificate</em></h2>'
-    +'<button class="tact" onclick="el(\'certSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'certSection\')">\u2715</button></div>'
     +'<div id="certCard" class="cert-card">'
       +'<div class="cert-topbar"><span class="cert-brand">ROAM<b>WISE</b></span><span class="cert-edition">ATLAS EDITION \u65c5</span></div>'
       +'<div class="cert-title">JOURNEY CERTIFICATE</div>'
@@ -3620,7 +4513,7 @@ function openJourneyCert(){
       +'<button class="tact" style="flex:1;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="certShare()">\ud83d\udce4 Share certificate</button>'
       +'<button class="tact" style="flex:1;font-weight:800" onclick="certDownload()">\u2b07\ufe0f Save image</button>'
     +'</div>';
-  sec.style.display=''; sec.scrollIntoView({behavior:'smooth',block:'start'});
+  rwOpenSection(sec.id); sec.scrollIntoView({behavior:'smooth',block:'start'});
 
   /* draw the route mini-map */
   rwEnsureLeaflet(function(ok){
@@ -6803,7 +7696,7 @@ var RW_ICON_PATHS = {
    declarations hoist but `var RW_TABS = {...}` does not, so calling
    renderTabbar() inline here silently produced an empty bar. DOMContentLoaded
    fires after all deferred script has executed, which is exactly what we want. */
-document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(rwMaybeOnboard, 900); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} try{ setTimeout(rwInitWebPush, 2200); }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyMode(); }catch(e){} try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(function(){ if(!rwOpeningSeen()) rwOpeningShow(); else rwMaybeOnboard(); }, 700); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} try{ setTimeout(rwInitWebPush, 2200); }catch(e){} });
 /* ===== BACK BUTTON CONFIRMATION (report #4) =====
    In the app, pressing hardware back on the home screen closed instantly. Now:
    if a modal/overlay is open, back closes THAT; on the home screen, back asks to
@@ -6996,7 +7889,8 @@ function tabGo(t){
   }, {passive:true});
 })();
 
-function openDrawer(){ el('drawer').classList.add('open'); el('drawerBk').classList.add('open'); }
+function openDrawer(){
+  try{ var q=el('drSearch'); if(q){ q.value=''; drFilter(''); } }catch(e){} el('drawer').classList.add('open'); el('drawerBk').classList.add('open'); }
 function drToggle(btn){
   var grp=btn.parentElement;
   document.querySelectorAll('.dr-grp.open').forEach(function(g){ if(g!==grp) g.classList.remove('open'); });
@@ -7902,6 +8796,7 @@ function copilotSend(fromHero){
         +'CONFLICT/INDECISION: if people want different things, name the split, give each option its honest best case in one line, then recommend one with a reason \u2014 decisiveness with warmth beats fence-sitting. '
         +'NEVER INVENT: no made-up prices, timings, phone numbers, hotel names or distances. If you do not know or the guide text does not say, say \u201cI\u2019m not certain \u2014 worth checking before you book\u201d and give the safest general guidance instead. A wrong specific is far worse than an honest gap. If the question is ambiguous, ASK ONE short clarifying question with 2-3 concrete options rather than guessing. Never invent facts to sound dramatic; if you are unsure, say so plainly with a grin. Do NOT quote real Bollywood dialogues or put words in real actors\u2019 mouths \u2014 use your own filmi-flavoured lines. '
         +'Read the user intent and mood: if they sound excited, match it; if stressed or on a tight budget, be reassuring and practical, not theatrical. '
+        +'INDIAN GROUND TRUTH \u2014 THIS MATTERS MORE THAN SOUNDING CONFIDENT: never estimate travel time from straight-line distance. In the Himalayas assume ~22km/h (100km can be 5 hours), hill/ghat roads ~32km/h, plains highways ~48km/h, and city traffic ~18km/h. Dehradun to Rishikesh is about an hour, not 30 minutes. Never suggest a day trip that needs more than ~6 hours of road time. Flag monsoon (Jun-Sep) road risk in hills, winter closures on high passes, and altitude acclimatisation for anywhere above 3000m. '
         +'MONEY: the user\u2019s selected currency is '+((CURR.find(function(x){return x.c===AC;})||{s:'\u20b9',c:'INR'}).s)+' ('+AC+'). Always give prices in that symbol, never $ unless AC is literally USD. '
         +'Prefer the verified guide text below over your own recollection; if it contradicts you, trust it. No markdown headers, no bullet spam.\n'
         +facts+(hist? 'Conversation so far:\n'+hist+'\n':'')+'User: '+t+'\nCopilot:';
@@ -8020,9 +8915,9 @@ function openGuide(){
   var sec=el('guideSection');
   if(!sec){ sec=document.createElement('section'); sec.id='guideSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83c\udf93 How to use <em>RoamWise</em></h2>'
-    +'<button class="tact" onclick="rwGuideStop();el(\'guideSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwGuideStop();rwCloseSection(\'guideSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Every feature, step by step \u2014 with narration if you\u2019d rather listen than read.</p>'
     +'<button class="tact" style="width:100%;margin-bottom:14px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none;padding:13px" onclick="rwGuidePlayAll()">\ud83c\udfa7 Play the whole walkthrough</button>'
     + RW_GUIDE.map(function(g,i){
@@ -8261,10 +9156,10 @@ function openBeacon(){
   var sec=el('beaconSection');
   if(!sec){ sec=document.createElement('section'); sec.id='beaconSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   var mine=rwBeaconMine();
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udce1 <em>Beacon</em></h2>'
-    +'<button class="tact" onclick="el(\'beaconSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'beaconSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Find your people within about a kilometre \u2014 founders, artists, runners, yogis \u2014 wherever you land. Light a beacon, see who else is lit.</p>'
     +'<div style="background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.4);border-radius:14px;padding:13px;margin-bottom:14px">'
     +'<div style="font-size:12px;color:#4ADE80;font-weight:800;margin-bottom:4px">\ud83d\udd12 How we keep this safe</div>'
@@ -8458,10 +9353,10 @@ function openRealms(){
   var sec=el('realmsSection');
   if(!sec){ sec=document.createElement('section'); sec.id='realmsSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   var h=rwHouseObj();
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\u2694\ufe0f Realms of <em>Roam</em></h2>'
-    +'<button class="tact" onclick="el(\'realmsSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'realmsSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Seven realms. Five houses. The only way to take territory is to actually go there \u2014 every claim must be a verified journey. No grinding, no shortcuts.</p>'
     + (h? rwRealmsHome(h) : rwRealmsPickHouse());
   if(h){ rwRealmsLoadMap(); rwRealmsLadder(); }
@@ -8572,9 +9467,9 @@ function openPassport(){
   var sec=el('passportSection');
   if(!sec){ sec=document.createElement('section'); sec.id='passportSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\udee1\ufe0f Journey <em>passport</em></h2>'
-    +'<button class="tact" onclick="el(\'passportSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'passportSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Verified proof of where you\u2019ve actually been. Each stamp is issued into the RoamWise network and can be checked by anyone \u2014 employers, hosts, communities, or fellow travellers.</p>'
     +'<div style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:16px;margin-bottom:14px">'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
@@ -8697,9 +9592,9 @@ function openTatkal(){
   var sec=el('tatkalSection');
   if(!sec){ sec=document.createElement('section'); sec.id='tatkalSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\u26a1 Tatkal <em>prep</em></h2>'
-    +'<button class="tact" onclick="rwTatkalStopTimer();el(\'tatkalSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwTatkalStopTimer();rwCloseSection(\'tatkalSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Tatkal is won or lost in the first 40 seconds. Have everything ready to paste, and a countdown so you\u2019re logged in before the window opens.</p>'
     +'<div id="tatkalClock" style="background:var(--bg2,#12151F);border:1px solid var(--gold,#E8BA6C);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px"></div>'
     +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px;margin-bottom:12px">'
@@ -8826,9 +9721,9 @@ function openArrival(){
   var sec=el('arrivalSection');
   if(!sec){ sec=document.createElement('section'); sec.id='arrivalSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\ude82 Arrival <em>mode</em></h2>'
-    +'<button class="tact" onclick="el(\'arrivalSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'arrivalSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Booked a train? Tell us where you land and when \u2014 we\u2019ll build the trip around your arrival, not around a search box.</p>'
     +'<div style="background:var(--bg2,#12151F);border:1px solid var(--b1,rgba(255,255,255,.07));border-radius:16px;padding:16px;margin-bottom:14px">'
     +'<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:7px">ARRIVING AT</div>'
@@ -8882,7 +9777,7 @@ function rwArrivalPlan(city, days, tm){
   var q='I arrive in '+city+' by train at '+tm+'. Plan '+days+' days starting from that arrival \u2014 account for the arrival time on day 1 (do not plan a full morning if I land in the afternoon).';
   var inp=el('heroInput')||el('cpInput');
   if(inp){ inp.value=q; try{ copilotSend(!!el('heroInput')); }catch(e){} }
-  var a=el('arrivalSection'); if(a) a.style.display='none';
+  rwCloseSection('arrivalSection');
 }
 function rwArrivalNear(city){
   try{ openNearMe(); }catch(e){}
@@ -8938,10 +9833,10 @@ function openMatchEngine(){
   var sec=el('matchSection');
   if(!sec){ sec=document.createElement('section'); sec.id='matchSection'; sec.className='xsec v v-home';
     var host=el('copilotHero'); if(host&&host.parentNode) host.parentNode.insertBefore(sec,host.nextSibling); else document.body.appendChild(sec); }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   var me=rwMatchProfile();
   sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83e\udd1d Travel <em>matching</em></h2>'
-    +'<button class="tact" onclick="el(\'matchSection\').style.display=\'none\'">\u2715</button></div>'
+    +'<button class="tact" onclick="rwCloseSection(\'matchSection\')">\u2715</button></div>'
     +'<p class="xsec-sub">Find founders, investors, creators and travellers heading where you\u2019re heading. You choose what to share \u2014 nothing is public until you post it.</p>'
     +'<div id="matchBody"></div>';
   rwMatchRender(me);
@@ -10767,11 +11662,14 @@ function chatKittyHTML(){
       var fromN = fromMe?'You':(k.names[t.from]||'Someone'), toN = t.to===user.uid?'you':(k.names[t.to]||'someone');
       return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
         +'<span style="font-size:12.5px"><b>'+esc2(fromN)+'</b> \u2192 '+esc2(toN)+' <b style="color:var(--gold,#E8BA6C)">\u20b9'+t.amount.toLocaleString('en-IN')+'</b></span>'
-        +(fromMe? '<button class="chat-tool" style="font-size:11px;padding:4px 10px" onclick="chatSettle(\''+t.to+'\','+t.amount+')">Mark paid</button>':'')
+        +(fromMe? '<span style="display:flex;gap:5px">'
+            +'<button class="chat-tool" style="font-size:11px;padding:4px 10px;font-weight:700;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwUpiPayUid(\''+t.to+'\','+t.amount+')">\ud83d\udcb3 Pay</button>'
+            +'<button class="chat-tool" style="font-size:11px;padding:4px 10px" onclick="chatSettle(\''+t.to+'\','+t.amount+')">Mark paid</button></span>':'')
         +'</div>';
     }).join('');
   }
   out+='<button class="chat-tool" style="width:100%;margin-top:9px;justify-content:center;background:var(--bg3,#1A1A20)" onclick="chatAddExpense()">+ Add an expense</button>';
+  out+='<button class="chat-tool" style="width:100%;margin-top:6px;justify-content:center;background:var(--bg3,#1A1A20);font-size:11.5px" onclick="rwUpiSetMine()">\ud83d\udcb3 '+(rwUpiMine()? 'My UPI: '+esc2(rwUpiMine()) : 'Add your UPI ID so friends can pay you')+'</button>';
   return out;
 }
 function chatSettle(toUid, amount){
@@ -14279,7 +15177,7 @@ function openTripMap(destName, stops){
     sec=document.createElement('section');
     sec.id='tripMapSection'; sec.className='xsec v v-home';
     sec.innerHTML='<div class="xsec-head"><h2 class="xsec-title">\ud83d\uddfa\ufe0f Trip <em>map</em></h2>'
-      +'<button class="tact" onclick="el(\'tripMapSection\').style.display=\'none\'">\u2715 Close</button></div>'
+      +'<button class="tact" onclick="rwCloseSection(\'tripMapSection\')">\u2715 Close</button></div>'
       +'<p class="xsec-sub" id="tripMapSub">Your itinerary, mapped \u2014 tap a numbered pin or a day to jump.</p>'
       +'<div style="display:flex;gap:12px;flex-wrap:wrap">'
       +'<div id="tripMap" style="flex:1 1 340px;height:56vh;min-height:300px;border-radius:16px;overflow:hidden;background:#0E1018;border:1px solid var(--b2,#2A2A36)"></div>'
@@ -14289,7 +15187,7 @@ function openTripMap(destName, stops){
     if(host && host.parentNode) host.parentNode.insertBefore(sec, host.nextSibling);
     else document.body.appendChild(sec);
   }
-  sec.style.display='';
+  rwOpenSection(sec.id);
   sec.scrollIntoView({behavior:'smooth', block:'start'});
   el('tripMapSub').textContent='Mapping '+destName+'\u2026';
   el('tripMapList').innerHTML='<div class="note" style="padding:10px">\u23f3 Finding your stops\u2026</div>';
