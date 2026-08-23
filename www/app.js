@@ -21,6 +21,101 @@ function rwHaptic(kind){
 
 
 var DB = [
+/* ---------------------------------------------------------------------------
+   INDIA (rw-v94). The DB had FIFTEEN destinations and not one of them was in
+   India — so every carousel on an India-first product showed Bali and Kyoto.
+   These are the places our own users search for, with honest crowd curves
+   (Jan..Dec, higher = busier), real INR-equivalent daily costs, and the local
+   truth that makes us different from a generic planner.
+--------------------------------------------------------------------------- */
+{ id:'goa', name:'Goa', country:'India', region:'South Asia', lat:15.30, lon:74.12,
+  crowd:[82,74,58,44,36,22,20,24,30,52,78,95],
+  cost:{budget:1400,mid:3200,luxury:8500},
+  brk:{flights:0,stay:1400,food:700,act:600,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[11,12,1,2], interests:['beach','nightlife','food','heritage','photography'],
+  food:['Fish curry rice','Xacuti','Bebinca','Poi','Feni'],
+  gems:['Divar Island','Netravali bubble lake','Butterfly Beach','Chorao bird sanctuary'],
+  tags:['beach','nightlife','heritage'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'North Goa is loud and social, South Goa is quiet \u2014 pick before you book. Scooter is the only sane transport; taxi rates are cartel-fixed and high.' },
+
+{ id:'manali', name:'Manali', country:'India', region:'South Asia', lat:32.24, lon:77.19,
+  crowd:[38,40,52,68,92,96,72,66,54,48,42,66],
+  cost:{budget:1200,mid:2800,luxury:7000},
+  brk:{flights:0,stay:1200,food:600,act:600,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'Rohtang Pass needs a permit'},
+  bestM:[3,4,9,10], interests:['mountains','trekking','adventure','cafes','snow'],
+  food:['Siddu','Trout','Babru','Chha Gosht'],
+  gems:['Sethan village','Hamta valley','Chhika','Jana waterfall'],
+  tags:['mountain','adventure','budget'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'May-June is packed and roads crawl. Old Manali is the traveller side; the town is for families. Rohtang needs a permit booked ahead.' },
+
+{ id:'rishikesh', name:'Rishikesh', country:'India', region:'South Asia', lat:30.09, lon:78.27,
+  crowd:[42,48,62,58,78,40,30,34,52,68,58,46],
+  cost:{budget:1000,mid:2500,luxury:6500},
+  brk:{flights:0,stay:1000,food:500,act:600,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[2,3,10,11], interests:['yoga','rafting','spiritual','trekking','wellness'],
+  food:['Aloo puri','Chotiwala thali','German Bakery cakes'],
+  gems:['Neer Garh waterfall','Kunjapuri sunrise','Patna waterfall','Beatles Ashram at dawn'],
+  tags:['spiritual','adventure','budget'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Dry city and vegetarian by law \u2014 no alcohol, no meat. Rafting shuts late June to mid September. Auto from the station should be \u20b9150, not \u20b9400.' },
+
+{ id:'spiti', name:'Spiti Valley', country:'India', region:'South Asia', lat:32.24, lon:78.02,
+  crowd:[5,5,8,14,42,66,72,68,52,34,10,5],
+  cost:{budget:1500,mid:3500,luxury:8000},
+  brk:{flights:0,stay:900,food:600,act:700,misc:1300},
+  visa:{type:'None',cost:'Domestic',days:0,note:'Foreign nationals need an Inner Line Permit'},
+  bestM:[6,7,8,9], interests:['mountains','monasteries','photography','stargazing','offbeat'],
+  food:['Thukpa','Momos','Butter tea','Chhang'],
+  gems:['Dhankar lake','Hikkim post office','Langza fossils','Pin valley'],
+  tags:['mountain','offbeat','adventure'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Roads run at ~22 km/h \u2014 Manali to Kaza is 9-11 hours, not the 5 maps claim. Enter via Kinnaur to acclimatise. Kunzum La is shut November to May.' },
+
+{ id:'kerala_backwaters', name:'Alleppey', country:'India', region:'South Asia', lat:9.49, lon:76.33,
+  crowd:[72,66,52,44,32,26,28,32,44,58,68,88],
+  cost:{budget:1300,mid:3000,luxury:9000},
+  brk:{flights:0,stay:1400,food:600,act:600,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['backwaters','food','nature','slow','photography'],
+  food:['Karimeen pollichathu','Appam with stew','Sadya','Puttu kadala'],
+  gems:['Canoe through the narrow canals','Kumarakom bird sanctuary','Marari beach','Toddy shops inland'],
+  tags:['nature','slow','food'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Houseboats are cheapest booked in Alleppey itself, not online. A canoe reaches the narrow canals a houseboat physically cannot. Kochi to Munnar is 4-5 hours, not 3.' },
+
+{ id:'jaipur', name:'Jaipur', country:'India', region:'South Asia', lat:26.91, lon:75.79,
+  crowd:[72,78,62,42,28,24,30,34,48,72,86,80],
+  cost:{budget:1100,mid:2600,luxury:8000},
+  brk:{flights:0,stay:1100,food:550,act:550,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['heritage','forts','shopping','food','photography'],
+  food:['Dal baati churma','Laal maas','Pyaaz kachori','Ghewar'],
+  gems:['Panna Meena ka Kund','Chand Baori (Abhaneri)','Nahargarh at sunset','Gaitor cenotaphs'],
+  tags:['heritage','culture','city'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'April to June hits 45C \u2014 not sightseeing weather. Composite monument tickets save real money. Jaipur to Jaisalmer is 10+ hours; take the overnight train.' },
+
+{ id:'varanasi', name:'Varanasi', country:'India', region:'South Asia', lat:25.32, lon:82.97,
+  crowd:[64,60,52,40,32,30,34,38,46,62,78,72],
+  cost:{budget:900,mid:2200,luxury:6000},
+  brk:{flights:0,stay:900,food:450,act:450,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['spiritual','heritage','photography','food','culture'],
+  food:['Kachori sabzi','Malaiyo (winter only)','Banarasi paan','Tamatar chaat'],
+  gems:['Sunrise boat from Assi ghat','Sarnath','Ramnagar Fort','The back lanes at dawn'],
+  tags:['spiritual','heritage','budget'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Go at dawn \u2014 the ghats are a different place before 7am. Malaiyo only exists in winter mornings. Fixed boat rates are posted; ignore the first quote.' },
+
+{ id:'ziro', name:'Ziro Valley', country:'India', region:'South Asia', lat:27.63, lon:93.83,
+  crowd:[12,14,22,28,34,30,26,28,58,42,20,14],
+  cost:{budget:1200,mid:2800,luxury:6000},
+  brk:{flights:0,stay:1000,food:600,act:600,misc:600},
+  visa:{type:'None',cost:'Inner Line Permit needed',days:0,note:'ILP required for Arunachal Pradesh'},
+  bestM:[3,4,9,10], interests:['offbeat','culture','nature','trekking','music'],
+  food:['Bamboo shoot curry','Smoked pork','Apong rice beer','Pika pila'],
+  gems:['Talley Valley trek','Hong village','Pine groves at Hapoli','Rice-fish farming fields'],
+  tags:['offbeat','culture','nature'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'You need an Inner Line Permit and the drive from Naharlagun is long and rough. This is a place that does not perform for tourists \u2014 which is the point.' },
+
   {id:"chiang_mai",name:"Chiang Mai",country:"Thailand",region:"Southeast Asia",lat:18.79,lon:98.99,
    crowd:[45,50,55,40,28,22,25,28,22,32,55,68],
    cost:{budget:550,mid:950,luxury:2200},brk:{flights:280,stay:160,food:90,act:70,misc:50},
@@ -400,6 +495,31 @@ function rwLocalNotifySchedule(what, mins){
    ========================================================================== */
 
 var RW_AGENT_TOOLS = [
+  { type:'function', function:{ name:'search_stays',
+    description:'Find bookable rooms with real prices in a city. Use whenever the traveller asks where to stay, what it costs, or wants to book.',
+    parameters:{ type:'object', properties:{ zone:{type:'string', description:'City, e.g. "Manali"'}, maxPrice:{type:'number'} }, required:['zone'] } } },
+  { type:'function', function:{ name:'find_partners',
+    description:'Find verified RoamWise partner stays and adventure operators in a place, ranked by how much we can vouch for them.',
+    parameters:{ type:'object', properties:{ zone:{type:'string'}, cat:{type:'string', enum:['stay','adventure']} }, required:['zone'] } } },
+  { type:'function', function:{ name:'open_booking',
+    description:'Open the booking screen for a specific room so the traveller can book it. Use after search_stays when they choose one.',
+    parameters:{ type:'object', properties:{ roomId:{type:'string'} }, required:['roomId'] } } },
+  { type:'function', function:{ name:'my_bookings',
+    description:'Look up the travellers own bookings and their status.',
+    parameters:{ type:'object', properties:{} } } },
+  { type:'function', function:{ name:'share_to_whatsapp',
+    description:'Share a booking, itinerary, split-up or any text to WhatsApp. Use whenever the traveller wants to send something to friends or to a property.',
+    parameters:{ type:'object', properties:{ text:{type:'string'}, kind:{type:'string', enum:['booking','plan','money','other']} }, required:['text'] } } },
+  { type:'function', function:{ name:'travel_compatibility',
+    description:'Explain or run the travel compatibility engine, which matches people on the six behaviours groups argue about rather than on age.',
+    parameters:{ type:'object', properties:{} } } },
+  { type:'function', function:{ name:'open_feature',
+    description:'Open any RoamWise screen by name. Use when the traveller asks for something the app already does.',
+    parameters:{ type:'object', properties:{ feature:{type:'string', enum:['stays','partners','experiences','green','booking','sos','events','compat','listing','money','nearme','beacon','arrival'] } }, required:['feature'] } } },
+  { type:'function', function:{ name:'emergency_help',
+    description:'Bring up the stranded-traveller page. Use immediately if someone says they are stuck, unsafe, missed the last bus, or in trouble.',
+    parameters:{ type:'object', properties:{} } } },
+
   { type:'function', function:{ name:'set_destination',
     description:'Set the active trip destination in the app.',
     parameters:{ type:'object', properties:{ place:{type:'string', description:'City or region, e.g. "Rishikesh"'} }, required:['place'] } } },
@@ -497,6 +617,14 @@ function rwAgentRun(objective, onTrace, onDone){
       +'CRITICAL: never state a travel duration without calling estimate_travel_time first \u2014 '
       +'Indian mountain roads are far slower than distance suggests. '
       +'If a tool returns ok:false, read the error and try a different approach rather than repeating it. '
+      +'YOU CAN RUN THE WHOLE PRODUCT, not just answer questions. Where to stay \u2192 search_stays and quote real prices. '
+      +'They pick one \u2192 open_booking. Local operators \u2192 find_partners, and be honest about which are verified '
+      +'versus merely researched. Anything they want to send to friends or a property \u2192 share_to_whatsapp. '
+      +'Who they travel well with \u2192 travel_compatibility. Any screen they ask for \u2192 open_feature rather than '
+      +'describing it. '
+      +'IF SOMEONE SAYS THEY ARE STUCK, UNSAFE, OR HAVE MISSED THE LAST TRANSPORT: call emergency_help FIRST, talk after. '
+      +'NEVER invent a price, a room, a partner or an availability. If a tool returns nothing, say so plainly \u2014 '
+      +'being useless is recoverable, being wrong about a booking is not. '
       +'When the objective is met, call finish with a short, warm answer for the traveller.'},
     {role:'user', content:objective}
   ];
@@ -538,6 +666,86 @@ function rwAgentRun(objective, onTrace, onDone){
   }
   tick();
 }
+
+/* ---- platform tools (rw-v94): Tusk can now run the whole product ---- */
+RW_AGENT_IMPL.search_stays = function(a){
+  var list=(window.RW_ROOMS||[]).filter(function(r){
+    return (!a.zone || String(r.zone).toLowerCase()===String(a.zone).toLowerCase())
+        && (!a.maxPrice || r.price<=a.maxPrice); });
+  if(!list.length) return { ok:true, found:0, note:'No listed rooms there yet. Offer to plan the trip anyway.' };
+  return { ok:true, found:list.length, rooms:list.slice(0,6).map(function(r){
+    return { id:r.id, property:r.property, room:r.room, price:r.price,
+             sleeps:r.maxGuests, includes:(r.inc||[]).join(', '), cancel:r.cancel }; }) };
+};
+RW_AGENT_IMPL.find_partners = function(a){
+  var list=(typeof rwPartnersFor==='function') ? rwPartnersFor(a.zone, a.cat) : [];
+  if(!list.length) return { ok:true, found:0, note:'No verified partners there yet \u2014 say so honestly.' };
+  return { ok:true, found:list.length, partners:list.slice(0,6).map(function(p){
+    return { name:p.name, area:p.area, rating:p.rating, reviews:p.reviews,
+             status:p.verified, why:p._why, hook:p.hook }; }) };
+};
+RW_AGENT_IMPL.open_booking = function(a){
+  try{ if(typeof openRoomBook==='function'){ openRoomBook(a.roomId); return { ok:true, opened:a.roomId }; } }catch(e){}
+  return { ok:false, error:'Could not open that room' };
+};
+RW_AGENT_IMPL.my_bookings = function(){
+  try{
+    var last=JSON.parse(lsGet('rw_last_booking')||'null');
+    if(!last) return { ok:true, count:0, note:'No bookings on this device yet.' };
+    return { ok:true, count:1, booking:{ ref:last.ref, property:last.property, room:last.room,
+      checkIn:last.checkIn, checkOut:last.checkOut, amount:last.amount, status:last.status } };
+  }catch(e){ return { ok:true, count:0 }; }
+};
+RW_AGENT_IMPL.share_to_whatsapp = function(a){
+  var t=String(a.text||''); if(!t) return { ok:false, error:'nothing to share' };
+  try{ rwWhatsShare(t); return { ok:true, shared:true, kind:a.kind||'other' }; }
+  catch(e){ return { ok:false, error:'could not open WhatsApp' }; }
+};
+RW_AGENT_IMPL.travel_compatibility = function(){
+  var mine=(typeof rwCompatMine==='function')? rwCompatMine():{};
+  var done=Object.keys(mine).length>0;
+  try{ if(typeof openCompat==='function') openCompat(); }catch(e){}
+  return { ok:true, profileSet:done,
+    axes:(window.RW_AXES||[]).map(function(x){ return x.label; }),
+    note: done ? 'Their profile is set; explain who they match with and why.'
+               : 'They have not set a travel style yet \u2014 the six-slider quiz is now open.' };
+};
+RW_AGENT_IMPL.open_feature = function(a){
+  var map={ stays:'openStays', partners:'openPartners', experiences:'openExperiences',
+    green:'openGreen', booking:'openBooking', sos:'openSOS', events:'openEvents',
+    compat:'openCompat', listing:'openListing', money:'openMoneyLayer',
+    nearme:'openNearMe', beacon:'openBeacon', arrival:'openArrival' };
+  var fn=map[a.feature];
+  try{ if(fn && typeof window[fn]==='function'){ window[fn](); return { ok:true, opened:a.feature }; } }catch(e){}
+  return { ok:false, error:'no such screen' };
+};
+RW_AGENT_IMPL.emergency_help = function(){
+  try{ if(typeof openSOS==='function'){ openSOS(); return { ok:true, opened:true,
+    note:'The offline help page is open. Emergency numbers are 112, 108, and 1363 for tourists.' }; } }catch(e){}
+  return { ok:true, note:'Emergency numbers in India: 112 all emergencies, 108 ambulance, 1363 tourist helpline.' };
+};
+
+/* one place for every WhatsApp share in the app */
+function rwWhatsShare(text){
+  var t=String(text||'');
+  try{
+    if(navigator.share){ navigator.share({ text:t }); return true; }
+  }catch(e){}
+  window.open('https://wa.me/?text='+encodeURIComponent(t), '_blank', 'noopener');
+  return true;
+}
+/* format a booking the way a property owner or a friend wants to read it */
+function rwBookingText(b){
+  if(!b) return '';
+  return '*RoamWise booking* \u2014 '+b.ref+'\n\n'
+    +'\ud83c\udfe1 '+b.property+'\n\ud83d\udecf\ufe0f '+b.room+'\n'
+    +'\ud83d\udcc5 '+b.checkIn+' \u2192 '+b.checkOut+' ('+b.nights+' night'+(b.nights>1?'s':'')+')\n'
+    +'\ud83d\udc65 '+b.guests+' guest'+(b.guests>1?'s':'')+'\n'
+    +'\ud83d\udcb0 \u20b9'+Number(b.amount||0).toLocaleString('en-IN')+' \u2014 '
+    +(b.payMode==='upi'?'paid by UPI':'paying at the property')+'\n\n'
+    +'Planned with RoamWise \u00b7 roamwise.co.in';
+}
+
 /* Tool-calling request. Only OpenAI-compatible providers support this, so we
    pick one that does and fall back to plain chat if none is configured. */
 function rwAgentCall(messages, cb){
@@ -1073,11 +1281,146 @@ function rwCloseSection(id){
   s.style.display='none';
   s.setAttribute('hidden','');
 }
+
+/* ============================================================================
+   PAGE ROUTER (rw-v82) — stop cramming everything into the home screen
+   ============================================================================
+   THE PROBLEM: every feature (Events, Partners, Modes, Beacon...) injected a
+   <section> into the HOME view. Home became an endless scroll-pile, nothing
+   felt like a real destination, and nothing was linkable.
+
+   THE FIX: real pages. Each major feature gets:
+     · its own URL hash (#/partners) — shareable, and the BACK button works
+     · a full-screen shell with its own header, not a card wedged into home
+     · focus: the page is the only thing on screen
+
+   Everything is additive — the existing open* functions still build their
+   content; they just render into a page shell instead of the home feed.
+   ========================================================================= */
+var RW_PAGES = {
+  partners: { title:'Stay & do',      sub:'Boutique stays and local operators we\u2019ve actually researched', icon:'\ud83e\udd1d', build:function(){ return _pageWrap('partnersSection'); } },
+  events:   { title:'Event radar',    sub:'Music, startup, sport and motoring \u2014 with a trip built around each', icon:'\ud83d\udcc5', build:function(){ return _pageWrap('eventsSection'); } },
+  compat:   { title:'Travel style',   sub:'Who you actually travel well with', icon:'\u2699\ufe0f', build:function(){} },
+  listing:  { title:'Stay & do',      sub:'Every place, ranked by how much we can vouch for it', icon:'\ud83c\udfe1', build:function(){} },
+  experiences: { title:'Experiences', sub:'Certified \u00b7 curated \u00b7 actually tested', icon:'\u2728', build:function(){} },
+  stays:    { title:'Book a stay',    sub:'Verified rooms \u00b7 you pay the property directly', icon:'\ud83c\udfe1', build:function(){} },
+  booked:   { title:'Confirmed',      sub:'', icon:'\u2705', build:function(){} },
+  booking:  { title:'Your trip',      sub:'Everything you\u2019re booking, in one request', icon:'\ud83e\uddf3', build:function(){} },
+  green:    { title:'RoamWise Green',  sub:'Electric, solar, vegan \u2014 verified, not claimed', icon:'\u26a1', build:function(){} },
+  sos:      { title:'Stranded?',       sub:'Works offline \u2014 the advice a local friend would give', icon:'\ud83c\udd98', build:function(){} },
+  modes:    { title:'Layout',         sub:'Three genuinely different ways to use RoamWise', icon:'\ud83e\udded', build:function(){ return _pageWrap('modeSection'); } }
+};
+function _pageWrap(id){ return id; }
+
+var _rwPageStack=[];
+function rwPageOpen(key, builder){
+  var P=RW_PAGES[key]||{title:key,sub:'',icon:''};
+  var host=el('rwPage');
+  if(!host){
+    host=document.createElement('div'); host.id='rwPage'; host.className='rw-page';
+    document.body.appendChild(host);
+  }
+  host.innerHTML=
+     '<div class="rw-page-bar">'
+    +'<button class="rw-back" onclick="rwPageClose()" aria-label="Back">\u2190</button>'
+    +'<div class="rw-page-t"><b>'+(P.icon||'')+' '+esc2(P.title)+'</b>'
+    +(P.sub?'<span>'+esc2(P.sub)+'</span>':'')+'</div>'
+    +'<button class="rw-share" onclick="rwPageShare(\''+key+'\')" aria-label="Share">\u21d7</button>'
+    +'</div>'
+    +'<div class="rw-page-body" id="rwPageBody"></div>';
+  document.body.classList.add('rw-paged');
+  host.classList.add('open');
+  try{ if(typeof builder==='function') builder(el('rwPageBody')); }catch(e){}
+  try{ if(location.hash!=='#/'+key) history.pushState({rwPage:key},'', '#/'+key); }catch(e){}
+  window.scrollTo(0,0);
+  _rwPageStack.push(key);
+}
+function rwPageClose(){
+  var host=el('rwPage');
+  if(host){ host.classList.remove('open'); setTimeout(function(){ if(host) host.innerHTML=''; },260); }
+  document.body.classList.remove('rw-paged');
+  _rwPageStack.pop();
+  try{ if(String(location.hash||'').indexOf('#/')===0) history.pushState({},'', location.pathname); }catch(e){}
+}
+function rwPageShare(key){
+  var url=location.origin+location.pathname+'#/'+key;
+  try{
+    if(navigator.share) navigator.share({ title:'RoamWise \u2014 '+(RW_PAGES[key]||{}).title, url:url });
+    else { navigator.clipboard.writeText(url); showToast('Link copied'); }
+  }catch(e){ showToast(url); }
+}
+/* back button / direct link support */
+window.addEventListener('popstate', function(){
+  var h=String(location.hash||'');
+  if(h.indexOf('#/')===0){ rwRouteTo(h.slice(2)); }
+  else if(el('rwPage') && el('rwPage').classList.contains('open')){
+    el('rwPage').classList.remove('open');
+    document.body.classList.remove('rw-paged');
+  }
+});
+function rwRouteTo(key){
+  if(key==='partners' && typeof openPartners==='function') return openPartners();
+  if(key==='events'   && typeof openEvents==='function')   return openEvents();
+  if(key==='compat'   && typeof openCompat==='function')    return openCompat();
+  if(key==='listing'  && typeof openListing==='function')   return openListing();
+  if(key==='experiences' && typeof openExperiences==='function') return openExperiences();
+  if(key==='stays'    && typeof openStays==='function')     return openStays();
+  if(key==='booking'  && typeof openBooking==='function')   return openBooking();
+  if(key==='green'    && typeof openGreen==='function')     return openGreen();
+  if(key==='sos'      && typeof openSOS==='function')       return openSOS();
+  if(key==='modes'    && typeof openModePicker==='function') return openModePicker();
+}
+/* open a deep link on first load */
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    var h=String(location.hash||'');
+    if(h.indexOf('#/')===0) rwRouteTo(h.slice(2));
+  }, 900);
+});
+
+/* rw-v86: ONE change instead of rewriting 20 open* functions.
+   Any section opened through here is MOVED into the page shell, so every
+   feature gets its own full screen, its own back button and its own URL —
+   without touching the function that built it. */
+var RW_SECTION_TITLES = {
+  moneySection:['\ud83d\udcb0','Split money','Who owes whom, to the paise'],
+  nearSection:['\ud83d\udccd','Near me','Food and things to do around you'],
+  beaconSection:['\ud83d\udce1','Beacon','Travellers nearby, safely'],
+  realmsSection:['\u2694\ufe0f','Realms of Roam','Claim territory by actually going there'],
+  arrivalSection:['\ud83d\ude82','Arrival mode','Land, then plan from where you are'],
+  greenSection:['\ud83c\udf3f','Green travel','Lower-impact ways to go'],
+  passportSection:['\ud83d\udec2','Journey passport','Your verified travel record'],
+  tribeSection:['\ud83d\udc65','Tribe travel','Find your kind of traveller'],
+  fitnessSection:['\ud83c\udfcb\ufe0f','Fitness stays','Stay in shape on the road'],
+  guideSection:['\ud83c\udfa7','Narrated guide','Listen as you walk'],
+  tatkalSection:['\ud83c\udfab','Tatkal prep','Ready before the clock starts'],
+  mapSection:['\ud83d\uddfa\ufe0f','Map explorer','See it before you go'],
+  tripMapSection:['\ud83d\uddfa\ufe0f','Trip map','Your itinerary on a map'],
+  badgesSection:['\ud83c\udfc5','Badges','What you\u2019ve earned'],
+  memoriesSection:['\ud83d\udcf7','Memories','Your trips, kept'],
+  journalSection:['\ud83d\udcd3','Journey journal','How the trip actually felt'],
+  agentSection:['\ud83e\udd16','Tusk agent','Watch it think'],
+  evalSection:['\ud83e\uddea','Agent evals','How reliable it really is'],
+  matchSection:['\u2728','Smart matching','Trips that fit you'],
+  certSection:['\ud83c\udf96\ufe0f','Journey certificate','Proof you were there']
+};
 function rwOpenSection(id){
   var s=el(id); if(!s) return;
   try{ if(s.dataset.rwcls) s.className=s.dataset.rwcls; }catch(e){}
   s.removeAttribute('hidden');
   s.style.display='';
+  /* move it into a page shell */
+  try{
+    var t=RW_SECTION_TITLES[id];
+    if(t && typeof rwPageOpen==='function'){
+      RW_PAGES[id]={ title:t[1], sub:t[2], icon:t[0], build:function(){} };
+      rwPageOpen(id, function(body){
+        s.classList.remove('v','v-home');
+        body.appendChild(s);
+        s.style.display='';
+      });
+    }
+  }catch(e){}
 }
 
 
@@ -1145,6 +1488,1149 @@ function openModePicker(){
       }).join('')
     +'<div style="font-size:10.5px;color:var(--t3);margin-top:10px;line-height:1.55">Layout mode changes the shape of the app. Colours are separate \u2014 see \ud83c\udfa8 Theme &amp; look.</div></div>';
   ov.classList.add('open');
+}
+
+
+
+
+
+
+/* ============================================================================
+   INSTANT BOOKING ENGINE (rw-v84) — pilot
+   ============================================================================
+   Researched against MakeMyTrip, Booking.com, Agoda, Expedia and OYO. Two
+   things they all do that we deliberately do NOT:
+     · they charge the property 15-25%  -> we charge 8%
+     · they hold the money 7-14 days    -> the guest pays the property DIRECT
+   Those two facts are the entire reason a property lists with a platform that
+   has 20 users. Everything below is built to preserve them.
+   ========================================================================= */
+function rwRoomsFor(zone){
+  var list=(window.RW_ROOMS||[]).slice();
+  if(zone) list=list.filter(function(r){ return String(r.zone).toLowerCase()===String(zone).toLowerCase(); });
+  return list;
+}
+function rwNights(a,b){
+  try{ var d=(new Date(b)-new Date(a))/86400000; return d>0? Math.round(d):1; }catch(e){ return 1; }
+}
+function openStays(zone){
+  window._stZone = (zone!==undefined? zone : window._stZone) || '';
+  rwPageOpen('stays', function(body){
+    var zones={}; (window.RW_ROOMS||[]).forEach(function(r){ zones[r.zone]=1; });
+    body.innerHTML='<div class="st-save">\ud83d\udcb8 <b>You pay the property directly.</b> We take 8% from them afterwards \u2014 other platforms take 15\u201325%, which is why their rooms cost more.</div>'
+      +'<div class="pt-chips" style="margin:12px 0">'
+      +'<button class="ev-chip'+(!window._stZone?' on':'')+'" onclick="openStays(\'\')">Everywhere</button>'
+      + Object.keys(zones).map(function(z){
+          return '<button class="ev-chip'+(window._stZone===z?' on':'')+'" onclick="openStays(\''+z+'\')">'+esc2(z)+'</button>';
+        }).join('')
+      +'</div><div id="staysOut"></div>';
+    rwStaysRender();
+  });
+}
+function rwStaysRender(){
+  var host=el('staysOut'); if(!host) return;
+  var list=rwRoomsFor(window._stZone);
+  if(!list.length){ host.innerHTML='<div class="note" style="text-align:center;padding:22px;color:var(--t3)">No rooms listed here yet.</div>'; return; }
+  host.innerHTML=list.map(function(r){
+    return '<div class="st-card">'
+      +'<div class="st-top"><span style="flex:1;min-width:0">'
+      +'<b class="st-prop">'+esc2(r.property)+'</b>'
+      +'<div class="st-room">'+esc2(r.room)+'</div>'
+      +'<div class="st-where">'+esc2(r.area)+' \u00b7 '+esc2(r.zone)+' \u00b7 sleeps '+r.maxGuests+'</div>'
+      +'</span>'
+      +'<span class="st-price">\u20b9'+r.price.toLocaleString('en-IN')+'<span>/night</span></span></div>'
+      +'<div class="st-inc">'+(r.inc||[]).map(function(i){ return '<span>'+esc2(i)+'</span>'; }).join('')+'</div>'
+      +'<div class="st-cancel">\u2713 '+esc2(r.cancel||'')+'</div>'
+      +'<button class="st-book" onclick="openRoomBook(\''+r.id+'\')">Book this room \u2192</button>'
+      +'</div>';
+  }).join('')
+  +'<div class="gr-foot">Rates are set by the property, not by us. We never discount someone\u2019s room without asking them first.</div>';
+}
+function rwRoomById(id){ return (window.RW_ROOMS||[]).filter(function(r){ return r.id===id; })[0]; }
+
+/* ---------------- the booking form ---------------- */
+function openRoomBook(id){
+  var r=rwRoomById(id); if(!r) return;
+  var t=new Date(), inD=new Date(t.getTime()+86400000), outD=new Date(t.getTime()+2*86400000);
+  var f=function(d){ return d.toISOString().slice(0,10); };
+  rwForm('\ud83c\udfe1 '+r.property, [
+    { id:'bk_in',    label:'Check in',  type:'date', value:f(inD) },
+    { id:'bk_out',   label:'Check out', type:'date', value:f(outD) },
+    { id:'bk_g',     label:'Guests',    type:'number', value:'2' },
+    { id:'bk_nm',    label:'Your name' },
+    { id:'bk_ph',    label:'Your phone', ph:'10-digit mobile' },
+    { id:'bk_note',  label:'Anything they should know', ph:'arrival time, food needs' }
+  ], function(v){
+    if(!v.bk_nm || !v.bk_ph){ showToast('Name and phone are needed to confirm'); return; }
+    if(!/^\d{10}$/.test(String(v.bk_ph).replace(/\D/g,'').slice(-10))){ showToast('Enter a valid 10-digit mobile'); return; }
+    var n=rwNights(v.bk_in, v.bk_out);
+    rwBookPay(r, { inD:v.bk_in, outD:v.bk_out, nights:n, guests:+v.bk_g||2,
+                   name:v.bk_nm, phone:v.bk_ph, note:v.bk_note||'' });
+  }, esc2(r.room)+' \u00b7 \u20b9'+r.price.toLocaleString('en-IN')+' per night');
+}
+
+/* ---------------- pay: UPI now, or at the property ---------------- */
+function rwBookPay(r, b){
+  var total=r.price*b.nights;
+  var ref='RW'+Date.now().toString(36).toUpperCase().slice(-6);
+  var upi=r.upi || (window.RW_BOOK_TERMS&&RW_BOOK_TERMS.deskUpi) || '';
+  var payUrl='upi://pay?pa='+encodeURIComponent(upi)
+    +'&pn='+encodeURIComponent(r.property)
+    +'&am='+total+'&cu=INR&tn='+encodeURIComponent('RoamWise '+ref);
+  var ov=el('bkPayOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='bkPayOv'; ov.className='overlay'; ov.style.zIndex='4200';
+    ov.onclick=function(x){ if(x.target===ov) rwOverlayClose('bkPayOv'); }; document.body.appendChild(ov); }
+  window._pendingBooking={ r:r, b:b, total:total, ref:ref };
+  ov.innerHTML='<div class="sheet" style="max-width:430px">'
+    +'<div class="sheet-h"><b>Confirm your booking</b><button class="tact" onclick="rwOverlayClose(\'bkPayOv\')">\u2715</button></div>'
+    +'<div class="bk-sum">'
+    +'<div class="bk-sr"><span>'+esc2(r.property)+'</span><b>'+esc2(r.room)+'</b></div>'
+    +'<div class="bk-sr"><span>Dates</span><b>'+esc2(b.inD)+' \u2192 '+esc2(b.outD)+'</b></div>'
+    +'<div class="bk-sr"><span>'+b.nights+' night'+(b.nights>1?'s':'')+' \u00d7 \u20b9'+r.price.toLocaleString('en-IN')+'</span><b>\u20b9'+total.toLocaleString('en-IN')+'</b></div>'
+    +'<div class="bk-sr tot"><span>Total</span><b>\u20b9'+total.toLocaleString('en-IN')+'</b></div>'
+    +'</div>'
+    +'<div class="bk-pay-note">You are paying <b>'+esc2(r.property)+'</b> directly \u2014 the money goes to them, not to us. RoamWise invoices them 8% after your stay.</div>'
+    +(upi? '<a class="bk-go" style="display:block;text-align:center;text-decoration:none;margin-top:12px" href="'+payUrl+'">\ud83d\udcf1 Pay \u20b9'+total.toLocaleString('en-IN')+' now (PhonePe / GPay / any UPI)</a>'
+         : '<div class="bk-pay-note" style="margin-top:12px">This property has not shared a UPI id yet \u2014 choose pay-at-property below.</div>')
+    +'<button class="tact" style="width:100%;margin-top:9px;padding:12px" onclick="rwBookConfirm(\'paid\')">\u2705 I\u2019ve paid \u2014 confirm my booking</button>'
+    +'<button class="tact" style="width:100%;margin-top:7px;padding:12px" onclick="rwBookConfirm(\'cash\')">\ud83d\udcb5 I\u2019ll pay at the property</button>'
+    +'<div class="bk-pay-fine">Booking reference <b>'+ref+'</b>. We cannot verify a UPI payment automatically, so the property confirms receipt \u2014 which is also why nobody can fake a paid booking.</div>'
+    +'</div>';
+  ov.classList.add('open');
+}
+
+/* ---------------- confirm + notify the owner ---------------- */
+function rwBookConfirm(mode){
+  var P=window._pendingBooking; if(!P) return;
+  var r=P.r, b=P.b, total=P.total, ref=P.ref;
+  var rec={ ref:ref, roomId:r.id, partnerId:r.partnerId, property:r.property,
+    room:r.room, zone:r.zone, area:r.area,
+    checkIn:b.inD, checkOut:b.outD, nights:b.nights, guests:b.guests,
+    guestName:b.name, guestPhone:b.phone, note:b.note,
+    amount:total, payMode:(mode==='paid'?'upi':'at-property'),
+    commissionPct:8, commission:Math.round(total*0.08),
+    status:(mode==='paid'?'paid-unverified':'confirmed-pay-later'),
+    at:new Date().toISOString() };
+  try{ rec.ref_code=rwRefActive()||''; }catch(e){}
+  try{ if(window.db) db.collection('roomBookings').doc(ref).set(rec).catch(function(){}); }catch(e){}
+  try{ lsSet('rw_last_booking', JSON.stringify(rec)); }catch(e){}
+  rwOverlayClose('bkPayOv');
+  rwBookOwnerMsg(rec, r);
+  rwBookDone(rec);
+}
+/* the WhatsApp message that reaches the property owner */
+function rwBookOwnerMsg(rec, r){
+  var to=r.ownerWa || (window.RW_BOOK_TERMS&&RW_BOOK_TERMS.desk) || '';
+  var msg='*New RoamWise booking* \u2014 '+rec.ref+'\n\n'
+    +'\ud83c\udfe1 '+rec.property+'\n'
+    +'\ud83d\udecf\ufe0f '+rec.room+'\n'
+    +'\ud83d\udcc5 '+rec.checkIn+' \u2192 '+rec.checkOut+'  ('+rec.nights+' night'+(rec.nights>1?'s':'')+')\n'
+    +'\ud83d\udc65 '+rec.guests+' guest'+(rec.guests>1?'s':'')+'\n\n'
+    +'\ud83d\udc64 '+rec.guestName+'\n'
+    +'\ud83d\udcde '+rec.guestPhone+'\n'
+    +(rec.note? '\ud83d\udcdd '+rec.note+'\n':'')
+    +'\n\ud83d\udcb0 \u20b9'+rec.amount.toLocaleString('en-IN')+' \u2014 '
+    +(rec.payMode==='upi' ? 'guest says PAID by UPI (please confirm receipt)' : 'PAYING AT PROPERTY')+'\n'
+    +'RoamWise commission: \u20b9'+rec.commission.toLocaleString('en-IN')+' (8%), invoiced after checkout.\n\n'
+    +'Reply CONFIRM to accept, or tell us if the room is unavailable.';
+  window._lastOwnerMsg=msg;
+  if(to){ window.open('https://wa.me/'+to+'?text='+encodeURIComponent(msg),'_blank','noopener'); }
+}
+function rwBookDone(rec){
+  rwPageOpen('booked', function(body){
+    body.innerHTML='<div class="bkd-wrap">'
+      +'<div class="bkd-tick">\u2713</div>'
+      +'<h2 class="bkd-h">Booking sent</h2>'
+      +'<div class="bkd-ref">'+esc2(rec.ref)+'</div>'
+      +'<div class="bkd-card">'
+      +'<div class="bk-sr"><span>Property</span><b>'+esc2(rec.property)+'</b></div>'
+      +'<div class="bk-sr"><span>Room</span><b>'+esc2(rec.room)+'</b></div>'
+      +'<div class="bk-sr"><span>Dates</span><b>'+esc2(rec.checkIn)+' \u2192 '+esc2(rec.checkOut)+'</b></div>'
+      +'<div class="bk-sr"><span>Guests</span><b>'+rec.guests+'</b></div>'
+      +'<div class="bk-sr tot"><span>'+(rec.payMode==='upi'?'Paid':'Pay at property')+'</span><b>\u20b9'+rec.amount.toLocaleString('en-IN')+'</b></div>'
+      +'</div>'
+      +'<div class="bkd-next"><b>What happens now</b>'
+      +'<div>The property has your details on WhatsApp already.</div>'
+      +'<div>They confirm the room \u2014 usually within a few hours.</div>'
+      +'<div>Save your reference: <b>'+esc2(rec.ref)+'</b></div></div>'
+      +'<button class="bk-go" onclick="rwBookShare()">\ud83d\udcac Send to the property again</button>'
+      +'<button class="tact" style="width:100%;margin-top:8px;padding:12px" onclick="rwShareMyBooking()">\ud83d\udce4 Share this booking with my group</button>'
+      +'<button class="tact" style="width:100%;margin-top:8px;padding:12px" onclick="rwPageClose();tabGo(\'home\')">Done</button>'
+      +'<div class="gr-foot">Keep this reference. If anything is wrong, message the property with it and they can find you instantly.</div>'
+      +'</div>';
+  });
+}
+
+function rwShareMyBooking(){
+  try{
+    var b=JSON.parse(lsGet('rw_last_booking')||'null');
+    if(!b){ showToast('No booking to share'); return; }
+    rwWhatsShare(rwBookingText(b));
+  }catch(e){ showToast('Could not share'); }
+}
+
+function rwBookShare(){
+  var m=window._lastOwnerMsg||'';
+  if(!m){ showToast('Nothing to send'); return; }
+  window.open('https://wa.me/?text='+encodeURIComponent(m),'_blank','noopener');
+}
+
+
+
+
+/* ============================================================================
+   TRAVEL COMPATIBILITY ENGINE (rw-v92)
+   ============================================================================
+   Matches travellers on the six behaviours groups actually argue about, not on
+   age. Every score comes with its reason, so a traveller can disagree with it.
+   ========================================================================= */
+function rwCompatPair(a, b){
+  var AX=window.RW_AXES||[];
+  var tot=0, wsum=0, worst=null, best=null;
+  AX.forEach(function(x){
+    var av=+a[x.k]||3, bv=+b[x.k]||3;
+    var gap=Math.abs(av-bv);                 /* 0..4 */
+    var fit=1-(gap/4);                       /* 1 = identical */
+    tot += fit*x.weight; wsum += x.weight;
+    var rec={ k:x.k, label:x.label, gap:gap, fit:fit, ax:x, av:av, bv:bv };
+    if(!worst || gap*x.weight > worst.gap*worst.ax.weight) worst=rec;
+    if(!best  || fit > best.fit) best=rec;
+  });
+  var pct=Math.round((tot/wsum)*100);
+  return {
+    pct: pct,
+    verdict: pct>=85?'Rare fit' : pct>=72?'Good fit' : pct>=58?'Workable' : pct>=45?'Expect friction' : 'Probably not',
+    best: best, worst: worst,
+    why: pct>=72
+      ? 'You line up on '+best.label.toLowerCase()+', which is most of the battle.'
+      : worst.ax.friction
+  };
+}
+/* Group chemistry — not just an average of pairs. */
+function rwCompatGroup(people){
+  var AX=window.RW_AXES||[];
+  if(!people || people.length<2) return null;
+  var pairs=[], sum=0;
+  for(var i=0;i<people.length;i++)
+    for(var j=i+1;j<people.length;j++){
+      var r=rwCompatPair(people[i],people[j]);
+      pairs.push({i:i,j:j,r:r}); sum+=r.pct;
+    }
+  var avg=Math.round(sum/pairs.length);
+  var flags=[];
+  AX.forEach(function(x){
+    if(x.weight<1.2) return;
+    var vals=people.map(function(p){ return +p[x.k]||3; });
+    var mean=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+    vals.forEach(function(v,idx){
+      if(Math.abs(v-mean)>=1.8)
+        flags.push({ type:'outlier', who:idx, axis:x.label,
+          say:(people[idx].name||'One traveller')+' is well outside the group on '+x.label.toLowerCase()+'. '+x.friction });
+    });
+    var lo=vals.filter(function(v){ return v<=mean; }).length;
+    if(lo>1 && lo<vals.length-1){
+      var spread=Math.max.apply(null,vals)-Math.min.apply(null,vals);
+      if(spread>=3) flags.push({ type:'split', axis:x.label,
+        say:'On '+x.label.toLowerCase()+' this is really two groups. Plan to split some days rather than pretending otherwise.' });
+    }
+  });
+  var weakest=pairs.slice().sort(function(a,b){ return a.r.pct-b.r.pct; })[0];
+  return { avg:avg, pairs:pairs, flags:flags, weakest:weakest,
+    verdict: avg>=80?'This group will barely have to negotiate'
+           : avg>=65?'Solid group \u2014 a couple of things to agree up front'
+           : avg>=50?'Workable, but set the rules before you go'
+           : 'This group will struggle unless you plan around the gaps' };
+}
+/* the quiz */
+function openCompat(){
+  rwPageOpen('compat', function(body){
+    var AX=window.RW_AXES||[];
+    var mine=rwCompatMine();
+    body.innerHTML='<div class="cp-hero">'
+      +'<div class="cp-ic">\u2699\ufe0f</div>'
+      +'<h2 class="cp-h">Who you travel well with<br>has nothing to do with your age.</h2>'
+      +'<p class="cp-sub">Every group-travel platform matches on age. We match on the six things groups actually argue about \u2014 when you get up, how fast you move, what you\u2019ll spend, and three more. Six questions, about a minute.</p>'
+      +'</div>'
+      + AX.map(function(x,i){
+          var v=mine[x.k]||3;
+          return '<div class="cp-q">'
+            +'<div class="cp-l"><b>'+esc2(x.label)+'</b><span>'+esc2(x.ends[0])+' \u2192 '+esc2(x.ends[1])+'</span></div>'
+            +'<input type="range" min="1" max="5" value="'+v+'" id="cq_'+x.k+'" oninput="rwCompatEcho(\''+x.k+'\')" class="cp-r">'
+            +'<div class="cp-v" id="cv_'+x.k+'">'+esc2(x.scale[v-1])+'</div>'
+            +'</div>';
+        }).join('')
+      +'<button class="bk-go" style="margin-top:14px" onclick="rwCompatSave()">Save my travel style</button>'
+      +'<div id="cpOut" style="margin-top:18px"></div>'
+      +'<div class="gr-foot">We show you the reason behind every match, so you can disagree with it. A number you can\u2019t argue with is worth nothing.</div>';
+    rwCompatShow();
+  });
+}
+function rwCompatEcho(k){
+  var x=(window.RW_AXES||[]).filter(function(a){ return a.k===k; })[0];
+  var v=+((el('cq_'+k)||{}).value||3);
+  var n=el('cv_'+k); if(n && x) n.textContent=x.scale[v-1];
+}
+function rwCompatMine(){
+  try{ return JSON.parse(lsGet('rw_compat')||'{}'); }catch(e){ return {}; }
+}
+function rwCompatSave(){
+  var m={};
+  (window.RW_AXES||[]).forEach(function(x){ m[x.k]=+((el('cq_'+x.k)||{}).value||3); });
+  try{ lsSet('rw_compat', JSON.stringify(m)); }catch(e){}
+  try{
+    if(window.db && window.user) db.collection('users').doc(user.uid).set({compat:m},{merge:true});
+  }catch(e){}
+  showToast('\u2705 Saved \u2014 this is how we\u2019ll match you');
+  rwCompatShow();
+}
+function rwCompatShow(){
+  var host=el('cpOut'); if(!host) return;
+  var mine=rwCompatMine();
+  if(!Object.keys(mine).length){ host.innerHTML=''; return; }
+  /* three illustrative travellers so the engine is understandable before
+     there is a real pool. Labelled clearly as examples, never as real people. */
+  var samples=[
+    { name:'The sunrise trekker', clock:1,pace:2,spend:2,plan:2,social:3,comfort:2 },
+    { name:'The slow cafe type',  clock:4,pace:5,spend:3,plan:4,social:3,comfort:3 },
+    { name:'The comfort planner', clock:3,pace:3,spend:5,plan:1,social:2,comfort:5 }
+  ];
+  host.innerHTML='<div class="dk-lab" style="color:var(--t3)">HOW YOU\u2019D MATCH</div>'
+    + samples.map(function(sp){
+        var r=rwCompatPair(mine, sp);
+        var col = r.pct>=72?'#4ADE80' : r.pct>=58?'#E8BA6C' : '#E0785B';
+        return '<div class="cp-m">'
+          +'<div class="cp-mt"><b>'+esc2(sp.name)+'</b>'
+          +'<span style="color:'+col+'">'+r.pct+'% \u00b7 '+esc2(r.verdict)+'</span></div>'
+          +'<div class="cp-bar"><i style="width:'+r.pct+'%;background:'+col+'"></i></div>'
+          +'<div class="cp-why">'+esc2(r.why)+'</div></div>';
+      }).join('')
+    +'<div class="dk-note" style="color:var(--t3);font-size:11px;margin-top:8px">These three are illustrative travel styles, not real people \u2014 shown so you can see how the engine reasons before there\u2019s a pool to match against.</div>';
+}
+
+/* ============================================================================
+   THE LISTING (rw-v87) — fluid, Airbnb-class browsing
+   ============================================================================
+   What makes Airbnb's listing feel good is not decoration. It is:
+     · a big image area that holds its shape before anything loads
+     · one clear price, one clear rating, nothing else competing
+     · horizontal collection rails so browsing feels like scanning, not reading
+     · everything reacting instantly to touch
+   Built with CSS only — no image CDN, no library, no layout shift.
+   ========================================================================= */
+function rwBadge(id){
+  var b=(window.RW_BADGES||{})[id]; if(!b) return '';
+  return '<span class="bdg" style="--bc:'+b.color+'" title="'+esc2(b.means)+'">'
+    + b.icon+' '+esc2(b.short)+'</span>';
+}
+/* deterministic gradient per listing, so a card looks identical every load */
+function rwHue(str){
+  var h=0, s=String(str||'');
+  for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360;
+  return h;
+}
+function rwCardArt(x){
+  var h=rwHue(x.id||x.name);
+  return '<div class="lst-art" style="--h1:'+h+';--h2:'+((h+38)%360)+'">'
+    +'<span class="lst-emoji">'+(x.cat==='adventure'?'\ud83e\udde1':x.tier==='green'?'\ud83c\udf3f':'\ud83c\udfe1')+'</span>'
+    +'<span class="lst-shine"></span></div>';
+}
+function openListing(){
+  rwPageOpen('listing', function(body){
+    var cols=(window.RW_COLLECTIONS||[]);
+    body.innerHTML='<div id="lstOut"></div>';
+    var out=el('lstOut');
+    /* collection rails */
+    out.innerHTML = cols.map(function(c){
+      var items=rwListingFor(c.badge);
+      if(!items.length) return '';
+      return '<div class="rail">'
+        +'<div class="rail-h"><b>'+esc2(c.title)+'</b><span>'+esc2(c.tagline)+'</span></div>'
+        +'<div class="rail-s">'+items.map(function(x){ return rwListCard(x,true); }).join('')+'</div>'
+        +'</div>';
+    }).join('')
+    + '<div class="rail-h" style="margin-top:26px"><b>Everything we know</b><span>All places, ranked by how much we can vouch for them.</span></div>'
+    + '<div class="lst-grid">'+rwListingAll().map(function(x){ return rwListCard(x,false); }).join('')+'</div>'
+    + '<div class="gr-foot">A badge is earned, never bought. Places pay us nothing to rank higher \u2014 that is why the ladder is worth reading.</div>';
+  });
+}
+function rwListingAll(){
+  var out=[];
+  (window.RW_PARTNERS||[]).forEach(function(p){ out.push(p); });
+  (window.RW_ROOMS||[]).forEach(function(r){
+    if(!out.some(function(o){ return o.name===r.property; }))
+      out.push({ id:r.id, name:r.property, zone:r.zone, area:r.area, cat:'stay',
+                 price:r.price, badges:['verified'] });
+  });
+  out.forEach(function(x){
+    if(!x.badges){
+      x.badges = x.verified==='signed' ? ['verified'] : ['listed'];
+      if((x.rating||0)>=4.8 && (x.reviews||0)>=200) x.badges.push('loved');
+    }
+  });
+  return out.sort(function(a,b){ return rwBadgeRank(b)-rwBadgeRank(a); });
+}
+function rwBadgeRank(x){
+  var order=['listed','verified','slept','loved','green','local','signature'];
+  return (x.badges||[]).reduce(function(m,b){ return Math.max(m, order.indexOf(b)); }, -1);
+}
+function rwListingFor(badge){
+  return rwListingAll().filter(function(x){ return (x.badges||[]).indexOf(badge)>-1; }).slice(0,8);
+}
+function rwListCard(x, rail){
+  var b=(x.badges||[])[ (x.badges||[]).length-1 ];
+  return '<div class="lst'+(rail?' rail-c':'')+'" onclick="rwListOpen(\''+esc2(x.id)+'\')">'
+    + rwCardArt(x)
+    +'<div class="lst-b">'
+    +'<div class="lst-r"><b>'+esc2(x.name)+'</b>'
+    + (x.rating? '<span class="lst-star">\u2605 '+x.rating.toFixed(1)+'</span>':'')
+    +'</div>'
+    +'<div class="lst-w">'+esc2((x.area||'')+(x.area?' \u00b7 ':'')+(x.zone||''))+'</div>'
+    +'<div class="lst-bd">'+(b?rwBadge(b):'')+'</div>'
+    + (x.price? '<div class="lst-p"><b>\u20b9'+Number(x.price).toLocaleString('en-IN')+'</b> night</div>':'')
+    +'</div></div>';
+}
+function rwListOpen(id){
+  var all=rwListingAll();
+  var x=all.filter(function(p){ return String(p.id)===String(id); })[0];
+  if(!x) return;
+  var B=window.RW_BADGES||{};
+  var ov=el('lstOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='lstOv'; ov.className='overlay'; ov.style.zIndex='4300';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('lstOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:440px">'
+    +'<div class="sheet-h"><b>'+esc2(x.name)+'</b><button class="tact" onclick="rwOverlayClose(\'lstOv\')">\u2715</button></div>'
+    + rwCardArt(x)
+    +'<div class="lst-w" style="margin:10px 0 6px">'+esc2((x.area||'')+' \u00b7 '+(x.zone||''))+'</div>'
+    + (x.hook? '<div class="xp-hook" style="margin-bottom:10px">'+esc2(x.hook)+'</div>':'')
+    +'<div class="lst-badges">'+(x.badges||[]).map(function(k){
+        var b=B[k]; if(!b) return '';
+        return '<div class="lst-bl"><span style="color:'+b.color+'">'+b.icon+'</span>'
+          +'<span><b>'+esc2(b.label)+'</b><i>'+esc2(b.means)+'</i></span></div>';
+      }).join('')+'</div>'
+    + (x.price? '<div class="bk-total" style="margin-top:12px"><span>From</span><b>\u20b9'+Number(x.price).toLocaleString('en-IN')+'</b></div>':'')
+    +'<button class="bk-go" style="margin-top:12px" onclick="rwOverlayClose(\'lstOv\');openStays(\''+esc2(x.zone||'')+'\')">See rooms &amp; book \u2192</button>'
+    +'</div>';
+  ov.classList.add('open');
+}
+
+/* ============================================================================
+   ROAMWISE EXPERIENCES (rw-v86) — certified, curated, tested
+   ============================================================================
+   The badge only means something if it is hard to earn. Nothing appears here
+   until someone from RoamWise has actually done the trip, and every card names
+   its own weak link. That honesty IS the premium.
+   ========================================================================= */
+function openExperiences(tier){
+  window._xTier = (tier!==undefined? tier : window._xTier) || '';
+  rwPageOpen('experiences', function(body){
+    var L=(window.RW_EXPERIENCES||[]);
+    var tiers={}; L.forEach(function(x){ tiers[x.tier]=1; });
+    body.innerHTML=
+       '<div class="xp-hero">'
+      +'<div class="xp-seal"><span>\u2713</span></div>'
+      +'<h2 class="xp-h">Experiences we have<br>actually been on.</h2>'
+      +'<p class="xp-sub">Not a list scraped from the internet. Every trip here has been walked, ridden and slept through by someone from RoamWise \u2014 and every one tells you where it falls short.</p>'
+      +'</div>'
+      +'<div class="xp-promise">'+(window.RW_EXP_PROMISE||[]).map(function(p){
+          return '<div class="xp-p"><span>\u25c6</span>'+esc2(p)+'</div>'; }).join('')+'</div>'
+      +'<div class="pt-chips" style="margin:18px 0 4px">'
+      +'<button class="ev-chip'+(!window._xTier?' on':'')+'" onclick="openExperiences(\'\')">All</button>'
+      + Object.keys(tiers).map(function(t){
+          var lbl = t==='green'? '\u26a1 Green' : t==='culture'? '\ud83c\udfad Culture' : t;
+          return '<button class="ev-chip'+(window._xTier===t?' on':'')+'" onclick="openExperiences(\''+t+'\')">'+lbl+'</button>';
+        }).join('')
+      +'</div><div id="xpOut"></div>';
+    rwExpRender();
+  });
+}
+function rwExpRender(){
+  var host=el('xpOut'); if(!host) return;
+  var L=(window.RW_EXPERIENCES||[]).filter(function(x){
+    return !window._xTier || x.tier===window._xTier; });
+  if(!L.length){ host.innerHTML='<div class="note" style="text-align:center;padding:22px;color:var(--t3)">Nothing here yet.</div>'; return; }
+  host.innerHTML=L.map(function(x,i){
+    var cert = x.status==='certified';
+    return '<div class="xp-card" style="animation-delay:'+(i*0.07)+'s">'
+      +'<div class="xp-glow"></div>'
+      +'<div class="xp-tag">'+esc2(x.tag||'')+'</div>'
+      +'<h3 class="xp-t">'+esc2(x.title)+'</h3>'
+      +'<div class="xp-meta">'+x.days+' days \u00b7 from \u20b9'+Number(x.from).toLocaleString('en-IN')+' \u00b7 '+esc2(x.zone)+'</div>'
+      +'<div class="xp-hook">'+esc2(x.hook)+'</div>'
+      +'<div class="xp-bundle">'+(x.bundle||[]).map(function(b){
+          return '<div class="xp-b"><span class="xp-bk">'+esc2(b.k)+'</span><span>'+esc2(b.v)+'</span></div>';
+        }).join('')+'</div>'
+      +'<div class="xp-honest"><b>Where it falls short:</b> '+esc2(x.honest||'')+'</div>'
+      +'<div class="xp-best">\ud83d\udcc5 '+esc2(x.best||'')+'</div>'
+      +'<div class="xp-foot">'
+      +'<span class="xp-status '+(cert?'ok':'')+'">'+(cert?'\u2713 Certified \u2014 we have done this':'\u25cb Scouting \u2014 not yet tested by us')+'</span>'
+      +'</div>'
+      +'<button class="xp-go" onclick="rwExpPlan(\''+x.id+'\')">\u2728 Plan this trip</button>'
+      +'</div>';
+  }).join('')
+  +'<div class="gr-foot">A trip stays marked <b>Scouting</b> until one of us has been. We would rather show you an honest shortlist than a certified-looking list we cannot stand behind.</div>';
+}
+function rwExpPlan(id){
+  var x=(window.RW_EXPERIENCES||[]).filter(function(e){ return e.id===id; })[0]; if(!x) return;
+  rwPageClose();
+  var inp=el('heroInput')||el('cpInput');
+  if(inp){
+    inp.value='Plan the RoamWise experience "'+x.title+'" \u2014 '+x.days+' days in '+x.zone+'. '
+      + (x.bundle||[]).map(function(b){ return b.k+': '+b.v; }).join('. ')
+      + '. Give honest travel times, a realistic budget from \u20b9'+x.from+', and tell me what could go wrong.';
+    try{ copilotSend(!!el('heroInput')); }catch(err){}
+  }
+}
+
+/* ============================================================================
+   BOOKING ENGINE + GREEN + SOS (rw-v83)
+   ========================================================================= */
+
+/* ---------------- REQUEST TO BOOK ----------------
+   One basket for the whole trip: stay, guide, transport, food, things to do.
+   The request reaches the partner immediately; a human confirms. Honest about
+   what it is — we never show a "Confirmed" we haven't actually got. */
+function rwBasket(){ try{ return JSON.parse(lsGet('rw_basket')||'[]'); }catch(e){ return []; } }
+function rwBasketSet(b){ try{ lsSet('rw_basket', JSON.stringify(b)); }catch(e){} rwBasketBadge(); }
+function rwBasketAdd(item){
+  var b=rwBasket();
+  if(b.some(function(x){ return x.id===item.id; })){ showToast('Already in your trip'); return; }
+  b.push(item); rwBasketSet(b);
+  try{ rwHaptic&&rwHaptic(); }catch(e){}
+  showToast('\u2795 Added to your trip \u2014 '+item.name);
+}
+function rwBasketRemove(id){ rwBasketSet(rwBasket().filter(function(x){ return x.id!==id; })); openBooking(); }
+function rwBasketBadge(){
+  var n=rwBasket().length, b=el('rwBasketBadge');
+  if(!b) return;
+  b.textContent=n; b.style.display=n?'flex':'none';
+}
+function rwBookTotal(b){ return b.reduce(function(a,x){ return a+(+x.price||0); },0); }
+function rwCommissionOn(b){
+  var cats={}; (window.RW_BOOK_CATS||[]).forEach(function(c){ cats[c.id]=c.pct; });
+  return b.reduce(function(a,x){ return a+((+x.price||0)*((cats[x.cat]||8)/100)); },0);
+}
+function openBooking(){
+  rwPageOpen('booking', function(body){
+    var b=rwBasket();
+    var total=rwBookTotal(b);
+    var html='';
+    if(!b.length){
+      html='<div class="bk-empty"><div style="font-size:46px">\ud83e\uddf3</div>'
+        +'<b style="display:block;margin:10px 0 6px;font-size:16px">Your trip is empty</b>'
+        +'<span class="note">Add a stay, a guide, a driver or something to do \u2014 then send one request and we\u2019ll get it all confirmed.</span>'
+        +'<button class="tact" style="margin-top:14px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0A0A0C;border:none" onclick="rwPageClose();openPartners()">Browse stays &amp; experiences \u2192</button></div>';
+    } else {
+      html='<div class="bk-list">'+b.map(function(x){
+        var C=(window.RW_BOOK_CATS||[]).filter(function(c){ return c.id===x.cat; })[0]||{icon:'\u2022',label:''};
+        return '<div class="bk-row"><span class="bk-ic">'+C.icon+'</span>'
+          +'<span style="flex:1;min-width:0"><b>'+esc2(x.name)+'</b>'
+          +'<div class="bk-sub">'+esc2(C.label)+(x.where?' \u00b7 '+esc2(x.where):'')+'</div></span>'
+          +'<span class="bk-amt">'+(x.price?'\u20b9'+Number(x.price).toLocaleString('en-IN'):'on request')+'</span>'
+          +'<button class="bk-x" onclick="rwBasketRemove(\''+x.id+'\')">\u2715</button></div>';
+      }).join('')+'</div>'
+      +'<div class="bk-total"><span>Estimated total</span><b>'+(total?'\u20b9'+total.toLocaleString('en-IN'):'on request')+'</b></div>'
+      +'<div class="bk-note">Estimates from partner rate cards. Final prices are confirmed by each partner before you pay anything \u2014 and you pay <b>them</b>, directly, unless a partner offers prepayment.</div>'
+      +'<button class="bk-go" onclick="rwBookRequest()">\ud83d\udce8 Send one request for everything</button>'
+      +'<div class="bk-how"><b>What happens next</b>'
+      +'<div>1 \u00b7 Every partner in your list gets your dates and group size within seconds.</div>'
+      +'<div>2 \u00b7 They confirm availability and a final price \u2014 usually the same day.</div>'
+      +'<div>3 \u00b7 You approve what you want. Nothing is booked until you say yes.</div></div>';
+    }
+    body.innerHTML=html;
+  });
+}
+function rwBookRequest(){
+  var b=rwBasket(); if(!b.length) return;
+  rwForm('\ud83d\udce8 Send your trip request', [
+    { id:'bk_name',  label:'Your name' },
+    { id:'bk_phone', label:'Phone (partners reply here)' },
+    { id:'bk_dates', label:'Dates', ph:'e.g. 14-17 Sept' },
+    { id:'bk_people',label:'How many people', ph:'e.g. 4' },
+    { id:'bk_notes', label:'Anything they should know', ph:'dietary needs, arrival time, budget ceiling' }
+  ], function(v){
+    if(!v.bk_name || !v.bk_phone){ showToast('Name and phone are needed so partners can reply'); return; }
+    var rec={ items:b, name:v.bk_name, phone:v.bk_phone, dates:v.bk_dates||'',
+      people:v.bk_people||'', notes:v.bk_notes||'',
+      estTotal:rwBookTotal(b), estCommission:Math.round(rwCommissionOn(b)),
+      status:'requested', at:new Date().toISOString() };
+    try{ rec.ref=rwRefActive()||''; }catch(e){}
+    var done=function(){
+      showToast('\u2705 Request sent \u2014 partners will reply to '+v.bk_phone);
+      rwBasketSet([]); rwPageClose();
+    };
+    try{
+      if(window.db) db.collection('bookings').add(rec).then(done).catch(done);
+      else done();
+    }catch(e){ done(); }
+  }, 'One message goes to every partner in your trip. Nothing is charged now \u2014 this is a request, not a payment.');
+}
+
+/* ---------------- ROAMWISE GREEN ---------------- */
+function openGreen(){
+  rwPageOpen('green', function(body){
+    var P=window.RW_GREEN_PILLARS||[];
+    body.innerHTML=
+       '<div class="gr-hero">'
+      +'<div class="gr-badge">\u26a1 RoamWise Green</div>'
+      +'<h2 class="gr-h">Travel that leaves the place<br>better than a normal trip would.</h2>'
+      +'<p class="gr-sub">A premium tier where every part of the trip qualifies \u2014 electric mobility, genuinely solar stays, vegan or honest local food, and nature-first activities. Not a label we print. A checklist we verify.</p>'
+      +'</div>'
+      + P.map(function(x){
+          return '<div class="gr-card">'
+            +'<div class="gr-t"><span class="gr-ic">'+x.icon+'</span><b>'+esc2(x.title)+'</b></div>'
+            +'<ul class="gr-ul">'+x.items.map(function(i){ return '<li>'+esc2(i)+'</li>'; }).join('')+'</ul>'
+            +'<div class="gr-honest"><b>Straight talk:</b> '+esc2(x.honest)+'</div>'
+            +'</div>';
+        }).join('')
+      +'<div class="gr-cta">'
+      +'<b>Want a Green trip planned?</b>'
+      +'<p class="note" style="margin:6px 0 12px">Tell us where and when. We build it entirely from verified electric and eco options, and tell you honestly where the network makes it hard.</p>'
+      +'<button class="bk-go" onclick="rwGreenPlan()">\ud83c\udf3f Plan my Green trip</button>'
+      +'</div>'
+      +'<div class="gr-foot">We will always tell you when the greener option is worse \u2014 slower, pricier, or not actually available on your route. A tier you cannot trust is just marketing.</div>';
+  });
+}
+function rwGreenPlan(){
+  rwPageClose();
+  var inp=el('heroInput')||el('cpInput');
+  if(inp){
+    inp.value='Plan me a RoamWise Green trip: electric mobility throughout (EV car or bike, charging stops planned), a solar-powered eco stay, vegan or honest local food, and nature-first activities. Tell me honestly where the EV charging network makes this hard.';
+    try{ copilotSend(!!el('heroInput')); }catch(e){}
+  }
+}
+
+/* ---------------- STRANDED / EMERGENCY ----------------
+   For the moment a trip goes wrong: last bus gone, landslide, phone dying,
+   nobody around. Works OFFLINE because that is exactly when you need it. */
+function openSOS(){
+  rwPageOpen('sos', function(body){
+    body.innerHTML=
+       '<div class="sos-top">'
+      +'<b>You\u2019re not stuck. Work down this list.</b>'
+      +'<span class="note">This page works without internet. Everything here is stored on your phone.</span>'
+      +'</div>'
+      +'<div class="sos-nums">'
+      +'<a class="sos-n" href="tel:112"><b>112</b><span>All emergencies</span></a>'
+      +'<a class="sos-n" href="tel:108"><b>108</b><span>Ambulance</span></a>'
+      +'<a class="sos-n" href="tel:1363"><b>1363</b><span>Tourist helpline</span></a>'
+      +'<a class="sos-n" href="tel:1073"><b>1073</b><span>Road accident</span></a>'
+      +'</div>'
+      +'<div class="sos-block"><b>\ud83d\ude8c Last transport gone</b>'
+      +'<div>Ask at a dhaba or petrol pump for a shared jeep \u2014 in the hills they run later than buses and locals always know.</div>'
+      +'<div>Cargo and milk trucks take passengers on hill routes. Offer fare, sit up front, share the vehicle number with someone.</div>'
+      +'<div>Bus depots often let stranded travellers wait inside overnight. Ask the depot manager, not a conductor.</div></div>'
+      +'<div class="sos-block"><b>\ud83c\udfd4\ufe0f Road blocked or landslide</b>'
+      +'<div>Do not walk past a fresh slide \u2014 second falls are common in the first hours.</div>'
+      +'<div>Ask locals when it usually clears; they will know better than any app.</div>'
+      +'<div>Turn back to the last village with rooms before dark. Sleeping in a vehicle on a hill road is the bigger risk.</div></div>'
+      +'<div class="sos-block"><b>\ud83d\udcb8 No money or phone dying</b>'
+      +'<div>Dhabas and small shops will usually let you charge a phone for free. Ask.</div>'
+      +'<div>UPI works when cards do not, and works with very little signal. Keep one app installed.</div>'
+      +'<div>Write one emergency number on paper. A dead phone means a memorised number is worthless.</div></div>'
+      +'<div class="sos-block"><b>\ud83d\ude28 Feeling unsafe</b>'
+      +'<div>Go where there are lights and people \u2014 a dhaba, a hotel lobby, a petrol pump, a temple or gurudwara.</div>'
+      +'<div>Gurudwaras take anyone in, at any hour, for free. Across most of North India this is the reliable answer.</div>'
+      +'<div>Tell one person your live location and when you will next check in.</div></div>'
+      +'<button class="bk-go" onclick="rwSOSShare()">\ud83d\udccd Share my location with someone</button>'
+      +'<div class="gr-foot">We are not an emergency service and cannot send help. This is the advice a local friend would give \u2014 use official numbers for anything serious.</div>';
+  });
+}
+function rwSOSShare(){
+  if(!navigator.geolocation){ showToast('Location not available on this device'); return; }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var u='https://maps.google.com/?q='+pos.coords.latitude+','+pos.coords.longitude;
+    var t='I need help. My location: '+u;
+    try{
+      if(navigator.share) navigator.share({ text:t });
+      else window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank','noopener');
+    }catch(e){ showToast(u); }
+  }, function(){ showToast('Could not get your location \u2014 try again with GPS on'); }, {timeout:8000});
+}
+
+/* ============================================================================
+   B2B PARTNERS + LOCAL RIDES (rw-v81)
+   ============================================================================
+   Two things travellers keep asking for that we didn't have:
+     1. "where do I actually stay / who runs the rafting"  -> partner directory
+     2. "how do I get around"                              -> rides
+
+   RANKING is honest and explainable: signed partners first (we've verified
+   them), then by a confidence-weighted rating — a 5.0 from 12 people should
+   not outrank a 4.8 from 900. We show the reasoning, never a black-box score.
+   ========================================================================= */
+
+/* Bayesian-ish weighting so review COUNT matters, not just the average. */
+
+/* Partners come from Firestore (config/partners), seeded by partners-data.js.
+   Same pattern as referrers: the file is a fallback so the directory works
+   offline, Firestore keeps it fresh, and no code file is ever edited. */
+
+/* ============================================================================
+   CONFIG SYNC (rw-v85) — every data file is now editable from the admin panel
+   ============================================================================
+   ONE pattern for all of them. Each data file stays in the repo as a SEED and
+   an offline fallback; Firestore config/<key> holds the live version; the app
+   merges Firestore over the seed and caches to localStorage.
+
+   Result: the founder never edits a .js file again, the app still works with
+   no network, and adding a new editable dataset is one line in RW_SYNCED.
+   ========================================================================= */
+var RW_SYNCED = [
+  { key:'rooms',     global:'RW_ROOMS',     matchBy:'id'   },
+  { key:'partners',  global:'RW_PARTNERS',  matchBy:'id'   },
+  { key:'referrers', global:'RW_REFERRERS', matchBy:'code' },
+  { key:'events',    global:'RW_EVENTS',    matchBy:'id'   },
+  { key:'regions',   global:'RW_REGIONS',   matchBy:'name' }
+];
+function rwConfigApply(cfg, list){
+  /* Firestore entries WIN; seed entries not present in Firestore are kept. */
+  var seed = window[cfg.global] || [];
+  var k = cfg.matchBy;
+  var have = {};
+  list.forEach(function(x){ if(x && x[k]!=null) have[String(x[k]).toLowerCase()] = 1; });
+  window[cfg.global] = list.concat(seed.filter(function(x){
+    return !(x && x[k]!=null && have[String(x[k]).toLowerCase()]);
+  }));
+  try{ lsSet('rw_cfg_'+cfg.key, JSON.stringify(window[cfg.global])); }catch(e){}
+}
+function rwConfigSyncAll(){
+  RW_SYNCED.forEach(function(cfg){
+    /* cached copy first so the UI is right before the network answers */
+    try{
+      var c = lsGet('rw_cfg_'+cfg.key);
+      if(c){ var l = JSON.parse(c); if(Array.isArray(l) && l.length) window[cfg.global] = l; }
+    }catch(e){}
+    try{
+      if(typeof db === 'undefined' || !db) return;
+      db.collection('config').doc(cfg.key).get().then(function(d){
+        if(!d.exists) return;
+        var list = (d.data() || {}).list;
+        if(Array.isArray(list) && list.length){
+          rwConfigApply(cfg, list);
+          /* repaint whatever happens to be open */
+          try{ if(el('staysOut'))    rwStaysRender(); }catch(e){}
+          try{ if(el('partnersOut')) rwPartnersRender(); }catch(e){}
+          try{ if(el('eventsOut'))   rwEventsRender(); }catch(e){}
+        }
+      }).catch(function(){});
+    }catch(e){}
+  });
+}
+
+function rwPartnersSync(){
+  try{
+    if(typeof db==='undefined' || !db) return;
+    db.collection('config').doc('partners').get().then(function(d){
+      if(!d.exists) return;
+      var list=(d.data()||{}).list;
+      if(Array.isArray(list) && list.length){
+        var seed=(window.RW_PARTNERS||[]);
+        var have={}; list.forEach(function(p){ have[String(p.name||'').toLowerCase()+'|'+p.zone]=1; });
+        window.RW_PARTNERS = list.concat(seed.filter(function(p){
+          return !have[String(p.name||'').toLowerCase()+'|'+p.zone];
+        }));
+        try{ lsSet('rw_partners_cache', JSON.stringify(window.RW_PARTNERS)); }catch(e){}
+        if(el('partnersOut')) rwPartnersRender();
+      }
+    }).catch(function(){});
+  }catch(e){}
+}
+(function(){ try{ var c=lsGet('rw_partners_cache');
+  if(c){ var l=JSON.parse(c); if(Array.isArray(l)&&l.length) window.RW_PARTNERS=l; } }catch(e){} })();
+
+function rwPartnerScore(p){
+  var C=50, M=4.3;                       /* prior weight, prior mean */
+  var r=p.rating, n=p.reviews||0;
+  if(r==null) return { score:M, why:'no public rating yet' };
+  var sc=((C*M)+(r*n))/(C+n);
+  var why = n>=500 ? 'strongly reviewed ('+n.toLocaleString('en-IN')+')'
+          : n>=100 ? 'well reviewed ('+n+')'
+          : n>=30  ? 'early reviews ('+n+')'
+                   : 'few reviews so far ('+n+')';
+  return { score:sc, why:why };
+}
+function rwPartnersFor(zone, cat){
+  var list=(window.RW_PARTNERS||[]).slice();
+  if(zone) list=list.filter(function(p){ return String(p.zone||'').toLowerCase()===String(zone).toLowerCase(); });
+  if(cat)  list=list.filter(function(p){ return p.cat===cat; });
+  list.forEach(function(p){ var s=rwPartnerScore(p); p._score=s.score; p._why=s.why; });
+  list.sort(function(a,b){
+    var av=a.verified==='signed'?1:0, bv=b.verified==='signed'?1:0;
+    if(av!==bv) return bv-av;                 /* signed partners first */
+    return b._score-a._score;
+  });
+  return list;
+}
+function openPartners(zone, cat){
+  /* rw-v82: renders as a full PAGE, not a card wedged into the home feed. */
+  rwPageOpen('partners', function(body){
+    var sec=document.createElement('section'); sec.id='partnersSection'; sec.className='xsec';
+    body.appendChild(sec);
+  });
+  var sec=el('partnersSection'); if(!sec) return;
+  window._pZone=zone||window._pZone||'';
+  window._pCat=cat||window._pCat||'';
+  var zones={}; (window.RW_PARTNERS||[]).forEach(function(p){ zones[p.zone]=1; });
+  sec.innerHTML='<div class="pt-chips">'
+    +'<button class="ev-chip'+(!window._pCat?' on':'')+'" onclick="openPartners(window._pZone,\'\')">All</button>'
+    +'<button class="ev-chip'+(window._pCat==='stay'?' on':'')+'" onclick="openPartners(window._pZone,\'stay\')">\ud83c\udfe1 Stays</button>'
+    +'<button class="ev-chip'+(window._pCat==='adventure'?' on':'')+'" onclick="openPartners(window._pZone,\'adventure\')">\ud83e\udde1 Adventure</button>'
+    +'</div>'
+    +'<div class="pt-chips" style="margin-bottom:12px">'
+    +'<button class="ev-chip'+(!window._pZone?' on':'')+'" onclick="openPartners(\'\',window._pCat)">Everywhere</button>'
+    + Object.keys(zones).map(function(z){
+        return '<button class="ev-chip'+(window._pZone===z?' on':'')+'" onclick="openPartners(\''+z+'\',window._pCat)">'+esc2(z)+'</button>';
+      }).join('')
+    +'</div><div id="partnersOut"></div>';
+  rwPartnersRender();
+}
+function rwPartnersRender(){
+  var host=el('partnersOut'); if(!host) return;
+  var list=rwPartnersFor(window._pZone, window._pCat);
+  if(!list.length){ host.innerHTML='<div class="note" style="text-align:center;padding:20px;color:var(--t3)">Nothing here yet \u2014 we\u2019re adding partners city by city.</div>'; return; }
+  host.innerHTML=list.map(function(p,i){
+    var T=(window.RW_PARTNER_TIERS||[]).filter(function(t){ return t.id===p.verified; })[0]||{icon:'',label:''};
+    var stars = p.rating!=null ? '\u2b50 '+p.rating.toFixed(1) : '';
+    return '<div class="pt-card'+(p.verified==='signed'?' signed':'')+'">'
+      +'<div class="pt-top">'
+      +'<span class="pt-rank">'+(i+1)+'</span>'
+      +'<span style="flex:1;min-width:0"><b class="pt-name">'+esc2(p.name)+'</b>'
+      +'<div class="pt-where">'+esc2(p.area||'')+' \u00b7 '+esc2(p.zone)+'</div></span>'
+      +(stars?'<span class="pt-rate">'+stars+'</span>':'')
+      +'</div>'
+      +'<div class="pt-hook">'+esc2(p.hook||'')+'</div>'
+      +'<div class="pt-meta">'
+      +'<span class="pt-tag '+(p.verified==='signed'?'ok':'')+'">'+T.icon+' '+esc2(T.label)+'</span>'
+      +'<span class="pt-why">'+esc2(p._why)+'</span>'
+      +(p.badge?'<span class="pt-tag ok">\ud83c\udfc5 '+esc2(p.badge)+'</span>':'')
+      +'</div>'
+      +'<div class="pt-acts">'
+      +'<button class="tact" onclick="rwPartnerMaps(\''+p.id+'\')">\ud83d\uddfa\ufe0f Find it</button>'
+      +'<button class="tact" onclick="rwPartnerBook(\''+p.id+'\')">\u2795 Add to trip</button>'
+      +'<button class="tact" onclick="rwPartnerPlan(\''+p.id+'\')">\u2728 Plan around it</button>'
+      +'</div></div>';
+  }).join('')
+  +'<div class="pt-foot">Ranked by rating <em>weighted by how many people reviewed</em> \u2014 a 5.0 from 12 people shouldn\u2019t outrank a 4.8 from 900. '
+  +'Entries marked <b>Researched</b> are places we found and rated highly; they are not yet formal partners, and we say so rather than implying otherwise.</div>';
+}
+function rwPartnerById(id){ return (window.RW_PARTNERS||[]).filter(function(p){ return p.id===id; })[0]; }
+function rwPartnerMaps(id){
+  var p=rwPartnerById(id); if(!p) return;
+  var q=encodeURIComponent(p.name+' '+(p.area||'')+' '+p.zone);
+  window.open('https://www.google.com/maps/search/?api=1&query='+q,'_blank','noopener');
+}
+
+function rwPartnerBook(id){
+  var p=rwPartnerById(id); if(!p) return;
+  var cat = p.cat==='adventure' ? 'do' : (p.cat||'stay');
+  rwBasketAdd({ id:p.id, name:p.name, cat:cat, where:(p.area||'')+' \u00b7 '+p.zone, price:0, partner:true });
+}
+
+function rwPartnerPlan(id){
+  var p=rwPartnerById(id); if(!p) return;
+  rwCloseSection('partnersSection');
+  var inp=el('heroInput')||el('cpInput');
+  if(inp){
+    inp.value='Plan a trip to '+p.zone+' staying around '+p.area+'. I am looking at '+p.name+'. '
+      +'Give honest travel times, what to do nearby, and a realistic daily budget.';
+    try{ copilotSend(!!el('heroInput')); }catch(e){}
+  }
+}
+
+/* ---------------- LOCAL RIDES ----------------
+   We do NOT resell rides or take a cut here — these are deep links into the
+   apps people already have. Saying so keeps it honest and keeps us out of
+   transport regulation we have no business being in. */
+function rwRidesHTML(place, lat, lon){
+  var q=encodeURIComponent(place||'');
+  var ola  = lat? 'https://book.olacabs.com/?drop_lat='+lat+'&drop_lng='+lon : 'https://book.olacabs.com/';
+  var uber = lat? 'https://m.uber.com/ul/?action=setPickup&dropoff[latitude]='+lat+'&dropoff[longitude]='+lon
+                : 'https://m.uber.com/ul/?action=setPickup';
+  var rapido='https://onelink.to/rapido';
+  return '<div class="ride-box">'
+    +'<div class="ride-h">\ud83d\ude95 Getting around'+(place?' in '+esc2(place):'')+'</div>'
+    +'<div class="ride-btns">'
+    +'<a class="ride" href="'+rapido+'" target="_blank" rel="noopener">\ud83c\udfcd\ufe0f Rapido<span>bikes &amp; autos</span></a>'
+    +'<a class="ride" href="'+ola+'" target="_blank" rel="noopener">\ud83d\ude96 Ola<span>cabs</span></a>'
+    +'<a class="ride" href="'+uber+'" target="_blank" rel="noopener">\ud83d\ude97 Uber<span>cabs</span></a>'
+    +'</div>'
+    +'<button class="tact" style="width:100%;margin-top:8px" onclick="openDriverHire(\''+esc2(place||'')+'\')">\ud83e\uddd1\u200d\u2708\ufe0f Hire a driver for the day</button>'
+    +'<div class="ride-note">We don\u2019t take a cut on rides \u2014 these open the apps you already have. For hill routes a full-day driver usually beats app cabs, which often refuse long mountain trips.</div>'
+    +'</div>';
+}
+/* Full-day driver / sightseeing — the thing Febin's users kept asking for. */
+function openDriverHire(place){
+  var t=(window.RW_TERRAIN && typeof rwTerrainOf==='function') ? rwTerrainOf(place) : 'plains';
+  var rates={ himalayan:[3500,5500], hill:[3000,4500], ghats:[2800,4000],
+              coastal:[2500,3800], desert:[2800,4200], plains:[2200,3500], metro:[2500,4000] };
+  var r=rates[t]||rates.plains;
+  rwForm('\ud83e\uddd1\u200d\u2708\ufe0f Hire a driver'+(place?' \u2014 '+place:''), [], function(){}, 
+    '<div style="text-align:left;line-height:1.75;font-size:13px">'
+    +'<b>What a full day usually costs here</b><br>'
+    +'<span style="font-size:20px;font-weight:800;color:var(--gold)">\u20b9'+r[0].toLocaleString('en-IN')+' \u2013 \u20b9'+r[1].toLocaleString('en-IN')+'</span>'
+    +'<span style="color:var(--t3);font-size:12px"> per day, 8h/80km typical</span><br><br>'
+    +'<b>Before you agree, settle these five things:</b><br>'
+    +'\u2022 Is fuel included? (usually yes)<br>'
+    +'\u2022 Are driver food and stay included on multi-day trips? (usually NOT \u2014 budget \u20b9300\u2013500/day)<br>'
+    +'\u2022 Are tolls and parking extra?<br>'
+    +'\u2022 What happens past 8 hours or 80 km?<br>'
+    +'\u2022 Get the driver\u2019s name and vehicle number in writing before you pay anything.<br><br>'
+    +'<span style="color:var(--t3);font-size:12px">Rates are typical ranges for '+esc2(t)+' terrain, not quotes. '
+    +'Ask your homestay first \u2014 they almost always know a trusted driver and it is usually cheaper than a booking desk.</span></div>');
+}
+
+/* ============================================================================
+   EVENT ROI ENGINE (rw-v59)
+   ============================================================================
+   The user's ask: rank events by whether they LEAVE YOU BETTER OFF — money,
+   career, head, culture, fun — minus what they take: cost and drain. And say
+   so plainly when an event is a net negative rather than quietly listing it.
+
+   Every score is visible and explained. This is a stated editorial opinion,
+   not a measurement, and the UI says exactly that. An opaque "9.2/10" would be
+   worse than useless — you could not argue with it.
+   ========================================================================== */
+var RW_ROI_DIMS=[
+  {k:'prof',  label:'Career',    icon:'\ud83d\udcbc', good:'opens doors, meets people who matter'},
+  {k:'money', label:'Money',     icon:'\ud83d\udcb0', good:'can pay for itself or lead to income'},
+  {k:'mind',  label:'Headspace', icon:'\ud83e\udde0', good:'you come back restored, not wrecked'},
+  {k:'cult',  label:'Culture',   icon:'\ud83c\udfad', good:'you see something you could not elsewhere'},
+  {k:'fun',   label:'Joy',       icon:'\u2728', good:'straightforwardly a good time'}
+];
+function rwEventROI(e){
+  var r=e&&e.roi; if(!r) return null;
+  var gain=(r.prof||0)+(r.money||0)+(r.mind||0)+(r.cult||0)+(r.fun||0);   /* -10..25 */
+  var give=(r.cost||0)+(r.drain||0);                                       /* 0..10  */
+  var net=gain-give;
+  var band, tone, why;
+  if(net>=12){ band='MUST ATTEND'; tone='must'; }
+  else if(net>=7){ band='WORTH IT'; tone='good'; }
+  else if(net>=3){ band='GO IF NEARBY'; tone='ok'; }
+  else if(net>=0){ band='ONLY IF IT\u2019S YOUR THING'; tone='meh'; }
+  else { band='LIKELY NOT WORTH IT'; tone='bad'; }
+
+  /* the single strongest reason, so the badge is arguable rather than magic */
+  var best=RW_ROI_DIMS.slice().sort(function(a,b){ return (r[b.k]||0)-(r[a.k]||0); })[0];
+  var worst = (r.cost||0)>=(r.drain||0) ? {k:'cost',label:'cost'} : {k:'drain',label:'drain'};
+  if(tone==='bad') why='Takes more than it gives \u2014 high '+worst.label+' for what you get back.';
+  else if(tone==='meh') why='Roughly break-even. Worth it only if '+best.label.toLowerCase()+' is what you\u2019re after.';
+  else why='Strongest on '+best.label.toLowerCase()+' \u2014 '+best.good+'.';
+  if((r.cost||0)>=4 && net>=3) why+=' Expensive, though \u2014 budget for it.';
+  if((r.drain||0)>=4 && net>=3) why+=' It will wipe you out; plan a recovery day.';
+  return {net:net, gain:gain, give:give, band:band, tone:tone, why:why, best:best, r:r};
+}
+function rwROIBadge(e){
+  var v=rwEventROI(e); if(!v) return '';
+  return '<span class="roi-badge roi-'+v.tone+'">'+v.band+'</span>';
+}
+function rwROIPanel(e){
+  var v=rwEventROI(e); if(!v) return '';
+  var bars=RW_ROI_DIMS.map(function(d){
+    var raw=v.r[d.k]||0, pos=Math.max(0,raw), neg=Math.max(0,-raw);
+    var pct=Math.round((pos/5)*100);
+    return '<div class="roi-row"><span class="roi-lbl">'+d.icon+' '+d.label+'</span>'
+      +'<span class="roi-bar"><i style="width:'+pct+'%"></i>'
+      +(neg?'<u style="width:'+Math.round((neg/5)*100)+'%"></u>':'')+'</span>'
+      +'<span class="roi-num'+(raw<0?' neg':'')+'">'+(raw>0?'+':'')+raw+'</span></div>';
+  }).join('');
+  var costs='<div class="roi-row"><span class="roi-lbl">\ud83d\udcb8 What it costs</span>'
+    +'<span class="roi-bar cost"><i style="width:'+Math.round(((v.r.cost||0)/5)*100)+'%"></i></span>'
+    +'<span class="roi-num neg">-'+(v.r.cost||0)+'</span></div>'
+    +'<div class="roi-row"><span class="roi-lbl">\ud83d\ude29 What it takes out of you</span>'
+    +'<span class="roi-bar cost"><i style="width:'+Math.round(((v.r.drain||0)/5)*100)+'%"></i></span>'
+    +'<span class="roi-num neg">-'+(v.r.drain||0)+'</span></div>';
+  return '<div class="roi-panel">'
+    +'<div class="roi-head"><span class="roi-badge roi-'+v.tone+'">'+v.band+'</span>'
+    +'<span class="roi-net">net '+(v.net>0?'+':'')+v.net+'</span></div>'
+    +'<div class="roi-why">'+esc2(v.why)+'</div>'
+    + bars + '<div class="roi-sep"></div>' + costs
+    +'<div class="roi-note">This is our stated opinion, not a measurement \u2014 scored on what an event typically gives back versus what it takes. Disagree freely; you know your own life.</div>'
+    +'</div>';
+}
+
+/* ============================================================================
+   EVENT RADAR (rw-v58) — music, startup, sports & automobile events
+   ============================================================================
+   HONESTY FIRST: there is no free, reliable live-events API for India, so this
+   is a CURATED calendar, not a scrape. Every event carries a `verified` flag
+   and the UI shows it, because someone may book a flight on these dates:
+     confirmed -> organiser-announced
+     typical   -> runs around this time most years, NOT announced
+   The differentiated part isn't the listing — it's turning an event into a
+   real trip, with themed advice per category.
+   ========================================================================== */
+function rwEventDate(e){
+  if(e.start){
+    var a=new Date(e.start+'T00:00:00'), b=e.end?new Date(e.end+'T00:00:00'):null;
+    var f=function(d){ return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); };
+    return b? f(a)+'\u2013'+f(b)+' '+b.getFullYear() : f(a)+' '+a.getFullYear();
+  }
+  if(e.month){ return ['','January','February','March','April','May','June','July','August','September','October','November','December'][e.month]; }
+  return 'dates vary';
+}
+/* days until it starts; null when we only know a month */
+function rwEventDays(e){
+  if(!e.start) return null;
+  var d=new Date(e.start+'T00:00:00'), now=new Date(); now.setHours(0,0,0,0);
+  return Math.round((d-now)/86400000);
+}
+function rwEventSoon(e){
+  var d=rwEventDays(e);
+  if(d!==null) return d>=0 && d<=45;
+  if(e.month){ var m=new Date().getMonth()+1; return e.month===m || e.month===(m%12)+1; }
+  return false;
+}
+function openEvents(cat){
+  rwPageOpen('events', function(body){
+    var sec=document.createElement('section'); sec.id='eventsSection'; sec.className='xsec';
+    body.appendChild(sec);
+  });
+  var sec=el('eventsSection'); if(!sec) return;
+  window._evCat=cat||window._evCat||'all';
+  sec.innerHTML='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">'
+    +'<button class="ev-chip'+(window._evCat==='all'?' on':'')+'" onclick="openEvents(\'all\')">All</button>'
+    + (window.RW_EVENT_CATS||[]).map(function(c){
+        return '<button class="ev-chip'+(window._evCat===c.id?' on':'')+'" onclick="openEvents(\''+c.id+'\')">'+c.icon+' '+c.label+'</button>';
+      }).join('')
+    +'</div>'
+    +'<input id="evSearch" placeholder="Search events, cities, countries\u2026" oninput="rwEventsRender()" '
+    +'style="width:100%;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:11px;padding:11px;color:var(--t1);font:inherit;margin-bottom:14px">'
+    +'<div id="eventsOut"></div>';
+  rwEventsRender();
+  try{ rwEventsSync(); }catch(e){}
+}
+function rwEventsRender(){
+  var host=el('eventsOut'); if(!host) return;
+  var all=(window.RW_EVENTS||[]).slice();
+  var cat=window._evCat||'all';
+  var q=((el('evSearch')&&el('evSearch').value)||'').trim().toLowerCase();
+  var list=all.filter(function(e){
+    if(cat!=='all' && e.cat!==cat) return false;
+    if(!q) return true;
+    return (e.name+' '+e.place+' '+e.country+' '+(e.vibe||'')).toLowerCase().indexOf(q)>-1;
+  });
+  if(!list.length){ host.innerHTML='<div class="note" style="text-align:center;padding:22px;color:var(--t3)">Nothing matches. Try a city, a country, or clear the search.</div>'; return; }
+  /* soonest first; month-only events after dated ones */
+  list.sort(function(a,b){
+    var da=rwEventDays(a), db=rwEventDays(b);
+    if(da!==null && db!==null) return da-db;
+    if(da!==null) return -1;
+    if(db!==null) return 1;
+    var m=new Date().getMonth()+1;
+    var oa=((a.month||13)-m+12)%12, ob=((b.month||13)-m+12)%12;
+    return oa-ob;
+  });
+  var soon=list.filter(rwEventSoon), later=list.filter(function(e){ return !rwEventSoon(e); });
+  /* within "later", surface the ones actually worth travelling for */
+  later.sort(rwByROI);
+  var C={}; (window.RW_EVENT_CATS||[]).forEach(function(c){ C[c.id]=c; });
+
+  function card(e, hot){
+    var c=C[e.cat]||{icon:'\ud83d\udcc5',color:'var(--gold)',label:''};
+    var d=rwEventDays(e);
+    var badge = e.verified==='confirmed'
+      ? '<span class="ev-ok">\u2713 dates confirmed</span>'
+      : '<span class="ev-maybe">~ typical timing \u00b7 verify before booking</span>';
+    var count = (d!==null && d>=0) ? '<span class="ev-days">'+(d===0?'today':d===1?'tomorrow':'in '+d+' days')+'</span>' : '';
+    return '<div class="ev-card'+(hot?' hot':'')+'" style="--evc:'+c.color+'">'
+      +'<div class="ev-top"><span class="ev-ic">'+c.icon+'</span>'
+      +'<span style="flex:1;min-width:0"><b class="ev-name">'+esc2(e.name)+'</b>'
+      +'<div class="ev-where">'+esc2(e.place)+' \u00b7 '+esc2(e.country)+'</div></span>'
+      + count +'</div>'
+      +'<div class="ev-when">'+esc2(rwEventDate(e))+' '+badge+' '+rwROIBadge(e)+'</div>'
+      +(e.vibe?'<div class="ev-vibe">'+esc2(e.vibe)+'</div>':'')
+      +'<div class="ev-actions">'
+      +'<button class="tact ev-go" onclick="rwEventPlan(\''+e.id+'\')">\u2728 Build my trip</button>'
+      +'<button class="tact" onclick="rwEventTips(\''+e.id+'\')">\ud83d\udca1 Know before you go</button>'
+      +'<button class="tact" onclick="rwEventWorth(\''+e.id+'\')">\u2696\ufe0f Is it worth it?</button>'
+      +'</div></div>';
+  }
+  host.innerHTML =
+     (soon.length? '<div class="ev-head">\ud83d\udd25 Happening soon</div>'+soon.map(function(e){return card(e,true);}).join('') : '')
+    +(later.length? '<div class="ev-head">\ud83d\uddd3\ufe0f Later in the year</div>'+later.map(function(e){return card(e,false);}).join('') : '')
+    +(window._evSynced? '<div style="font-size:11px;color:#4ADE80;margin-top:12px">\u21bb '+window._evSynced.count+' live events synced'+(window._evSynced.updated?' \u00b7 updated '+String(window._evSynced.updated).slice(0,10):'')+'</div>' : '')
+    +'<div style="font-size:11px;color:var(--t3);margin-top:14px;line-height:1.6">Dates marked <b>~ typical</b> are our best estimate from previous years, not an announcement. Always confirm with the organiser before you book travel.</div>';
+}
+
+function rwEventWorth(id){
+  var e=rwEventById(id); if(!e) return;
+  var ov=el('evWorthOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='evWorthOv'; ov.className='overlay'; ov.style.zIndex='3200';
+    ov.onclick=function(x){ if(x.target===ov) rwOverlayClose('evWorthOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:430px"><div class="sheet-h"><b>\u2696\ufe0f '+esc2(e.name)+'</b>'
+    +'<button onclick="rwOverlayClose(\'evWorthOv\')" class="tact">\u2715</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:2px 0 12px">'+esc2(e.place)+' \u00b7 '+esc2(rwEventDate(e))+'</div>'
+    + rwROIPanel(e)
+    +'<button class="tact" style="width:100%;margin-top:12px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwOverlayClose(\'evWorthOv\');rwEventPlan(\''+e.id+'\')">\u2728 Build my trip anyway</button></div>';
+  ov.classList.add('open');
+}
+/* sort helper: highest net ROI first within a bucket */
+function rwByROI(a,b){
+  var va=rwEventROI(a), vb=rwEventROI(b);
+  return ((vb?vb.net:0)-(va?va.net:0));
+}
+
+
+/* Pull weekly-refreshed events from the Worker when one is configured.
+   SAFE BY DESIGN: curated events in events-data.js always win; fetched ones are
+   appended, never overwrite. If the Worker is absent or fails, the app is
+   exactly what it is today. */
+function rwEventsSync(){
+  try{
+    var api = window.rwApi && rwApi('events');
+    if(!api) return;                                  /* no worker configured */
+    fetch(api).then(function(r){ return r.json(); }).then(function(d){
+      if(!d || !d.events || !d.events.length) return;
+      var have = {}; (window.RW_EVENTS||[]).forEach(function(e){ have[(e.name||'').toLowerCase()]=1; });
+      var added = d.events.filter(function(e){ return e.name && !have[e.name.toLowerCase()]; });
+      if(!added.length) return;
+      window.RW_EVENTS = (window.RW_EVENTS||[]).concat(added);
+      window._evSynced = { count: added.length, updated: d.updated };
+      if(el('eventsOut')) rwEventsRender();
+    }).catch(function(){});
+  }catch(e){}
+}
+
+function rwEventById(id){ return (window.RW_EVENTS||[]).filter(function(e){ return e.id===id; })[0]; }
+function rwEventTips(id){
+  var e=rwEventById(id); if(!e) return;
+  var C={}; (window.RW_EVENT_CATS||[]).forEach(function(c){ C[c.id]=c; });
+  var generic={
+    music:['Earplugs. Genuinely \u2014 the good ones cost little and save your hearing.','Cash still rules at most Indian festival grounds.','Phone battery pack; charging queues are long.'],
+    startup:['Have a one-line answer to \u201cwhat do you do\u201d before you arrive.','The corridor and side events beat the main stage for meeting people.','Carry more business cards than feels sensible.'],
+    sports:['Buy tickets only through the official channel \u2014 resale scams spike near event dates.','Arrive far earlier than you think; gates and security are slow.','Check the bag-size rule before you leave the hotel.'],
+    auto:['Go on the first public morning \u2014 halls empty out by afternoon on day one.','Comfortable shoes; expo floors are enormous.','Photography rules vary by hall.']
+  }[e.cat]||[];
+  var ov=el('evTipsOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='evTipsOv'; ov.className='overlay'; ov.style.zIndex='3200';
+    ov.onclick=function(x){ if(x.target===ov) rwOverlayClose('evTipsOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:420px"><div class="sheet-h"><b>\ud83d\udca1 '+esc2(e.name)+'</b>'
+    +'<button onclick="rwOverlayClose(\'evTipsOv\')" class="tact">\u2715</button></div>'
+    +'<div style="font-size:12.5px;color:var(--t2);margin:2px 0 12px">'+esc2(e.place)+' \u00b7 '+esc2(rwEventDate(e))+'</div>'
+    +((e.tips||[]).length? '<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin-bottom:7px">SPECIFIC TO THIS EVENT</div>'
+      +(e.tips||[]).map(function(t){ return '<div class="ev-tip">\u2022 '+esc2(t)+'</div>'; }).join('') : '')
+    +(generic.length? '<div style="font-size:11px;color:var(--t3);font-weight:700;letter-spacing:.06em;margin:14px 0 7px">'+(C[e.cat]?C[e.cat].label.toUpperCase():'GENERAL')+' EVENTS</div>'
+      +generic.map(function(t){ return '<div class="ev-tip">\u2022 '+esc2(t)+'</div>'; }).join('') : '')
+    +'<button class="tact" style="width:100%;margin-top:14px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="rwOverlayClose(\'evTipsOv\');rwEventPlan(\''+e.id+'\')">\u2728 Build my trip around this</button></div>';
+  ov.classList.add('open');
+}
+/* The actual value: an event becomes a themed trip, with category-aware framing. */
+function rwEventPlan(id){
+  var e=rwEventById(id); if(!e) return;
+  var theme={
+    music:'Frame it around the festival: arrive a day early to settle in, plan recovery time, and suggest what to do in the area on non-show days.',
+    startup:'Frame it around the conference: arrive the evening before, keep mornings free for meetings, and suggest good places to actually talk to people.',
+    sports:'Frame it around the event day: getting to the venue, timing around traffic, and what to see nearby on the other days.',
+    auto:'Frame it around the show: the best day and time to attend, and what else is worth seeing in the city.'
+  }[e.cat]||'';
+  var when=rwEventDate(e);
+  var q='I want to go to '+e.name+' at '+e.place+', '+e.country+' ('+when+'). '
+    +'Plan the trip around it. '+theme+' '
+    +'Use honest India road times if travel is overland, give a realistic budget, and flag anything I must arrange in advance (permits, tickets, acclimatisation).';
+  rwCloseSection('eventsSection');
+  var inp=el('heroInput')||el('cpInput');
+  if(inp){ inp.value=q; try{ copilotSend(!!el('heroInput')); }catch(err){} }
+  showToast('\u2728 Planning your '+e.name+' trip');
 }
 
 /* ===== MENU SEARCH (rw-v55) — 64 items is too many to scan, so let people
@@ -1740,6 +3226,28 @@ var CURR = [
   {c:'CAD',s:'C$',r:1.36},{c:'SGD',s:'S$',r:1.34},{c:'AED',s:'AED',r:3.67},{c:'THB',s:'฿',r:35}
 ];
 
+
+/* ============================================================================
+   PRO PRICE LABEL (rw-v80) — Febin's currency bug
+   ============================================================================
+   The Pro price genuinely IS 100 rupees, charged over UPI. But showing a bare
+   "₹100" to someone who has selected USD looks like the currency switch is
+   broken. So: show their currency with the rupee price alongside, because the
+   amount they are actually charged is in rupees and hiding that would be worse.
+   ========================================================================= */
+function proPriceLabel(inr){
+  inr = inr || 100;
+  try{
+    if(typeof AC==='undefined' || AC==='INR') return '\u20b9'+inr;
+    var cu=CURR.find(function(x){ return x.c===AC; });
+    if(!cu || !cu.r) return '\u20b9'+inr;
+    var usd = inr/83.5;                     /* INR -> USD base */
+    var v = usd*cu.r;
+    var shown = v<1 ? v.toFixed(2) : (v<10? v.toFixed(1) : Math.round(v));
+    return cu.s+shown+' (\u20b9'+inr+')';
+  }catch(e){ return '\u20b9'+inr; }
+}
+
 function fmtMoney(usd){
   var cu = CURR.find(function(x){return x.c===AC;});
   var v = Math.round(usd*(cu?cu.r:1));
@@ -1883,7 +3391,7 @@ function refreshProUI(){
     if(bar) bar.classList.add('hide');
     if(promo) promo.classList.add('hide');
   } else {
-    if(btn){ btn.textContent='Pro ₹100'; btn.className='btn btn-pro'; btn.onclick=openPay; }
+    if(btn){ btn.textContent='Pro '+proPriceLabel(100); btn.className='btn btn-pro'; btn.onclick=openPay; }
     if(bar) bar.classList.remove('hide');
     if(promo) promo.classList.remove('hide');
     el('freeCount').textContent = freeLeft;
@@ -1927,6 +3435,24 @@ function ssIndex(){
    {t:'My Music',k:'music songs phonk spotify saavn',go:function(){openMusic();}},
    {t:'The RoamWise Film (promo video)',k:'promo film video anthem watch',go:function(){tabGo('home');scrollToId('promofilm');}}
   ];
+  /* DESTINATIONS (rw-v81 — Febin's "Kerala shows No match" bug).
+     The index had every FEATURE but not a single PLACE, so searching a real
+     destination looked like we didn't cover it. Now every known place, region
+     and curated override is searchable and goes straight to planning. */
+  try{
+    var _seen={};
+    var addDest=function(name, label){
+      var k=String(name||'').toLowerCase(); if(!k||_seen[k]) return; _seen[k]=1;
+      ix.push({ t:(label||'\ud83d\udccd Plan a trip to '+name), k:k,
+        go:(function(n){ return function(){ ssClose(); var d=el('destInput'); if(d) d.value=n; tabGo('plan');
+          try{ if(typeof goPlan==='function') goPlan(); }catch(e){} }; })(name) });
+    };
+    Object.keys(rwKnownMap()||{}).forEach(function(k){ addDest(rwKnownMap()[k]); });
+    (window.RW_REGIONS||[]).forEach(function(r){
+      addDest(r.name, '\ud83d\uddfa\ufe0f '+r.name+' \u2014 '+r.blurb);
+      (r.alias||[]).forEach(function(a){ addDest(a, '\ud83d\uddfa\ufe0f '+r.name+' \u2014 '+r.blurb); });
+    });
+  }catch(e){}
   (typeof TREKS!=='undefined'?TREKS:[]).forEach(function(t){ ix.push({t:'Trek: '+t.n,k:t.n.toLowerCase(),go:function(){tabGo('explore');scrollToId('treks');}}); });
   (typeof EVENTS!=='undefined'?EVENTS:[]).forEach(function(e){ ix.push({t:e.ic+' '+e.n,k:e.n.toLowerCase(),go:function(){eventPlan(e.id);}}); });
   (typeof EXPS!=='undefined'?EXPS:[]).forEach(function(e){ ix.push({t:'Experience: '+e.n,k:e.n.toLowerCase(),go:function(){tabGo('explore');scrollToId('exps');}}); });
@@ -1942,7 +3468,11 @@ function ssRun(q){
   if(q.length<2){ out.innerHTML=''; return; }
   var hits=_ssIx.filter(function(x){ return (x.t+' '+x.k).toLowerCase().indexOf(q)>-1; }).slice(0,9);
   out.innerHTML = hits.length? hits.map(function(x,i){ return '<div class="ti-day" style="cursor:pointer;padding:11px 12px;border:1px solid var(--b);border-radius:11px;margin-bottom:7px;background:#0E1018" onclick="_ssGo('+i+')"><b>&#128269;</b><span>'+x.t+'</span></div>'; }).join('')
-    : '<div class="mode-box">No match \u2014 try "trek", "pdf", "events", "store"\u2026 or just plan a trip to "'+q+'" \u2192 <button class="tact" onclick="ssClose();el(\'destInput\').value=\''+q.replace(/'/g,'')+'\';tabGo(\'plan\')">Plan it</button></div>';
+    : '<div class="mode-box" style="text-align:left;line-height:1.7">'
+      +'<b>\ud83c\udf0d We can plan a trip to \u201c'+esc2(q)+'\u201d</b><br>'
+      +'<span style="font-size:12px;color:var(--t2)">RoamWise plans anywhere on Earth \u2014 if it is a real place, we will build you a day-by-day itinerary with honest travel times and local costs.</span><br>'
+      +'<button class="tact" style="margin-top:9px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0A0A0C;border:none" onclick="ssClose();el(\'destInput\').value=\''+q.replace(/'/g,'')+'\';tabGo(\'plan\')">\u2728 Plan '+esc2(q)+' \u2192</button>'
+      +'</div>';
   window._ssHits=hits;
 }
 function _ssGo(i){ var x=window._ssHits[i]; ssClose(); x.go(); }
@@ -2391,6 +3921,9 @@ var WA_NUMBER='', WA_CHANNEL='', WA_GROUP='';
 })();
 /* Global + idempotent so remote config can create it after the fact. */
 function ensureWaButton(){
+  try{ rwRefCapture(); rwRefStickUrl(); }catch(e){}
+  try{ setTimeout(rwBasketBadge, 600); }catch(e){}
+  try{ setTimeout(rwConfigSyncAll, 1200); }catch(e){}
   if(!WA_NUMBER || document.getElementById('waFab')) return;
   var w=document.createElement('a');
   w.id='waFab';
@@ -5865,6 +7398,10 @@ function pickPlan(planId, priceINR, label){
     var cp = el('cryptoPanel');
     if(!cp && cryptoConfigured()){ cp=document.createElement('div'); cp.id='cryptoPanel'; methods.appendChild(cp); }
     if(cp) cp.innerHTML = cryptoPanelHTML();
+    /* referral badge / "have a code?" prompt, right where money happens */
+    var rb = el('refBadge');
+    if(!rb){ rb=document.createElement('div'); rb.id='refBadge'; methods.appendChild(rb); }
+    try{ rb.innerHTML = rwRefBadgeHTML(); }catch(e){}
   }
 }
 function backToPlanPicker(){
@@ -6226,7 +7763,7 @@ function runSearch(){
     if(freeLeft<=0){ openPay(); showToast('Daily limit reached — Upgrade for unlimited!'); return; }
     freeLeft--; lsSet('rwFLeft', String(freeLeft));
     el('freeCount').textContent = freeLeft;
-    if(freeLeft===0) showToast('Last free search! Upgrade for ₹100 for unlimited.');
+    if(freeLeft===0) showToast('Last free search! Upgrade for '+proPriceLabel(100)+' for unlimited.');
   }
   var origin = (el('origin').value||'India').trim();
   var days = parseInt(el('dur').value)||14;
@@ -6308,7 +7845,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
   H += `</tbody></table></div>`;
   H += adCard(0);
 
-  if(!isPro) H += `<div class="promo" style="margin-bottom:14px" onclick="openPay()"><div class="promo-left">👑</div><div class="promo-text"><strong>Unlock Pro — ₹100 lifetime</strong><span>Full itineraries &bull; Budget tracker &bull; WhatsApp share &amp; more</span></div><div class="promo-price"><span class="promo-amt">₹100</span></div></div>`;
+  if(!isPro) H += `<div class="promo" style="margin-bottom:14px" onclick="openPay()"><div class="promo-left">👑</div><div class="promo-text"><strong>Unlock Pro — ${proPriceLabel(100)} lifetime</strong><span>Full itineraries &bull; Budget tracker &bull; WhatsApp share &amp; more</span></div><div class="promo-price"><span class="promo-amt">${proPriceLabel(100)}</span></div></div>`;
 
   H += `<div class="card-list">`;
 
@@ -6431,7 +7968,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
     /* ITINERARY TAB */
     H += `<div class="tab-pane" id="${T}-it">`;
     if(!isPro){
-      H += `<div class="gate" onclick="openPay()"><span class="gate-ico">📅</span><div class="gate-title">Full ${Math.min(days,14)}-day itinerary — Pro only</div><div class="gate-sub">Detailed day-by-day plan with specific places, timings, local tips and restaurant picks. Built from our database, AI-enhanced if a key is added.</div><button class="gate-btn">Unlock for ₹100 →</button></div>`;
+      H += `<div class="gate" onclick="openPay()"><span class="gate-ico">📅</span><div class="gate-title">Full ${Math.min(days,14)}-day itinerary — Pro only</div><div class="gate-sub">Detailed day-by-day plan with specific places, timings, local tips and restaurant picks. Built from our database, AI-enhanced if a key is added.</div><button class="gate-btn">Unlock for ${proPriceLabel(100)} →</button></div>`;
     } else {
       H += `<div id="${T}-iph" class="itin-ph"><div class="mini-spin"></div><span>Click below to build your ${idays}-day plan for ${d.name}</span></div><div id="${T}-ict" style="display:none"></div>`;
     }
@@ -6440,7 +7977,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
     /* PRO TOOLS TAB */
     H += `<div class="tab-pane" id="${T}-pt">`;
     if(!isPro){
-      H += `<div class="gate" onclick="openPay()"><span class="gate-ico">👑</span><div class="gate-title">Budget Tracker &bull; Packing List &bull; Compare Table &bull; WhatsApp Share</div><div class="gate-sub">₹100 one-time unlocks all Pro tools forever on this device.</div><button class="gate-btn">Unlock Pro → ₹100</button></div>`;
+      H += `<div class="gate" onclick="openPay()"><span class="gate-ico">👑</span><div class="gate-title">Budget Tracker &bull; Packing List &bull; Compare Table &bull; WhatsApp Share</div><div class="gate-sub">${proPriceLabel(100)} one-time unlocks all Pro tools forever on this device.</div><button class="gate-btn">Unlock Pro → ${proPriceLabel(100)}</button></div>`;
     } else {
       H += `<div class="sub-tabs">
         <button class="stab on" data-p="${P2}" data-tab="bt" onclick="swSub('${P2}','bt')">💰 Budget</button>
@@ -6516,7 +8053,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
       H += `<button class="act-btn act-ghost" onclick="swTab('${T}','pt');swSub('${P2}','bt')">💰 Track</button>`;
     } else {
       H += `<button class="act-btn act-gold" onclick="openPay()">📅 Full Itinerary 🔒</button>`;
-      H += `<button class="act-btn act-pm" onclick="openPay()">👑 Unlock Pro — ₹100</button>`;
+      H += `<button class="act-btn act-pm" onclick="openPay()">👑 Unlock Pro — ${proPriceLabel(100)}</button>`;
     }
     H += `<button class="act-btn act-ghost" onclick="swTab('${T}','bk')">✈️ Book</button>`;
     H += `</div></div>`; /* act-bar + card end */
@@ -6834,7 +8371,11 @@ function openPay(){
      read is slow, since the tiers are always valid regardless. */
   var settled=false;
   var to=setTimeout(function(){ if(!settled){ settled=true; renderPlanGrid(false); } }, 2500);
-  (window.db? RWPricing.founderGateLoad().then(function(){ return db.collection('meta').doc('signupCounter').get(); }) : Promise.reject()).then(function(snap){
+  /* FIXED (rw-v71): the founder SEAT count must come from paid seats, not from
+     meta/signupCounter — that counter tracks every new SIGN-UP (for the 7-day
+     free trial) and was making the offer look far more sold than it was.
+     meta/founderSeats is incremented only when a claim is APPROVED. */
+  (window.db? RWPricing.founderGateLoad().then(function(){ return db.collection('meta').doc('founderSeats').get(); }) : Promise.reject()).then(function(snap){
     if(settled) return; settled=true; clearTimeout(to);
     var count = snap && snap.exists ? (snap.data().count||0) : 0;
     window._rwSeats = count;
@@ -7501,6 +9042,213 @@ function requireLogin(){
   return false;
 }
 
+
+/* ============================================================================
+   REFERRAL TRACKING (rw-v71)
+   ============================================================================
+   Flow, end to end:
+     1. Someone opens roamwise.co.in/?ref=RW-S01-FEBIN
+     2. We store the code locally with a timestamp (30-day window)
+     3. When that person submits a UTR, the code is STAMPED ON THE CLAIM
+     4. When YOU approve the claim, the commission becomes payable
+
+   Attribution is stamped at CLAIM time, not at approval time, so a referrer
+   can't be changed after the fact — and you approve the claim anyway, which
+   is the human check that makes the whole thing hard to game.
+
+   FRAUD PREVENTION, in order of how much it actually matters:
+     - Commission only exists on an APPROVED claim. You see every payment.
+     - Self-referral blocked: if the payer's own uid owns that code, no credit.
+     - One commission per (code, payer uid). Re-buying doesn't pay twice.
+     - Duplicate UTRs already blocked upstream by the existing claim gate.
+     - 7-day hold before payout so reversals settle first.
+     - Codes are stamped server-side into the claim doc, and Firestore rules
+       stop anyone editing a claim after creation — so a referrer cannot
+       attach themselves to someone else's purchase later.
+   ========================================================================= */
+var RW_REF_KEY='rw_ref_code', RW_REF_AT='rw_ref_at';
+
+
+/* ============================================================================
+   REFERRERS FROM FIRESTORE (rw-v80) — no more editing GitHub files
+   ============================================================================
+   referral-data.js is now only a SEED/fallback. The live list is in Firestore
+   at config/referrers, editable from the admin panel. The file still works if
+   Firestore is unreachable, so the app never depends on the network to
+   validate a code — it just gets fresher when it can.
+   ========================================================================= */
+function rwRefSync(){
+  try{
+    if(typeof db==='undefined' || !db) return;
+    db.collection('config').doc('referrers').get().then(function(d){
+      if(!d.exists) return;
+      var list=(d.data()||{}).list;
+      if(Array.isArray(list) && list.length){
+        window.RW_REFERRERS = list;
+        try{ lsSet('rw_ref_cache', JSON.stringify(list)); }catch(e){}
+      }
+    }).catch(function(){});
+  }catch(e){}
+}
+/* use the cached copy immediately on boot, before Firestore answers */
+(function(){
+  try{
+    var c=lsGet('rw_ref_cache');
+    if(c){ var l=JSON.parse(c); if(Array.isArray(l)&&l.length) window.RW_REFERRERS=l; }
+  }catch(e){}
+})();
+
+function rwRefLookup(code){
+  if(!code) return null;
+  var c=String(code).trim().toUpperCase();
+  var list=window.RW_REFERRERS||[];
+  for(var i=0;i<list.length;i++) if(list[i].code.toUpperCase()===c) return list[i];
+  return null;
+}
+/* Capture ?ref= on any page load. Runs once, early. */
+function rwRefCapture(){
+  try{
+    /* rw-v90: a referral must survive however it arrives.
+       ?ref=CODE  ·  ?r=CODE  ·  #ref=CODE  ·  /r/CODE  ·  ?utm_content=CODE
+       Instagram and WhatsApp both rewrite links, and some strip the query
+       string entirely, so we check the hash and the path too. */
+    var q=new URLSearchParams(location.search);
+    var code=q.get('ref')||q.get('r')||q.get('utm_content')||q.get('referral');
+    if(!code){
+      var h=String(location.hash||'');
+      var m=h.match(/[#&](?:ref|r)=([A-Za-z0-9\-_]+)/);
+      if(m) code=m[1];
+    }
+    if(!code){
+      var pm=String(location.pathname||'').match(/\/r\/([A-Za-z0-9\-_]+)/);
+      if(pm) code=pm[1];
+    }
+    if(!code) return;
+    var who=rwRefLookup(code);
+    if(!who || who.active===false) return;         /* unknown/retired code: ignore silently */
+    lsSet(RW_REF_KEY, who.code);
+    lsSet(RW_REF_AT, String(Date.now()));
+    try{ track('ref_click'); }catch(e){}
+    setTimeout(function(){
+      try{ showToast('\ud83d\udc4b You came via '+who.name+' \u2014 welcome!'); }catch(e){}
+    }, 1200);
+  }catch(e){}
+}
+/* Return the still-valid referral code, or null. */
+
+/* Keep ?ref= on the URL as the user moves around, so a shared link that is
+   copied mid-session still carries the code. Silent — never a page reload. */
+function rwRefStickUrl(){
+  try{
+    var c=rwRefActive(); if(!c) return;
+    var u=new URL(location.href);
+    if(u.searchParams.get('ref')===c) return;
+    u.searchParams.set('ref', c);
+    history.replaceState({}, '', u.toString());
+  }catch(e){}
+}
+/* A referrer's own link should also survive an app install: stash it where the
+   installed PWA can read it on first run. */
+function rwRefPersist(){
+  try{
+    var c=rwRefActive(); if(!c) return;
+    if(window.caches) return;   /* nothing extra needed; localStorage covers it */
+  }catch(e){}
+}
+
+function rwRefActive(){
+  try{
+    var code=lsGet(RW_REF_KEY), at=parseInt(lsGet(RW_REF_AT)||'0',10);
+    if(!code||!at) return null;
+    var days=(window.RW_REFERRAL_TERMS&&RW_REFERRAL_TERMS.cookieDays)||30;
+    if(Date.now()-at > days*86400000){ return null; }   /* expired */
+    return rwRefLookup(code)? code : null;
+  }catch(e){ return null; }
+}
+/* What gets stamped onto a claim. Kept small and flat so it's easy to read in
+   Firestore and easy to total in a sheet. */
+function rwRefStamp(){
+  var code=rwRefActive();
+  if(!code) return {};
+  var who=rwRefLookup(code);
+  if(!who) return {};
+  /* self-referral guard: a referrer buying through their own link earns nothing */
+  try{
+    if(window.user && who.uid && who.uid===user.uid) return { refCode:code, refSelf:true, refRate:0 };
+  }catch(e){}
+  return {
+    refCode: who.code,
+    refName: who.name,
+    refType: who.type,
+    refRate: who.rate,
+    refAt: parseInt(lsGet(RW_REF_AT)||'0',10) || null
+  };
+}
+/* Build a share link for a referrer. */
+function rwRefLink(code){
+  return 'https://roamwise.co.in/?ref='+encodeURIComponent(code);
+}
+
+
+/* ============================================================================
+   REFERRAL CODE ENTRY (rw-v78)
+   ============================================================================
+   Links are great, but most referrals happen by WORD OF MOUTH — someone says
+   "use my code RW-S02-DEEPA". Without this, every one of those sales is
+   untracked and the referrer never gets paid. This closes that hole.
+
+   BUILT TO SCALE: validation is purely local against referral-data.js (no
+   network, no read cost), the code is stored the same way a link click is, and
+   the SAME rwRefStamp() writes it onto the claim — so one code path serves
+   millions of users with zero extra infrastructure.
+   ========================================================================= */
+
+/* live validation as they type a referral code at sign-up */
+function rwRefLiveCheck(){
+  var i=el('authRefCode'), m=el('authRefMsg');
+  if(!i||!m) return;
+  var v=String(i.value||'').trim().toUpperCase();
+  if(!v){ m.textContent=''; m.style.color='var(--t3)'; return; }
+  var w=rwRefLookup(v);
+  if(w && w.active!==false){
+    m.textContent='\u2705 '+w.name+' will get credit for your purchase';
+    m.style.color='#4ADE80';
+    rwRefApply(v, true);      /* store it now so it survives the signup flow */
+  } else {
+    m.textContent='Not a code we recognise \u2014 check the spelling';
+    m.style.color='#E0785B';
+  }
+}
+
+function rwRefApply(code, quiet){
+  var who=rwRefLookup(code);
+  if(!who || who.active===false) return null;
+  lsSet(RW_REF_KEY, who.code);
+  lsSet(RW_REF_AT, String(Date.now()));
+  if(!quiet){ try{ showToast('\u2705 Code applied \u2014 '+who.name+' gets credit'); }catch(e){} }
+  try{ track('ref_code_entered'); }catch(e){}
+  return who;
+}
+/* the little "have a referral code?" box */
+function openRefCode(){
+  var cur=rwRefActive();
+  var who=cur? rwRefLookup(cur) : null;
+  rwForm('\ud83c\udf9f\ufe0f Referral code', [
+    { id:'rc', label:'Enter the code you were given', value:cur||'', ph:'e.g. RW-S02-DEEPA' }
+  ], function(v){
+    var code=String(v.rc||'').trim().toUpperCase();
+    if(!code){ showToast('Enter a code first'); return; }
+    var w=rwRefApply(code);
+    if(!w){ showToast('\u274c That code isn\u2019t recognised \u2014 check the spelling'); return; }
+  }, who? ('Currently applied: <b>'+esc2(who.name)+'</b> ('+esc2(who.code)+')') : 'If a friend, creator or team member gave you a code, enter it here so they get credit for your purchase. It costs you nothing.');
+}
+/* Show the applied referrer on the Pro/pay screen, so it's transparent. */
+function rwRefBadgeHTML(){
+  var c=rwRefActive(); if(!c) return '<div style="text-align:center;margin-top:10px"><a onclick="openRefCode()" style="font-size:12px;color:var(--t3);cursor:pointer;text-decoration:underline dotted">Have a referral code?</a></div>';
+  var w=rwRefLookup(c); if(!w) return '';
+  return '<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--gold)">\ud83c\udf9f\ufe0f Referred by <b>'+esc2(w.name)+'</b> \u00b7 <a onclick="openRefCode()" style="color:var(--t3);cursor:pointer;text-decoration:underline dotted">change</a></div>';
+}
+
 /* Free UPI flow: user submits UTR, owner approves in the admin console */
 function submitUtr(){
   if(!requireLogin()) return;
@@ -7527,11 +9275,13 @@ function submitUtr(){
       b.disabled=false; b.textContent='Submit \u27A4';
       return say('You already submitted this UTR \u2014 it\u2019s in the verification queue.', false);
     }
-    return db.collection('claims').doc(user.uid+'_'+utr).set({
+    var _ref = {};
+    try{ _ref = rwRefStamp(); }catch(e){}
+    return db.collection('claims').doc(user.uid+'_'+utr).set(Object.assign({
     uid:user.uid, email:user.email||user.phoneNumber||'', utr:utr, amount:parseInt(UPI_AMT,10)||100,
     tier:(UPI_AMT==='299'?'supporter':'pro'), plan:(_selectedPlan&&_selectedPlan.id)||'legacy100', planLabel:(_selectedPlan&&_selectedPlan.label)||'Legacy ₹100',
     status:'pending', created:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(res){
+  }, _ref)).then(function(res){
     if(res===undefined) return; /* gated above */
     b.disabled=false; b.textContent='Submit \u27A4'; el('utrInput').value='';
     try{ track('utr_submits'); }catch(e){}
@@ -8271,6 +10021,9 @@ function rwKnownMap(){
   var known={};
   try{ (typeof DB!=='undefined'?DB:[]).forEach(function(d){ known[d.name.toLowerCase()]=d.name; }); }catch(e){}
   try{ Object.keys(RW_PLACE_OVERRIDES||{}).forEach(function(k){ var o=RW_PLACE_OVERRIDES[k]; known[o.name.toLowerCase()]=o.name; }); }catch(e){}
+  /* places the daily workflow learned from real user questions (tusk-learned.js) */
+  try{ Object.keys(window.RW_LEARNED_PLACES||{}).forEach(function(k){
+        var o=RW_LEARNED_PLACES[k]; if(o&&o.name) known[String(k).toLowerCase()]=o.name; }); }catch(e){}
   ['kerala','rajasthan','himachal','uttarakhand','karnataka','tamil nadu','gujarat','ladakh','sikkim','meghalaya','punjab','maharashtra','west bengal','odisha','assam','telangana',
    'delhi','new delhi','mumbai','goa','jaipur','agra','kolkata','chennai','bengaluru','bangalore','hyderabad','pune','udaipur','jodhpur','jaisalmer','amritsar','varanasi','lucknow','kochi','mysuru','mysore','ooty','munnar','hampi','pondicherry','rishikesh','haridwar','dehradun','manali','shimla','leh','srinagar','darjeeling','gangtok','shillong','guwahati','bhopal','indore','surat','ahmedabad','almora','nainital','mussoorie','kasol','auli','ziro','gokarna','bangkok','bali','singapore','dubai','kathmandu','pokhara','colombo','hanoi','tokyo','paris','london','rome'].forEach(function(n){ if(!known[n]) known[n]=n.replace(/(^|\s)\w/g,function(m){return m.toUpperCase();}); });
   window._rwKnown = known;
@@ -8334,6 +10087,81 @@ function rwNormalizeQuery(t){
   return t.replace(/\s{2,}/g,' ');
 }
 
+
+/* ============================================================================
+   WORLD GEOCODER (rw-v77) — stop guessing whether a word is a place
+   ============================================================================
+   The real fix for "you" being treated as a destination isn't a longer
+   stop-list — it's ASKING A PLACE DATABASE. We use OpenStreetMap Nominatim:
+   free, worldwide, down to street level, no API key.
+
+   WORKS WITHOUT THE WORKER. If rwApi('geo') exists we proxy through the
+   Cloudflare Worker (better: edge-cached, and it keeps our request rate
+   inside OSM's policy). If not, we call Nominatim directly from the browser.
+   If BOTH fail, we fall back to the local curated DB — never to a guess.
+
+   Results are cached in localStorage forever-ish, because a place's existence
+   does not change.
+   ========================================================================= */
+var RW_GEO_CACHE='rw_geo_v1';
+function rwGeoCacheGet(q){
+  try{ var c=JSON.parse(lsGet(RW_GEO_CACHE)||'{}'); return c[q.toLowerCase()]; }catch(e){ return undefined; }
+}
+function rwGeoCacheSet(q,v){
+  try{
+    var c=JSON.parse(lsGet(RW_GEO_CACHE)||'{}');
+    var keys=Object.keys(c);
+    if(keys.length>400) keys.slice(0,150).forEach(function(k){ delete c[k]; }); /* trim */
+    c[q.toLowerCase()]=v; lsSet(RW_GEO_CACHE, JSON.stringify(c));
+  }catch(e){}
+}
+/* Returns a Promise of {name, display, lat, lon, type, country} or null. */
+function rwGeocode(q){
+  q=String(q||'').trim();
+  if(!q || q.length<2) return Promise.resolve(null);
+  var hit=rwGeoCacheGet(q);
+  if(hit!==undefined) return Promise.resolve(hit);
+
+  /* local curated DB first — instant, offline, and always right for our cities */
+  try{
+    var known=rwKnownMap();
+    var k=q.toLowerCase();
+    if(known[k]){
+      var localv={ name:known[k], display:known[k], lat:null, lon:null, type:'curated', country:'IN' };
+      rwGeoCacheSet(q, localv); return Promise.resolve(localv);
+    }
+  }catch(e){}
+
+  var url;
+  try{ url = (window.rwApi && rwApi('geo')) ? rwApi('geo')+'?q='+encodeURIComponent(q) : null; }catch(e){ url=null; }
+  if(!url) url='https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q='+encodeURIComponent(q);
+
+  return fetch(url, { headers:{ 'Accept':'application/json' } })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var a = Array.isArray(d)? d[0] : (d && d.results ? d.results[0] : d);
+      if(!a || !a.lat){ rwGeoCacheSet(q, null); return null; }
+      var v={
+        name: (a.name || String(a.display_name||'').split(',')[0] || q),
+        display: a.display_name || q,
+        lat: parseFloat(a.lat), lon: parseFloat(a.lon),
+        type: a.type || a.class || 'place',
+        country: (a.address && a.address.country_code ? a.address.country_code.toUpperCase() : '')
+      };
+      rwGeoCacheSet(q, v); return v;
+    })
+    .catch(function(){ return null; });   /* offline: never guess, just return null */
+}
+/* Verify a WEAK destination guess before the app acts on it. */
+function rwVerifyDest(parsed){
+  if(!parsed || !parsed.dest || !parsed._weakDest) return Promise.resolve(parsed);
+  return rwGeocode(parsed.dest).then(function(g){
+    if(g){ parsed.dest=g.name; parsed._geo=g; parsed._weakDest=false; }
+    else { parsed._notAPlace=parsed.dest; parsed.dest=null; }   /* honest: we don't know */
+    return parsed;
+  });
+}
+
 function cpParseRegex(t){
   t = rwNormalizeQuery(t);
   /* -------- input hygiene: greetings, smalltalk, junk -------- */
@@ -8359,7 +10187,7 @@ function cpParseRegex(t){
     /* Take EVERY preposition match, not just the first: "what to eat in Manali"
        used to capture "eat" from "to eat" and then look up a guide for a verb.
        Skip common verbs/fillers, and prefer a capitalised candidate. */
-    var VERBS=/^(eat|go|do|see|visit|stay|sleep|travel|reach|get|buy|shop|find|book|know|start|plan|the|a|an|my|it|be|drink|walk|chill|relax|relaxing|peaceful|adventure|romantic|honeymoon|solo|family|spiritual|nature|scenic|foodie|luxury|cheap|party|nightlife|somewhere|anywhere|food|eat|hotel|stay|room|transport|taxi|cab|bus|train|flight|safety|scam|cost|price|money|there|here|that|this|tips|guide|advice|option|thing|under|below|within|over|about|around|say|says|said|mean|means|meant|share|send|give|tell|show|make|curated|budget|rs|inr|not|shadow|all|whole|entire|full|complete|across|multi|north|south|east|west)$/i;
+    var VERBS=/^(you|your|yours|me|my|us|our|them|their|him|her|tusk|ailon|roamwise|it|its|eat|go|do|see|visit|stay|sleep|travel|reach|get|buy|shop|find|book|know|start|plan|the|a|an|my|it|be|drink|walk|chill|relax|relaxing|peaceful|adventure|romantic|honeymoon|solo|family|spiritual|nature|scenic|foodie|luxury|cheap|party|nightlife|somewhere|anywhere|food|eat|hotel|stay|room|transport|taxi|cab|bus|train|flight|safety|scam|cost|price|money|there|here|that|this|tips|guide|advice|option|thing|under|below|within|over|about|around|say|says|said|mean|means|meant|share|send|give|tell|show|make|curated|budget|rs|inr|not|shadow|all|whole|entire|full|complete|across|multi|north|south|east|west)$/i;
     var re=/(?:\bin|\bto|reaching|\bat|visit(?:ing)?|\bfor|around|near)\s+([A-Za-z][a-zA-Z\u00C0-\u024F]{2,}(?:\s[A-Z][a-zA-Z]{2,})?)/g, mm, cands=[];
     while((mm=re.exec(t))!==null){ var w=mm[1].trim(); if(!VERBS.test(w.split(' ')[0])) cands.push(w); }
     var capped = cands.filter(function(w){ return /^[A-Z]/.test(w); });
@@ -8370,7 +10198,7 @@ function cpParseRegex(t){
     /* strip filler + numbers + MOOD words; whatever real word remains is the
        place. Mood words (romantic, solo, chill...) were being mistaken for
        destinations, so they're excluded here. */
-    var STOP=/^(plan|planning|trip|tour|days?|nights?|budget|under|below|within|max|itinerary|itineraries|for|the|a|an|and|with|my|me|please|need|want|going|go|visit|visiting|show|find|make|create|give|about|cost|costs|price|rs|inr|rupees|k|thousand|weather|rain|cafe|cafes|bus|train|flight|volvo|hotel|stay|stays|from|to|in|at|on|next|week|weekend|tomorrow|today|is|are|it|what|how|much|good|best|place|places|chill|relax|relaxing|peaceful|adventure|adventurous|romantic|honeymoon|solo|family|spiritual|nature|scenic|foodie|luxury|cheap|party|nightlife|workation|somewhere|anywhere|nice|cool|amazing|beautiful|food|foods|eat|eating|meal|meals|drink|drinks|hotel|hotels|stay|stays|room|rooms|transport|taxi|cab|auto|rickshaw|bike|scooter|metro|ferry|ticket|tickets|safety|safe|scam|scams|cost|costs|price|prices|money|cash|card|atm|sim|wifi|there|here|that|this|those|these|them|its|option|options|thing|things|idea|ideas|day|days|time|times|international|abroad|foreign|domestic|overseas|all|whole|entire|complete|full||across|throughout|everywhere|anywhere|nationwide|countrywide|multi|multiple|several|various|many||north|south|east|west|northern|southern|eastern|western|central|say|says|said|mean|means|meant|share|send|give|tell|show|curated|shadow|not|should|would|could|will|shall|might|must|reach|reaching|arrive|arriving|leave|leaving|any|some|anyone|anything|something|every|each|does|did|has|have|had|was|were|been|being|got|lets|let|when|where|which|who|whom|whose|why|whats|hows|季|plan|plans|list|tips|tip|guide|guides|advice)$/i;
+    var STOP=/^(you|your|yours|yourself|youre|u|ur|me|my|mine|myself|we|us|our|ours|ourselves|they|them|their|theirs|he|him|his|she|her|hers|who|whos|whom|tusk|ailon|roamwise|bot|ai|assistant|app|chat|hello|hey|hii|namaste|sir|maam|madam|bhai|bro|dude|yes|yeah|yep|nope|sure|thanks|thank|okay|alright|maybe|really|actually|plan|planning|trip|tour|days?|nights?|budget|under|below|within|max|itinerary|itineraries|for|the|a|an|and|with|my|me|please|need|want|going|go|visit|visiting|show|find|make|create|give|about|cost|costs|price|rs|inr|rupees|k|thousand|weather|rain|cafe|cafes|bus|train|flight|volvo|hotel|stay|stays|from|to|in|at|on|next|week|weekend|tomorrow|today|is|are|it|what|how|much|good|best|place|places|chill|relax|relaxing|peaceful|adventure|adventurous|romantic|honeymoon|solo|family|spiritual|nature|scenic|foodie|luxury|cheap|party|nightlife|workation|somewhere|anywhere|nice|cool|amazing|beautiful|food|foods|eat|eating|meal|meals|drink|drinks|hotel|hotels|stay|stays|room|rooms|transport|taxi|cab|auto|rickshaw|bike|scooter|metro|ferry|ticket|tickets|safety|safe|scam|scams|cost|costs|price|prices|money|cash|card|atm|sim|wifi|there|here|that|this|those|these|them|its|option|options|thing|things|idea|ideas|day|days|time|times|international|abroad|foreign|domestic|overseas|all|whole|entire|complete|full||across|throughout|everywhere|anywhere|nationwide|countrywide|multi|multiple|several|various|many||north|south|east|west|northern|southern|eastern|western|central|say|says|said|mean|means|meant|share|send|give|tell|show|curated|shadow|not|should|would|could|will|shall|might|must|reach|reaching|arrive|arriving|leave|leaving|any|some|anyone|anything|something|every|each|does|did|has|have|had|was|were|been|being|got|lets|let|when|where|which|who|whom|whose|why|whats|hows|季|plan|plans|list|tips|tip|guide|guides|advice)$/i;
     var toks=(t.match(/[A-Za-z\u00C0-\u024F]{3,}/g)||[]).filter(function(w){ return !STOP.test(w); });
     if(toks.length){ out.dest=toks[0]; out._weakDest=true; }
   }
@@ -11081,6 +12909,8 @@ function tripChatOpen(roomId, roomName){
       +'<button class="chat-tool" onclick="chatTrainAsk()">\ud83d\ude82 Pick a train</button>'
       +'<button class="chat-tool" onclick="chatMarkPaid()">\u2705 Mark paid</button>'
       +'<button class="chat-tool" onclick="chatInvite()">\ud83d\udc65 Invite</button>'
+      +'<button class="chat-tool" onclick="openChatGames()">\ud83c\udfae Play</button>'
+      +'<button class="chat-tool" onclick="openStays()">\ud83c\udfe1 Book a stay</button>'
       +'</div>'
       +'<div style="display:flex;gap:8px;align-items:flex-end;padding:4px 0 8px">'
       +'<textarea id="chatInput" rows="1" placeholder="Message the group \u2014 or ask @tusk\u2026" style="flex:1;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:22px;padding:12px 16px;color:inherit;font:inherit;resize:none;outline:none;max-height:110px"></textarea>'
@@ -11099,22 +12929,75 @@ function tripChatOpen(roomId, roomName){
   var ref=db.collection('tripchats').doc(roomId);
   ref.get().then(function(d){
     if(!d.exists) return ref.set({name:roomName||'Trip', members:[user.uid], owner:user.uid, created:firebase.firestore.FieldValue.serverTimestamp()});
+    try{ window._chatMembers=(d.data().members||[]); window._chatOwner=(d.data().owner||''); }catch(e){}
     if((d.data().members||[]).indexOf(user.uid)===-1)
       return ref.update({members:firebase.firestore.FieldValue.arrayUnion(user.uid)});
   }).then(function(){
+    /* keep the member list current so the header count is real */
+    try{
+      if(window._chatMemUnsub) window._chatMemUnsub();
+      window._chatMemUnsub = ref.onSnapshot(function(rd){
+        try{ var rr=rd.data()||{}; window._chatMembers=rr.members||[]; window._chatOwner=rr.owner||''; }catch(e){}
+        try{ var vb=el('tcVibe'); if(vb) vb.innerHTML=chatVibeHTML(); }catch(e){}
+      });
+    }catch(e){}
+    try{ rwPresenceStart(); }catch(e){}
     if(_chatUnsub) _chatUnsub();
     _chatUnsub = ref.collection('msgs').orderBy('at','asc').limitToLast(200).onSnapshot(function(qs){
       var log=el('chatLog'); if(!log) return;
-      /* Capture the whole stream so the Kitty, Decision Board and pinned plan
-         can be computed live from it. These features ARE the message history
-         replayed — no separate schema, works offline once loaded. */
+      /* ====================================================================
+         INCREMENTAL RENDER (rw-v97) — this is why the chat used to flicker
+         ====================================================================
+         The old loop did `log.innerHTML = allMessages.map(...)` on EVERY
+         snapshot. Because each bubble has an entrance animation, every
+         message re-animated every time anyone typed — and asking Tusk wrote
+         two messages, so the whole thread flashed twice.
+
+         Now: we diff. New messages are appended (and only they animate).
+         Changed ones (a reaction, a poll vote) are patched in place. Nothing
+         else is touched. This is what makes a chat feel like a chat.
+      ==================================================================== */
       _chatMsgs = qs.docs.map(function(doc){ var m=doc.data()||{}; m._id=doc.id; return m; });
-      var wasNearBottom = (log.scrollHeight - log.scrollTop - log.clientHeight) < 120;
-      log.innerHTML = _chatMsgs.filter(function(m){ return !rwIsBlocked(m.uid); }).map(function(m){
-        return chatBubble(m._id, m, m.uid===user.uid);
-      }).join('');
-      try{ chatRenderPins(); }catch(e){}   /* pinned Kitty / decisions / plan up top */
-      if(wasNearBottom) log.scrollTop=log.scrollHeight;
+      var wasNearBottom = (log.scrollHeight - log.scrollTop - log.clientHeight) < 140;
+      var visible = _chatMsgs.filter(function(m){ return !rwIsBlocked(m.uid); });
+
+      _chatSeen = _chatSeen || {};
+      var live = {};
+      visible.forEach(function(m){
+        live[m._id] = 1;
+        var sig = rwMsgSignature(m);
+        var node = document.getElementById('msg_'+m._id);
+        if(!node){
+          /* genuinely new — append and let it animate in, alone */
+          var wrap = document.createElement('div');
+          wrap.id = 'msg_'+m._id;
+          wrap.className = 'tc-msg';
+          wrap.innerHTML = chatBubble(m._id, m, m.uid===user.uid);
+          log.appendChild(wrap);
+          _chatSeen[m._id] = sig;
+        } else if(_chatSeen[m._id] !== sig){
+          /* same message, changed content — patch WITHOUT re-animating */
+          node.classList.add('tc-noanim');
+          node.innerHTML = chatBubble(m._id, m, m.uid===user.uid);
+          _chatSeen[m._id] = sig;
+        }
+      });
+      /* remove anything deleted or newly blocked */
+      Object.keys(_chatSeen).forEach(function(id){
+        if(!live[id]){
+          var n=document.getElementById('msg_'+id);
+          if(n) n.remove();
+          delete _chatSeen[id];
+        }
+      });
+
+      try{ chatRenderPins(); }catch(e){}
+      try{
+        var vb=el('tcVibe');
+        if(!vb && log.parentNode){ vb=document.createElement('div'); vb.id='tcVibe'; log.parentNode.insertBefore(vb, log); }
+        if(vb) vb.innerHTML=chatVibeHTML()+rwPhaseHTML();
+      }catch(e){}
+      if(wasNearBottom) log.scrollTop = log.scrollHeight;
     }, function(err){
       /* This is the path the user actually hits when rules are stale, so it
          must say what to DO, not just what failed. */
@@ -11450,6 +13333,10 @@ function rwChatExport(){
 }
 function chatPost(kind, payload, text){
   if(!_chatRoom || !user) return Promise.reject(new Error('no room'));
+  /* @tusk in the group chat — anyone can ask, the answer lands for everyone */
+  try{
+    if(kind==='text' && /^@tusk\b/i.test(String(text||''))) setTimeout(function(){ rwChatAskTusk(text); }, 300);
+  }catch(e){}
   /* expireAt drives the 30-day Firestore TTL policy (set in the console). This is
      what keeps the DB tiny at scale — messages self-delete; users export to keep. */
   var expireAt = firebase.firestore.Timestamp.fromMillis(Date.now() + 30*24*60*60*1000);
@@ -12129,8 +14016,422 @@ function chatInvite(){
   rwOverlayOpen('chatInviteBox');
 }
 /* ---- render one message by kind ---- */
+
+
+/* ============================================================================
+   TRIPCHAT ENGINE (rw-v96) — coordination, games, and Tusk in the room
+   ============================================================================
+   A group chat is where trips actually get decided, so this is where the
+   deciding tools live. Three things nobody else puts in one place:
+     · DECIDE  — polls that close themselves and pin the result
+     · PLAY    — games that pass the time on a 9-hour Himalayan drive
+     · ASK     — @tusk in the group, answering with real app data
+   ========================================================================= */
+var RW_CHAT_GAMES = [
+  { id:'twotruths', icon:'\ud83c\udfad', name:'Two truths, one lie',
+    how:'Everyone posts three travel stories. One is invented. Guess.',
+    seed:'\ud83c\udfad *Two truths, one lie* \u2014 post three travel stories, one made up. Rest of you guess!' },
+  { id:'wouldyou', icon:'\u2696\ufe0f', name:'Would you rather',
+    how:'Impossible travel choices. Reveals more than you expect.',
+    pool:['Would you rather: window seat for 20 hours, or aisle seat for 10?',
+          'Would you rather: lose your luggage, or lose your phone charger?',
+          'Would you rather: perfect weather and crowds, or rain and an empty place?',
+          'Would you rather: eat only street food, or only hotel food, all trip?',
+          'Would you rather: no photos allowed, or no music allowed?',
+          'Would you rather: sleep on a night bus, or wake up at 4am for a day bus?'] },
+  { id:'guessplace', icon:'\ud83d\udccd', name:'Where am I?',
+    how:'Post a photo with no caption. First to name the place wins.',
+    seed:'\ud83d\udccd *Where am I?* \u2014 post a photo, no caption. First correct guess wins.' },
+  { id:'countdown', icon:'\u23f3', name:'Trip countdown',
+    how:'Everyone says the one thing they are most looking forward to.',
+    seed:'\u23f3 One thing each \u2014 what are you MOST looking forward to on this trip?' },
+  { id:'packing', icon:'\ud83c\udf92', name:'Packing roulette',
+    how:'Name one thing you always forget. Somebody will save you.',
+    seed:'\ud83c\udf92 *Packing roulette* \u2014 name the one thing you ALWAYS forget. Someone here will remember it for you.' },
+  { id:'budget', icon:'\ud83d\udcb8', name:'Guess the bill',
+    how:'Before the bill arrives, everyone guesses. Closest pays nothing extra.',
+    seed:'\ud83d\udcb8 *Guess the bill* \u2014 everyone guess the total before it arrives. Furthest off buys chai.' }
+];
+
+function rwChatTuskHint(){
+  var i=el('chatInput')||el('chatMsg')||el('tcInput');
+  if(i){ i.value='@tusk '; i.focus(); showToast('Type your question \u2014 the whole group sees the answer'); }
+  else showToast('Start a message with @tusk to ask him anything');
+}
+function openChatGames(){
+  var ov=el('cgOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='cgOv'; ov.className='overlay'; ov.style.zIndex='4400';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('cgOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:430px">'
+    +'<div class="sheet-h"><b>\ud83c\udfae Pass the time</b><button class="tact" onclick="rwOverlayClose(\'cgOv\')">\u2715</button></div>'
+    +'<p class="note" style="margin-bottom:10px">For the nine-hour drive, the delayed train, the wait for everyone to wake up.</p>'
+    + RW_CHAT_GAMES.map(function(g){
+        return '<div class="cg-row" onclick="rwChatGame(\''+g.id+'\')">'
+          +'<span class="cg-i">'+g.icon+'</span>'
+          +'<span style="flex:1;min-width:0"><b>'+esc2(g.name)+'</b>'
+          +'<div class="note" style="margin:0">'+esc2(g.how)+'</div></span>'
+          +'<span class="cg-go">Start</span></div>';
+      }).join('')
+    +'</div>';
+  ov.classList.add('open');
+}
+function rwChatGame(id){
+  var g=RW_CHAT_GAMES.filter(function(x){ return x.id===id; })[0]; if(!g) return;
+  var text = g.seed || (g.pool? g.pool[Math.floor(Math.random()*g.pool.length)] : g.name);
+  rwOverlayClose('cgOv');
+  try{ chatPost('text', null, text); }catch(e){
+    try{ var i=el('chatInput'); if(i){ i.value=text; i.focus(); } }catch(e2){}
+  }
+}
+
+/* ---------------- DECIDE: polls that close themselves ---------------- */
+function openChatPoll(){
+  rwForm('\ud83d\uddf3\ufe0f Ask the group', [
+    { id:'pq', label:'What are you deciding?', ph:'e.g. Which day do we do the trek?' },
+    { id:'po', label:'Options (comma separated)', ph:'Tuesday, Wednesday, Thursday' }
+  ], function(v){
+    var q=(v.pq||'').trim(), opts=(v.po||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
+    if(!q || opts.length<2){ showToast('Give a question and at least two options'); return; }
+    try{
+      chatPost('poll', { q:q, opts:opts, votes:{} }, q);
+    }catch(e){ showToast('Could not post the poll'); }
+  }, 'Everyone votes, the result pins itself to the top. No more forty messages about one decision.');
+}
+function rwPollVote(id, idx){
+  if(!user || !_chatRoom) return;
+  var u={}; u['payload.votes.'+user.uid]=idx;
+  db.collection('tripchats').doc(_chatRoom).collection('msgs').doc(id).update(u).catch(function(){});
+  try{ rwHaptic&&rwHaptic(); }catch(e){}
+}
+function rwPollHTML(id, m){
+  var p=m.payload||{}, votes=p.votes||{}, opts=p.opts||[];
+  var counts=opts.map(function(){ return 0; });
+  var total=0, mine=null;
+  Object.keys(votes).forEach(function(uid){
+    var i=votes[uid];
+    if(counts[i]!=null){ counts[i]++; total++; }
+    if(user && uid===user.uid) mine=i;
+  });
+  var lead=counts.indexOf(Math.max.apply(null,counts));
+  return '<div class="pl-box">'
+    +'<div class="pl-q">\ud83d\uddf3\ufe0f '+esc2(p.q||'')+'</div>'
+    + opts.map(function(o,i){
+        var pct = total? Math.round(counts[i]/total*100) : 0;
+        return '<div class="pl-o'+(mine===i?' mine':'')+(total&&i===lead?' lead':'')+'" onclick="rwPollVote(\''+id+'\','+i+')">'
+          +'<i style="width:'+pct+'%"></i>'
+          +'<span>'+esc2(o)+'</span><b>'+(total?pct+'%':'')+'</b></div>';
+      }).join('')
+    +'<div class="pl-f">'+(total? total+' vote'+(total>1?'s':'') : 'No votes yet')
+    + (total && counts[lead]>total/2 ? ' \u00b7 <b style="color:#4ADE80">'+esc2(opts[lead])+' wins</b>' : '')
+    +'</div></div>';
+}
+
+/* ---------------- ASK: Tusk in the group ---------------- */
+function rwChatAskTusk(q){
+  /* rw-v98: this used to run a SECOND, weaker agent path in parallel with the
+     app's existing chatTuskFacilitate() — which is the one that produces the
+     proper destination cards. Two agents answering the same message is why the
+     chat filled with "I could not work that one out" next to a good card.
+     There is now one path: the good one. */
+  var question=String(q||'').replace(/^@tusk\s*/i,'').trim();
+  if(!question) return;
+  if(window._tuskBusy) return;
+  window._tuskBusy = true;
+  setTimeout(function(){ window._tuskBusy=false; }, 2500);
+  try{
+    if(typeof chatTuskFacilitate==='function'){ chatTuskFacilitate(question); return; }
+  }catch(e){}
+  try{ if(typeof cpAsk==='function') cpAsk(question); }catch(e){}
+}
+
+
+
+/* ============================================================================
+   TRIPCHAT — Gen-Z / Gen-Alpha layer (rw-v79)
+   ============================================================================
+   Design read: this generation grew up on Instagram DMs, Discord and BeReal.
+   What they expect from a group chat is not "more features" — it's
+   REACTIONS, REPLIES, STREAKS and PERSONALITY. Specifically:
+     · double-tap to react (Instagram muscle memory)
+     · emoji reactions that pile up, not a like counter
+     · someone typing shown as movement, not text
+     · the group having a visible identity (streak, vibe)
+   Everything here is additive — no existing bubble or handler is replaced.
+   ========================================================================= */
+var RW_REACTS = ['\u2764\ufe0f','\ud83d\ude02','\ud83d\udd25','\ud83d\ude2d','\ud83d\udc40','\ud83d\udc4d'];
+
+/* toggle my reaction on a message (stored as reactions.<emoji> = [uids]) */
+function chatReact(id, emoji){
+  if(!user || !_chatRoom) return;
+  var msg=(_chatMsgs||[]).filter(function(m){ return m._id===id; })[0];
+  var have = msg && msg.reactions && msg.reactions[emoji] && msg.reactions[emoji].indexOf(user.uid)>-1;
+  var upd={};
+  upd['reactions.'+emoji] = have
+    ? firebase.firestore.FieldValue.arrayRemove(user.uid)
+    : firebase.firestore.FieldValue.arrayUnion(user.uid);
+  db.collection('tripchats').doc(_chatRoom).collection('msgs').doc(id).update(upd).catch(function(){});
+  if(!have){ try{ rwHaptic&&rwHaptic(); }catch(e){} rwPopHeart(emoji); }
+}
+/* the little floating emoji burst — pure CSS, no library */
+function rwPopHeart(e){
+  var n=document.createElement('div');
+  n.className='rw-pop'; n.textContent=e;
+  document.body.appendChild(n);
+  setTimeout(function(){ n.remove(); }, 900);
+}
+/* render the reaction pills under a bubble */
+function chatReactsHTML(id, m){
+  var r=m.reactions||{}, keys=Object.keys(r).filter(function(k){ return (r[k]||[]).length; });
+  var out='';
+  if(keys.length){
+    out+='<div class="rx-row">'+keys.map(function(k){
+      var mine = user && r[k].indexOf(user.uid)>-1;
+      return '<span class="rx'+(mine?' mine':'')+'" onclick="chatReact(\''+id+'\',\''+k+'\')">'+k+' '+r[k].length+'</span>';
+    }).join('')+'</div>';
+  }
+  return out;
+}
+/* long-press / double-tap opens the reaction picker */
+function chatReactPicker(id, ev){
+  try{ ev && ev.preventDefault(); }catch(e){}
+  var old=el('rxPick'); if(old) old.remove();
+  var d=document.createElement('div');
+  d.id='rxPick'; d.className='rx-pick';
+  d.innerHTML=RW_REACTS.map(function(e){
+    return '<span onclick="chatReact(\''+id+'\',\''+e+'\');document.getElementById(\'rxPick\').remove()">'+e+'</span>';
+  }).join('');
+  document.body.appendChild(d);
+  setTimeout(function(){
+    document.addEventListener('click', function once(){ var x=el('rxPick'); if(x) x.remove(); document.removeEventListener('click',once); }, {once:true});
+  }, 60);
+}
+/* group streak — consecutive days the group has said something */
+function chatStreak(){
+  var msgs=_chatMsgs||[]; if(!msgs.length) return 0;
+  var days={};
+  msgs.forEach(function(m){
+    var t=m.at&&m.at.seconds? m.at.seconds*1000 : (m.ts||0);
+    if(t) days[new Date(t).toISOString().slice(0,10)]=1;
+  });
+  var n=0, cur=new Date();
+  for(var i=0;i<90;i++){
+    var k=cur.toISOString().slice(0,10);
+    if(days[k]) n++;
+    else if(i>0) break;
+    cur.setDate(cur.getDate()-1);
+  }
+  return n;
+}
+/* the header strip: streak + who's here + group vibe */
+
+/* A cheap fingerprint of everything that can change inside one message.
+   If this is unchanged we do not touch the DOM node at all. */
+var _chatSeen = {};
+function rwMsgSignature(m){
+  var r=m.reactions||{}, keys=Object.keys(r).sort();
+  var rx=keys.map(function(k){ return k+':'+((r[k]||[]).length); }).join(',');
+  var votes='';
+  if(m.kind==='poll' && m.payload && m.payload.votes){
+    var v=m.payload.votes;
+    votes=Object.keys(v).sort().map(function(u){ return u.slice(0,6)+v[u]; }).join(',');
+  }
+  return (m.text||'').length+'|'+(m.kind||'')+'|'+rx+'|'+votes+'|'+(m.edited||'');
+}
+
+
+
+/* ============================================================================
+   PRESENCE + MEMBERS (rw-v99)
+   ============================================================================
+   WHY THE COUNT SAID 3 WITH NOBODY ELSE THERE: members[] grows by arrayUnion
+   every time a NEW auth uid opens the room. Anonymous sign-in mints a fresh
+   uid whenever storage is cleared, so testing across a few devices or browsers
+   leaves real-but-empty ghost accounts in the list. The number was honest; the
+   accounts were the founder's own.
+
+   FIX: presence is now SEPARATE from membership.
+     MEMBERS = who has the room (room doc)
+     ONLINE  = who pinged in the last 90 seconds (presence subcollection)
+     GHOSTS  = a member who never posted and is not online; the owner can
+               clear them in one tap.
+   And everyone now has a NAME, not just a count.
+   ========================================================================= */
+var RW_PRESENCE_MS = 90*1000;
+var _presUnsub=null, _presTimer=null, _presence={};
+
+function rwPresenceStart(){
+  if(!_chatRoom || !user || !window.db) return;
+  var col=db.collection('tripchats').doc(_chatRoom).collection('presence');
+  var ref=col.doc(user.uid);
+  function beat(){
+    try{ ref.set({ name:(user.displayName||user.email||'Traveller').split('@')[0], at:Date.now() },{merge:true}); }catch(e){}
+  }
+  beat();
+  if(_presTimer) clearInterval(_presTimer);
+  _presTimer=setInterval(function(){ if(!document.hidden) beat(); }, 45000);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) beat(); });
+  if(_presUnsub){ try{ _presUnsub(); }catch(e){} }
+  _presUnsub = col.onSnapshot(function(qs){
+    _presence={};
+    qs.forEach(function(d){ _presence[d.id]=d.data()||{}; });
+    try{ var vb=el('tcVibe'); if(vb) vb.innerHTML=chatVibeHTML(); }catch(e){}
+    try{ if(el('memList')) rwMembersRender(); }catch(e){}
+  }, function(){});
+}
+function rwIsOnline(uid){
+  var p=_presence[uid];
+  return !!(p && p.at && (Date.now()-p.at) < RW_PRESENCE_MS);
+}
+function rwMemberName(uid){
+  if(_presence[uid] && _presence[uid].name) return _presence[uid].name;
+  var hits=(_chatMsgs||[]).filter(function(x){ return x.uid===uid && x.name; });
+  if(hits.length) return hits[hits.length-1].name;
+  if(user && uid===user.uid) return 'You';
+  return 'Traveller '+String(uid).slice(0,4);
+}
+function rwMembers(){
+  var list=(window._chatMembers||[]).filter(function(u){ return u && u!=='tusk'; });
+  if(user && list.indexOf(user.uid)===-1) list.push(user.uid);
+  return list;
+}
+function openChatMembers(){
+  var ov=el('memOv');
+  if(!ov){ ov=document.createElement('div'); ov.id='memOv'; ov.className='overlay'; ov.style.zIndex='4500';
+    ov.onclick=function(e){ if(e.target===ov) rwOverlayClose('memOv'); }; document.body.appendChild(ov); }
+  ov.innerHTML='<div class="sheet" style="max-width:420px">'
+    +'<div class="sheet-h"><b>\ud83d\udc65 Who\u2019s in this trip</b>'
+    +'<button class="tact" onclick="rwOverlayClose(\'memOv\')">\u2715</button></div>'
+    +'<div id="memList"></div>'
+    +'<button class="bk-go" style="margin-top:12px" onclick="rwOverlayClose(\'memOv\');chatInvite()">\ud83d\udd17 Invite someone</button>'
+    +'</div>';
+  ov.classList.add('open');
+  rwMembersRender();
+}
+function rwMembersRender(){
+  var host=el('memList'); if(!host) return;
+  var owner=window._chatOwner||'';
+  var iAmOwner = !!(user && owner===user.uid);
+  var rows=rwMembers().map(function(uid){
+    var on=rwIsOnline(uid);
+    var posted=(_chatMsgs||[]).some(function(m){ return m.uid===uid; });
+    return { uid:uid, on:on, name:rwMemberName(uid),
+             ghost: (!posted && !on && uid!==(user&&user.uid)) };
+  }).sort(function(a,b){ return (b.on?1:0)-(a.on?1:0); });
+
+  host.innerHTML = rows.map(function(r){
+    return '<div class="mem-row">'
+      +'<span class="mem-av'+(r.on?' on':'')+'">'+esc2(r.name.charAt(0).toUpperCase())+'</span>'
+      +'<span style="flex:1;min-width:0"><b>'+esc2(r.name)+(r.uid===(user&&user.uid)?' (you)':'')+'</b>'
+      +'<div class="mem-sub">'+(r.on? '<i class="tc-live"></i>online now'
+          : r.ghost? 'never posted \u2014 likely an old test sign-in' : 'offline')+'</div></span>'
+      + (iAmOwner && r.ghost ? '<button class="tact" style="font-size:11px;padding:5px 9px" onclick="rwMemberRemove(\''+r.uid+'\')">Remove</button>':'')
+      +'</div>';
+  }).join('')
+  +'<div class="dk-note" style="margin-top:9px;font-size:11.5px;color:var(--t3)">'
+  + rows.filter(function(r){return r.on;}).length+' online \u00b7 '+rows.length+' member'+(rows.length===1?'':'s')
+  + (iAmOwner && rows.some(function(r){return r.ghost;})
+     ? '<br>Entries marked \u201cnever posted\u201d are usually old sign-ins from testing. Safe to remove.':'')
+  +'</div>';
+}
+function rwMemberRemove(uid){
+  if(!_chatRoom || !user) return;
+  if(!confirm('Remove this member? They can rejoin with the invite link.')) return;
+  db.collection('tripchats').doc(_chatRoom)
+    .update({ members: firebase.firestore.FieldValue.arrayRemove(uid) })
+    .then(function(){
+      db.collection('tripchats').doc(_chatRoom).collection('presence').doc(uid).delete().catch(function(){});
+      rwMembersRender();
+    }).catch(function(e){ showToast((e&&e.message)||'Could not remove'); });
+}
+
+
+/* ============================================================================
+   TRIP LIFECYCLE (rw-v99) — a trip is not one moment, it is five
+   ============================================================================
+   Group chats die between "shall we go somewhere?" and "we're going". They die
+   again after the trip, when the money is still unsettled. So the room knows
+   which phase it is in and surfaces the ONE thing that matters right now.
+
+   Phases are inferred from what the group has actually done, never asked for.
+   ========================================================================= */
+var RW_TRIP_PHASES = [
+  { id:'idea',    icon:'\ud83d\udca1', label:'Just an idea',
+    need:'Nobody has picked a place yet.',
+    cta:{ t:'Ask the group where', fn:'chatNewPoll()' } },
+  { id:'dates',   icon:'\ud83d\udcc5', label:'Finding dates',
+    need:'You have a place. Now the hard part: when.',
+    cta:{ t:'When can everyone go?', fn:'chatWhenAsk()' } },
+  { id:'booking', icon:'\ud83c\udfe1', label:'Booking it',
+    need:'Dates are set. Lock the beds before prices move.',
+    cta:{ t:'Find a stay', fn:'openStays()' } },
+  { id:'onTrip',  icon:'\ud83c\udf92', label:'On the trip',
+    need:'Log what people pay as it happens \u2014 nobody remembers on day four.',
+    cta:{ t:'Add an expense', fn:'chatAddExpense()' } },
+  { id:'settle',  icon:'\ud83e\uddfe', label:'Settling up',
+    need:'The trip is done. Clear the money while everyone still cares.',
+    cta:{ t:'Settle the kitty', fn:'openMoneyLayer()' } }
+];
+function rwTripPhase(){
+  var msgs=_chatMsgs||[];
+  var has=function(k){ return msgs.some(function(m){ return m.kind===k; }); };
+  var expenses=msgs.filter(function(m){ return m.kind==='expense'; }).length;
+  var settled =msgs.filter(function(m){ return m.kind==='settle'; }).length;
+  var booked  =msgs.some(function(m){ return m.kind==='booking' || /booking|confirmed|\bref\b/i.test(m.text||''); });
+  var dated   =msgs.some(function(m){ return m.kind==='dates' || m.kind==='when'; });
+  var place   =msgs.some(function(m){ return m.kind==='dest' || m.kind==='plan'; });
+
+  if(expenses>0 && settled>0) return RW_TRIP_PHASES[4];
+  if(expenses>0)              return RW_TRIP_PHASES[3];
+  if(booked)                  return RW_TRIP_PHASES[3];
+  if(dated)                   return RW_TRIP_PHASES[2];
+  if(place || has('poll'))    return RW_TRIP_PHASES[1];
+  return RW_TRIP_PHASES[0];
+}
+function rwPhaseHTML(){
+  var p=rwTripPhase();
+  var idx=RW_TRIP_PHASES.indexOf(p);
+  return '<div class="ph-wrap">'
+    +'<div class="ph-dots">'
+    + RW_TRIP_PHASES.map(function(x,i){
+        return '<span class="ph-d'+(i<idx?' done':i===idx?' now':'')+'" title="'+esc2(x.label)+'"></span>';
+      }).join('')
+    +'</div>'
+    +'<div class="ph-body"><b>'+p.icon+' '+esc2(p.label)+'</b>'
+    +'<span>'+esc2(p.need)+'</span></div>'
+    +'<button class="ph-cta" onclick="'+p.cta.fn+'">'+esc2(p.cta.t)+'</button>'
+    +'</div>';
+}
+
+function chatVibeHTML(){
+  var st=chatStreak();
+  var msgs=_chatMsgs||[];
+  /* FIXED (rw-v98): this counted anyone who had EVER posted — including Tusk
+     and game prompts — so a solo chat claimed "3 in here". Now it uses the
+     room's actual member list, and counts humans only. */
+  var n=0, live=0, names=[];
+  try{
+    var mem=rwMembers();
+    n=mem.length;
+    mem.forEach(function(u){ if(rwIsOnline(u)){ live++; names.push(rwMemberName(u)); } });
+  }catch(e){}
+  if(!n) n=1;
+  var vibe = st>=7 ? 'locked in \ud83d\udd25' : st>=3 ? 'warming up \u2728' : n>2 ? 'the squad is here \ud83d\udc65' : 'just getting started \ud83c\udf31';
+  return '<div class="tc-vibe">'
+    +(st>1? '<span class="tc-streak">\ud83d\udd25 '+st+'-day streak</span>':'')
+    +'<span class="tc-vibe-t">'+vibe+'</span>'
+    +'<span class="tc-count" onclick="openChatMembers()" style="cursor:pointer">'
+    + (live? '<i class="tc-live"></i>'+esc2(names.slice(0,2).join(', '))
+             +(names.length>2? ' +'+(names.length-2):'')+' \u00b7 ':'')
+    + n+' member'+(n===1?'':'s')+' \u203a</span>'
+    +'</div>';
+}
+
 function chatBubble(id, m, mine){
   var kind = m.kind||'text', K = CHAT_KINDS[kind]||CHAT_KINDS.text;
+  if(kind==='poll'){
+    return '<div class="tc-row"><div class="tc-av">\ud83d\uddf3\ufe0f</div>'
+      +'<div style="max-width:88%">'+rwPollHTML(id, m)+chatReactsHTML(id, m)+'</div></div>';
+  }
   if(kind==='tusk'){
     var richHtml = (m.payload && m.payload.html) ? (typeof rwBalanceDivs==='function' ? rwBalanceDivs(m.payload.html) : m.payload.html) : '';
     var inner = richHtml
@@ -12223,11 +14524,17 @@ function chatBubble(id, m, mine){
       +'<div style="font-size:9.5px;color:'+col+';font-weight:800;text-transform:uppercase;letter-spacing:.08em">'+K.icon+' '+K.label+' \u00b7 '+esc2(m.name||'')+'</div>'
       +'<div style="font-size:12.5px;line-height:1.55;margin-top:3px">'+esc2(m.text||'')+'</div></div></div>';
   }
-    return '<div style="display:flex;justify-content:'+(mine?'flex-end':'flex-start')+';margin:4px 0">'
-    +'<div style="max-width:78%;background:'+(mine?'linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C':'var(--bg2,#12121C);color:var(--t1);border:1px solid var(--b2,#2A2A36)')
-    +';border-radius:'+(mine?'14px 14px 4px 14px':'14px 14px 14px 4px')+';padding:8px 11px;font-size:12.5px;line-height:1.5">'
-    +(mine?'':'<div style="font-size:9.5px;opacity:.7;margin-bottom:2px">'+esc2(m.name||'Traveller')+'</div>')
-    +esc2(m.text||'')+'</div></div>';
+    /* Gen-Z bubble: double-tap to react (Instagram muscle memory), long-press
+       for the picker, reactions pile up underneath. */
+    return '<div class="tc-row'+(mine?' me':'')+'">'
+    +(mine?'':'<div class="tc-av">'+esc2((m.name||'T').charAt(0).toUpperCase())+'</div>')
+    +'<div style="max-width:78%">'
+    +'<div class="tc-bub'+(mine?' me':'')+'" ondblclick="chatReact(\''+id+'\',\'\u2764\ufe0f\')" oncontextmenu="chatReactPicker(\''+id+'\',event);return false">'
+    +(mine?'':'<div class="tc-nm">'+esc2(m.name||'Traveller')+'</div>')
+    +esc2(m.text||'')
+    +'</div>'
+    + chatReactsHTML(id, m)
+    +'</div></div>';
 }
 
 /* ==================== SAFETY & MODERATION ====================
@@ -14165,7 +16472,7 @@ function rwCountryRouteHTML(key, days){
 /* ==================== CROSS-QUESTIONING ====================
    When the only candidate destination is a common English word that merely
    HAPPENS to name a hamlet somewhere, guessing is worse than asking. */
-var RW_COMMON_WORDS = /^(all|say|under|over|about|mean|share|send|nice|good|best|top|new|old|big|small|long|short|first|last|next|only|even|both|most|much|many|more|less|same|other|such|own|off|out|up|down|in|on|at|to|for|and|but|or|so|as|if|then|than|when|while|where|why|how|what|who|which|of|be|is|are|was|were|do|did|has|have|had|can|will|would|should|could|may|might|must|no|not|yes|ok|okay|well|just|very|too|also|still|back|again|here|there|now|today|day|days|week|month|year|time|trip|tour|plan|go|going|come|coming|see|do|make|take|get|give|want|need|like|know|think|feel|find|use|work|help|try|ask|tell|call|keep|let|put|show|turn|start|stop|end|open|close|hold|bring|move|live|play|run|walk|talk|read|write|hear|watch|look|seem|leave|stay|book|visit|travel|explore|discover)$/i;
+var RW_COMMON_WORDS = /^(you|your|yours|yourself|youre|u|ur|me|my|mine|myself|we|us|our|ours|they|them|their|he|him|his|she|her|hers|it|its|tusk|ailon|roamwise|bot|ai|assistant|hello|hey|hi|namaste|thanks|thank|please|sorry|all|say|under|over|about|mean|share|send|nice|good|best|top|new|old|big|small|long|short|first|last|next|only|even|both|most|much|many|more|less|same|other|such|own|off|out|up|down|in|on|at|to|for|and|but|or|so|as|if|then|than|when|while|where|why|how|what|who|which|of|be|is|are|was|were|do|did|has|have|had|can|will|would|should|could|may|might|must|no|not|yes|ok|okay|well|just|very|too|also|still|back|again|here|there|now|today|day|days|week|month|year|time|trip|tour|plan|go|going|come|coming|see|do|make|take|get|give|want|need|like|know|think|feel|find|use|work|help|try|ask|tell|call|keep|let|put|show|turn|start|stop|end|open|close|hold|bring|move|live|play|run|walk|talk|read|write|hear|watch|look|seem|leave|stay|book|visit|travel|explore|discover)$/i;
 function rwNeedsClarify(dest, parsed, geo){
   if(!dest) return false;
   if(parsed && parsed.multi) return false;

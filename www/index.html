@@ -217,7 +217,7 @@ body.shell{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 ::-webkit-scrollbar{width:9px;height:9px}
 ::-webkit-scrollbar-thumb{background:#23232E;border-radius:9px}
 ::-webkit-scrollbar-thumb:hover{background:#2E2E3C}
-.chat-tool{flex:0 0 auto;white-space:nowrap;font-size:12px;padding:7px 13px;border-radius:999px;border:1px solid var(--b2,#2A2A36);background:var(--bg3,#1A1A20);color:var(--t2,#C8C8D0);font-weight:600;cursor:pointer;transition:all .15s}
+.chat-tool{flex:0 0 auto;white-space:nowrap;font-size:13px;min-height:42px;padding:10px 16px;border-radius:999px;border:1px solid var(--b2,#2A2A36);background:var(--bg3,#1A1A20);color:var(--t2,#C8C8D0);font-weight:600;cursor:pointer;transition:border-color .16s,color .16s,transform .16s cubic-bezier(.34,1.56,.64,1)}.chat-tool:active{transform:scale(.94)}.chat-tool:first-child{border-color:rgba(232,186,108,.5);color:var(--gold,#E8BA6C);background:linear-gradient(150deg,rgba(232,186,108,.14),var(--bg3,#1A1A20));font-weight:800}
 .pin-row{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #chatFab{position:fixed;right:18px;bottom:88px;z-index:8000;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;font-size:24px;box-shadow:0 6px 20px rgba(232,186,108,.4);cursor:pointer;display:none;align-items:center;justify-content:center;animation:fabIn .25s ease}
 @keyframes fabIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
@@ -231,6 +231,16 @@ body.shell{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .tusk-more{display:block;width:100%;margin-top:6px;font-size:12px;font-weight:700;color:var(--gold,#E8BA6C);background:transparent;border:1px solid var(--b2,#2A2A36);border-radius:999px;padding:6px 0;cursor:pointer}
 .pin-body{margin-top:9px;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:12px;padding:11px 13px;max-height:22dvh;overflow-y:auto;animation:pinIn .18s ease}
 @keyframes pinIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+.tc-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ADE80;margin-right:5px;vertical-align:middle;animation:tcLive 1.8s ease-in-out infinite}
+@keyframes tcLive{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,.55)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(74,222,128,0)}}
+.tc-vibe{flex-wrap:nowrap;gap:10px}
+.tc-count{white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (min-width:900px){
+  #chatLog{padding:18px 24px!important}
+  .tc-bub{font-size:14px;padding:11px 15px}
+  .chat-tool{font-size:13.5px;min-height:44px}
+}
 .chat-tool:hover,.chat-tool:active{border-color:var(--gold,#E8BA6C);color:var(--gold,#E8BA6C)}
 </style>
 <style id="rwScale">
@@ -367,14 +377,14 @@ html{-webkit-text-size-adjust:100%}
 </section>
 <div class="hero-sky v v-home v-web-only"><div class="kumo" style="top:12%;left:4%"></div><div class="kumo k2" style="top:58%;right:6%"></div><div class="kumo k3" style="top:30%;right:22%"></div><div class="hero">
   <h1><span data-i18n="hero.title1">Escape the crowds.</span><br><em data-i18n="hero.title2">Discover your world.</em></h1>
-  <p data-i18n="hero.sub">The AI travel planner that works for any destination on Earth — smart itineraries, crowd heatmaps, real budget breakdowns and packing lists. No signup. No subscription. Pay once, yours forever.</p>
+  <p data-i18n="hero.sub">Plan a less crowded trip you can actually take — together. Honest travel times, real local prices, and a budget that survives contact with reality. Built AI-native in the Himalayas. Start without an account.</p>
   <div class="hero-btns">
     <button class="hero-btn hb-gold" data-i18n="hero.startFree" onclick="scrollTo(0,document.getElementById('app').offsetTop-10)">Start Planning &mdash; Free &rarr;</button>
     <button class="hero-btn hb-pm" onclick="openPay()" id="heroProBtn">Unlock Pro &mdash; &#8377;100</button>
   </div>
   <div class="trust-strip">
     <span class="trust-chip"><b>195+</b> countries covered</span>
-    <span class="trust-chip"><b>No signup</b> required</span>
+    <span class="trust-chip"><b>No account</b> needed to start</span>
     <span class="trust-chip"><b>One-time</b> pricing, no subscription</span>
     <span class="trust-chip shinobi-chip"><b>&#129399; Shinobi mode</b> crowd-dodging routes</span>
   </div>
@@ -388,13 +398,16 @@ html{-webkit-text-size-adjust:100%}
 
 <section class="v v-home" id="quickGrid" style="margin:4px 14px 8px">
   <div class="qg-wrap">
-    <button class="qg-tile rw-pulse" onclick="openBeacon()"><span class="qg-ic">📡</span><span class="qg-lbl">Beacon</span></button>
-    <button class="qg-tile" onclick="openRealms()"><span class="qg-ic">⚔️</span><span class="qg-lbl">Realms</span></button>
-    <button class="qg-tile" onclick="openArrival()"><span class="qg-ic">🚂</span><span class="qg-lbl">Arrival mode</span></button>
-    <button class="qg-tile" onclick="openPnrPaste()"><span class="qg-ic">🎫</span><span class="qg-lbl">Paste PNR</span></button>
-    <button class="qg-tile" onclick="openNearMe()"><span class="qg-ic">📍</span><span class="qg-lbl">Near me</span></button>
-    <button class="qg-tile" onclick="openMoneyLayer()"><span class="qg-ic">💰</span><span class="qg-lbl">Split money</span></button>
+    <!-- rw-v82: the FOUR things most people actually came to do. Everything
+         else moved behind "More" so home stays a decision, not a menu. -->
+    <button class="qg-tile qg-primary" onclick="openListing()"><span class="qg-ic">🏡</span><span class="qg-lbl">Stay &amp; do</span></button>
+    <button class="qg-tile qg-primary" onclick="openMoneyLayer()"><span class="qg-ic">💰</span><span class="qg-lbl">Split money</span></button>
+    <button class="qg-tile qg-primary" onclick="openNearMe()"><span class="qg-ic">📍</span><span class="qg-lbl">Near me</span></button>
+    <button class="qg-tile qg-primary" style="position:relative" onclick="openBooking()"><span class="qg-ic">🧳</span><span class="qg-lbl">Your trip</span><span id="rwBasketBadge">0</span></button>
+    <button class="qg-tile qg-primary" onclick="openExperiences()"><span class="qg-ic">✨</span><span class="qg-lbl">Experiences</span></button>
+    <button class="qg-tile qg-primary" onclick="openEvents()"><span class="qg-ic">📅</span><span class="qg-lbl">Events</span></button>
   </div>
+  <div class="qg-more"><button onclick="openDrawer()">Everything else · Beacon, Realms, Arrival mode, Treks &amp; more →</button></div>
 </section>
 
 <section class="brief v v-home" id="brief" style="display:none">
@@ -541,7 +554,7 @@ html{-webkit-text-size-adjust:100%}
 </section>
 
 <section class="xsec v v-explore" id="events">
-  <div class="xsec-head"><h2 class="xsec-title">&#127967;&#65039; Event <em>Radar</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
+  <div class="xsec-head"><h2 class="xsec-title">&#127760; World <em>moments</em></h2><button class="share-fab" onclick="shareApp('app')">&#128228; Share</button></div>
   <p class="xsec-sub">The world&rsquo;s biggest moments &mdash; World Cups, Olympics, launches, tours &mdash; turned into trip triggers with insider timing.</p>
   <div class="exp-grid" id="evtGrid"></div>
 </section>
@@ -750,7 +763,7 @@ html{-webkit-text-size-adjust:100%}
 <div class="dr-grp"><button class="dr-gh" onclick="drToggle(this)">✨ Discover<span class="chev">›</span></button><div class="dr-gb">
   <a class="dr-link" onclick="closeDrawer();scrollToId('exps')"><span class="ic">✨</span>Fresh Experiences</a>
   <a class="dr-link" onclick="closeDrawer();scrollToId('circuits')"><span class="ic">🏎️</span>Legendary Circuits</a>
-  <a class="dr-link" onclick="closeDrawer();scrollToId('events')"><span class="ic">🏟️</span>Event Radar</a>
+  <a class="dr-link" onclick="closeDrawer();openEvents('moments')"><span class="ic">🏟️</span>World moments</a>
   <a class="dr-link" onclick="closeDrawer();scrollToId('hubspoke')"><span class="ic">🇮🇳</span>Hub &amp; Spoke India</a>
   <a class="dr-link" onclick="closeDrawer();scrollToId('ev')"><span class="ic">⚡</span>EV Vault</a>
   <a class="dr-link" onclick="closeDrawer();scrollToId('basecamp')"><span class="ic">⛺</span>Basecamp</a>
@@ -766,6 +779,12 @@ html{-webkit-text-size-adjust:100%}
 <div class="dr-grp open"><button class="dr-gh" onclick="drToggle(this)">🧳 Travel tools<span class="dr-count">10</span><span class="chev">›</span></button><div class="dr-gb">
   <a class="dr-link" onclick="closeDrawer();openBeacon()"><span class="ic">📡</span>Beacon — who's nearby <span style="margin-left:auto;font-size:9px;background:#4ADE80;color:#0A0A0C;padding:1px 6px;border-radius:20px;font-weight:800">NEW</span></a>
   <a class="dr-link" onclick="closeDrawer();openTatkal()"><span class="ic">⚡</span>Tatkal prep</a>
+    <a class="dr-link" href="/partner/" target="_blank" rel="noopener"><span class="ic">🤝</span>Partner login</a>
+  <a class="dr-link" onclick="closeDrawer();openCompat()"><span class="ic">⚙️</span>My travel style <span style="margin-left:auto;font-size:9px;background:var(--gold,#E8BA6C);color:#0A0A0C;padding:1px 6px;border-radius:20px;font-weight:800">NEW</span></a>
+  <a class="dr-link" onclick="closeDrawer();openSOS()"><span class="ic">🆘</span>Stranded? Get help <span style="margin-left:auto;font-size:9px;background:#E0785B;color:#fff;padding:1px 6px;border-radius:20px;font-weight:800">OFFLINE</span></a>
+  <a class="dr-link" onclick="closeDrawer();openPartners()"><span class="ic">🤝</span>Stay &amp; do <span style="margin-left:auto;font-size:9px;background:var(--gold,#E8BA6C);color:#0A0A0C;padding:1px 6px;border-radius:20px;font-weight:800">NEW</span></a>
+  <a class="dr-link" onclick="closeDrawer();openEvents()"><span class="ic">📅</span>Event radar <span style="margin-left:auto;font-size:9px;background:var(--gold,#E8BA6C);color:#0A0A0C;padding:1px 6px;border-radius:20px;font-weight:800">NEW</span></a>
+  <a class="dr-link" onclick="closeDrawer();openPnrPaste()"><span class="ic">🎫</span>Paste PNR</a>
   <a class="dr-link" onclick="closeDrawer();openArrival()"><span class="ic">🚂</span>Arrival mode <span style="margin-left:auto;font-size:9px;background:var(--gold,#E8BA6C);color:#0A0A0C;padding:1px 6px;border-radius:20px;font-weight:800">NEW</span></a>
   <a class="dr-link" onclick="closeDrawer();openNearMe()"><span class="ic">📍</span>Near me</a>
   <a class="dr-link" onclick="closeDrawer();openFitnessStays()"><span class="ic">🏋️</span>Fitness-first stays</a>
@@ -861,6 +880,8 @@ html{-webkit-text-size-adjust:100%}
       <div id="emailPane">
         <input class="auth-inp" type="email" id="authEmail" placeholder="Email address" autocomplete="email">
         <input class="auth-inp" type="password" id="authPass" placeholder="Password (min 6 chars)" autocomplete="current-password">
+        <input class="auth-inp" type="text" id="authRefCode" placeholder="Referral code (optional)" autocapitalize="characters" oninput="rwRefLiveCheck()" style="text-transform:uppercase">
+        <div id="authRefMsg" style="font-size:11.5px;margin:-4px 0 8px;min-height:15px;color:var(--t3)"></div>
         <button class="rzp-main-btn" style="margin-top:2px" onclick="loginEmail()"><span id="authAction">Sign in</span></button>
         <div class="auth-sub" id="authToggleRow">New here? <a onclick="toggleAuthMode()">Create an account</a></div>
       </div>
@@ -1037,6 +1058,17 @@ html{-webkit-text-size-adjust:100%}
 
 
 <script src="rw-config.js"></script>
+<script src="events-data.js" defer></script>
+<script src="referral-data.js"></script>
+<script src="partners-data.js"></script>
+<script src="booking-data.js"></script>
+<script src="rooms-data.js"></script>
+<script src="experiences-data.js"></script>
+<script src="badges-data.js"></script>
+<script src="compat-data.js"></script>
+<script src="finance-data.js"></script>
+<script src="regions-data.js"></script>
+<script src="tusk-learned.js" onerror="void 0"></script>
 <script src="destination-photos.js" defer></script>
 <script src="tusk-data.js" defer></script>
 <script src="app.js" defer></script>
