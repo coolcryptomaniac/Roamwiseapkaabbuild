@@ -1,84 +1,170 @@
-name: Build RoamWise Android (APK + AAB)
+name: Build RoamWise Android (fresh APK + AAB)
+
 on:
   workflow_dispatch:
+  schedule:
+    # Sunday 09:00 IST / 03:30 UTC
+    - cron: '30 3 * * 0'
   push:
     branches: [ main ]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: roamwise-android-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SOURCE_REPO: coolcryptomaniac/roamwise
+  SOURCE_BRANCH: main
+  BASE_VERSION_CODE: 1000
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout Android build repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v4
-        with: { node-version: '24'
-         }
+      - name: Checkout latest RoamWise web app
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ env.SOURCE_BRANCH }}
+          path: source-roamwise
+          fetch-depth: 1
 
-      - uses: actions/setup-java@v5
-        with: { distribution: 'temurin', java-version: '21' }
+      - name: Refresh www from roamwise/main
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p www
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='node_modules/' \
+            --exclude='scripts/' \
+            --exclude='tests/' \
+            --exclude='test/' \
+            --exclude='firestore-rules-history/' \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            --exclude='*.rules' \
+            --exclude='*.zip' \
+            --exclude='*.apk' \
+            --exclude='*.aab' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='wrangler.toml' \
+            --exclude='worker.js' \
+            source-roamwise/ www/
+          SOURCE_SHA=$(git -C source-roamwise rev-parse HEAD)
+          printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s",\n  "syncedAtUtc": "%s"\n}\n' \
+            "$SOURCE_REPO" "$SOURCE_BRANCH" "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > www/roamwise-build-source.json
+          rm -rf source-roamwise
+          echo "Synced RoamWise web commit $SOURCE_SHA into www/"
+
+      - name: Persist refreshed www snapshot
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- www/; then
+            echo "www already matches latest RoamWise source."
+            exit 0
+          fi
+          git config user.name "roamwise-build-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add www/
+          git commit -m "chore: sync latest RoamWise web into Android [skip ci]"
+          git push origin HEAD:main
+
+      - name: Calculate monotonic Android version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION_CODE=$((BASE_VERSION_CODE + GITHUB_RUN_NUMBER))
+          VERSION_NAME="18.${GITHUB_RUN_NUMBER}.$(date -u +%Y%m%d)"
+          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+          echo "RoamWise Android versionName=$VERSION_NAME versionCode=$VERSION_CODE"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-
-      # ADD THESE THREE LINES: It creates a blank lockfile so npm ci doesn't crash
-      
-        
+        uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Add Android platform
-        run: npx cap add android || true
+      - name: Recreate Android platform
+        shell: bash
+        run: |
+          rm -rf android
+          npx cap add android
 
-      - name: Sync web assets into Android project
+      - name: Sync refreshed web assets into Android
         run: npx cap sync android
 
-      - name: Generate app icons & splash (real RoamWise icon, not placeholder)
+      - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
-      - name: Ensure Tailored RoamWise Permissions (Core App Mechanics Only)
+      - name: Ensure required Android permissions
+        shell: bash
         run: |
+          set -euo pipefail
           MANIFEST=android/app/src/main/AndroidManifest.xml
-          
           add_perm() {
-            local PERM=$1
-            grep -q "$PERM" $MANIFEST || \
-              sed -i "s#<application#<uses-permission android:name=\"android.permission.$PERM\"/>\n    <application#" $MANIFEST
+            local PERM="$1"
+            grep -q "android.permission.$PERM" "$MANIFEST" || \
+              sed -i "s#<application#<uses-permission android:name=\"android.permission.$PERM\"/>\n    <application#" "$MANIFEST"
           }
+          add_perm INTERNET
+          add_perm ACCESS_NETWORK_STATE
+          add_perm VIBRATE
+          add_perm POST_NOTIFICATIONS
+          add_perm ACCESS_FINE_LOCATION
+          add_perm ACCESS_COARSE_LOCATION
+          add_perm RECORD_AUDIO
+          add_perm CAMERA
+          grep -E "uses-permission" "$MANIFEST" || true
 
-          # Core Network, Notification & Operation Elements
-          add_perm "INTERNET"
-          add_perm "ACCESS_NETWORK_STATE"
-          add_perm "VIBRATE"
-          add_perm "POST_NOTIFICATIONS"
-
-          # Smart Features (Location & Voice Copilot Speech Engine)
-          add_perm "ACCESS_FINE_LOCATION"
-          add_perm "ACCESS_COARSE_LOCATION"
-          add_perm "RECORD_AUDIO"
-
-          # User Media & Journey Cards (Camera + Gallery Storage Links)
-          add_perm "CAMERA"
-          
-
-          echo "---- RoamWise Manifest Verification Complete ----"
-          grep -E "permission" $MANIFEST || true
-
-
-    
       - name: Decode signing keystore
-        run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > android/app/rw.keystore
-
-      - name: Configure signing
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
         run: |
-          cat >> android/app/build.gradle <<'GRADLE'
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" || { echo "KEYSTORE_B64 secret is missing"; exit 1; }
+          printf '%s' "$KEYSTORE_B64" | base64 -d > android/app/rw.keystore
+
+      - name: Configure release signing and version
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >> android/app/build.gradle <<GRADLE
 
           android {
-          compileSdk 36
+              compileSdk 36
               defaultConfig {
-              targetSdk 36
-              minSdk 24
-                  versionCode 92
-                  versionName "17.5"
+                  targetSdk 36
+                  minSdk 24
+                  versionCode ${VERSION_CODE}
+                  versionName "${VERSION_NAME}"
               }
               signingConfigs {
                   release {
@@ -96,20 +182,31 @@ jobs:
           }
           GRADLE
 
-      - name: Build signed APK (direct install)
-        run: cd android && ./gradlew assembleRelease
+      - name: Build signed APK and AAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon clean assembleRelease bundleRelease
 
-      - name: Build signed AAB (Play Store)
-        run: cd android && ./gradlew bundleRelease
+      - name: Verify build outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -lh android/app/build/outputs/apk/release/*.apk
+          ls -lh android/app/build/outputs/bundle/release/*.aab
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RoamWise-APK
+          name: RoamWise-${{ env.VERSION_NAME }}-APK
           path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: RoamWise-AAB
+          name: RoamWise-${{ env.VERSION_NAME }}-AAB
           path: android/app/build/outputs/bundle/release/*.aab
+          retention-days: 30
