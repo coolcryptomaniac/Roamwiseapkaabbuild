@@ -116,11 +116,217 @@ var DB = [
   tags:['offbeat','culture','nature'], cur:'INR', sym:'\u20b9', rate:1,
   local:'You need an Inner Line Permit and the drive from Naharlagun is long and rough. This is a place that does not perform for tourists \u2014 which is the point.' },
 
+/* ---------------------------------------------------------------------------
+   INDIA (rw-v112) \u2014 expansion. Eight India entries meant "Popular now" and its
+   sibling carousels ran dry after Goa/Manali/Jaipur \u2014 everything past that was
+   Bali and Kyoto again. These eighteen cover hills, beaches, deserts, heritage,
+   wildlife and high-altitude adventure, spread across the calendar so the
+   in-season and low-crowd rows actually have real India picks, not just
+   overflow from the international list.
+--------------------------------------------------------------------------- */
+{ id:'munnar', name:'Munnar', country:'India', region:'South Asia', lat:10.09, lon:77.06,
+  crowd:[68,55,48,58,70,28,20,18,24,40,58,92],
+  cost:{budget:103,mid:239,luxury:597},
+  brk:{flights:0,stay:103,food:48,act:48,misc:40},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,4], interests:['hills','tea','nature','honeymoon','photography'],
+  food:['Kerala sadya','Appam with stew','Malabar biryani','Banana chips'],
+  gems:['Top Station viewpoint at sunrise','Eravikulam National Park (Nilgiri tahr)','Anamudi peak trail','Attukad waterfalls'],
+  tags:['mountain','nature','honeymoon'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Tea garden views are free from the road \u2014 skip the paid "estate entry" gates near the highway. Eravikulam caps at 3,600 visitors a day; book ahead in season.' },
+
+{ id:'coorg', name:'Coorg', country:'India', region:'South Asia', lat:12.42, lon:75.74,
+  crowd:[55,48,40,50,58,22,18,16,22,38,55,78],
+  cost:{budget:1200,mid:2800,luxury:7000},
+  brk:{flights:0,stay:1200,food:550,act:550,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,3], interests:['coffee','hills','nature','waterfalls','wildlife'],
+  food:['Pandi curry (pork)','Kadambuttu','Coorg-style chicken curry','Estate filter coffee'],
+  gems:['Abbey Falls before the tour buses','Nagarhole tiger reserve safari','Chelavara waterfalls trek','Homestay coffee-picking mornings'],
+  tags:['mountain','nature','food'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Coffee-picking season is Nov-Jan \u2014 most homestays let you join for free if you ask. Roads flood fast in July-August; check conditions before driving in.' },
+
+{ id:'hampi', name:'Hampi', country:'India', region:'South Asia', lat:15.34, lon:76.46,
+  crowd:[62,58,45,32,20,14,16,18,24,42,60,72],
+  cost:{budget:900,mid:2200,luxury:5500},
+  brk:{flights:0,stay:800,food:500,act:500,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['heritage','ruins','rock climbing','cycling','photography'],
+  food:['Thali on a banana leaf','Jolada rotti','Filter coffee','Riverside cafe pancakes'],
+  gems:['Matanga Hill sunrise','Sunset from Hemakuta Hill','Coracle ride across the Tungabhadra','Boulder-hopping past the Vittala temple crowds'],
+  tags:['heritage','offbeat','photography'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'April to June hits 42C among bare boulders with zero shade \u2014 brutal. Rent a bicycle, not a scooter; many ruins sit across the river reachable only by coracle or footbridge.' },
+
+{ id:'pondicherry', name:'Pondicherry', country:'India', region:'South Asia', lat:11.94, lon:79.81,
+  crowd:[58,52,42,30,22,18,20,24,32,48,62,80],
+  cost:{budget:1200,mid:2600,luxury:6500},
+  brk:{flights:0,stay:1200,food:600,act:400,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['heritage','beach','cafes','yoga','architecture'],
+  food:['French-Tamil fusion','Fresh croissants','Filter coffee','Seafood on the promenade'],
+  gems:['Auroville Matrimandir at sunrise','Paradise Beach boat crossing','White Town lanes before 8am','Serenity Beach for surfing'],
+  tags:['heritage','beach','cafes'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'White Town parking is a nightmare after 10am \u2014 walk or cycle in instead. Auroville needs an online slot booking; the meditation hall itself is silent viewing only.' },
+
+{ id:'rann_kutch', name:'Rann of Kutch', country:'India', region:'South Asia', lat:23.89, lon:69.85,
+  crowd:[70,55,20,5,2,0,0,0,2,15,60,88],
+  cost:{budget:1500,mid:3500,luxury:8500},
+  brk:{flights:0,stay:1500,food:600,act:800,misc:600},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed for Indian citizens'},
+  bestM:[11,12,1,2], closedM:[6,7,8,9], interests:['desert','festival','photography','offbeat','culture'],
+  food:['Kutchi thali','Bajra rotla','Dabeli','Kutchi dabroti'],
+  gems:['Full moon night on the white salt','Kalo Dungar (Black Hill) sunset','Hodka village crafts walk','Banni grassland birdwatching'],
+  tags:['offbeat','desert','photography'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'The salt crust is only walkable Nov-Feb \u2014 monsoon floods the Rann completely and it stays underwater the rest of the year. Book Rann Utsav tents months ahead; Bhuj homestays are the budget alternative.' },
+
+{ id:'havelock', name:'Havelock Island', country:'India', region:'South Asia', lat:11.97, lon:92.98,
+  crowd:[55,50,40,32,22,10,8,10,16,28,48,68],
+  cost:{budget:1800,mid:4000,luxury:9500},
+  brk:{flights:0,stay:1800,food:800,act:800,misc:600},
+  visa:{type:'None',cost:'Domestic',days:0,note:'Foreign nationals need a Restricted Area Permit on arrival'},
+  bestM:[11,12,1,2,3], interests:['beach','diving','snorkeling','island','honeymoon'],
+  food:['Fresh grilled fish','Andaman crab curry','Coconut prawn curry','Local fruit platters'],
+  gems:['Elephant Beach snorkeling before the noon boats','Radhanagar Beach sunset','Kalapathar rocks at low tide','Night dive off the Havelock jetty'],
+  tags:['beach','diving','island'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Ferries from Port Blair sell out in season \u2014 book both legs the day you land. Cyclone season (Jun-Sep) can cancel ferries for days; build in buffer time if traveling then.' },
+
+{ id:'darjeeling', name:'Darjeeling', country:'India', region:'South Asia', lat:27.04, lon:88.26,
+  crowd:[45,42,55,68,72,35,25,22,30,52,58,70],
+  cost:{budget:1200,mid:2800,luxury:6800},
+  brk:{flights:0,stay:1200,food:550,act:550,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[3,4,5,10,11], interests:['tea','mountains','toy train','photography','trekking'],
+  food:['Momos','Thukpa','Darjeeling first-flush tea','Nepali-style thali'],
+  gems:['Tiger Hill sunrise over Kanchenjunga','Toy train up to Ghum','Tea estate walk at Happy Valley','Singalila ridge trek to Sandakphu'],
+  tags:['mountain','tea','photography'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Kanchenjunga shows up clearly only about 1 morning in 3 \u2014 plan on two sunrise attempts at Tiger Hill. Toy train joy-ride slots sell out; book that specifically, not just the full route.' },
+
+{ id:'gangtok', name:'Gangtok', country:'India', region:'South Asia', lat:27.34, lon:88.61,
+  crowd:[35,38,50,58,62,30,22,20,28,55,58,60],
+  cost:{budget:1300,mid:3000,luxury:7200},
+  brk:{flights:0,stay:1300,food:600,act:600,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'Inner Line Permit needed for Nathula/Tsomgo/Zuluk'},
+  bestM:[3,4,5,10,11], interests:['mountains','monasteries','adventure','photography','food'],
+  food:['Momos','Thukpa','Gundruk soup','Sikkimese pork curry'],
+  gems:['Tsomgo Lake at dawn before the tour convoy','Rumtek Monastery morning prayers','Zuluk\u2019s zigzag Silk Route road','Kanchenjunga view from Hanuman Tok'],
+  tags:['mountain','offbeat','culture'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Nathula and Tsomgo need permits arranged a day ahead through a registered agent \u2014 walk-ins get turned back. Roads shut without warning after landslides; keep a buffer day.' },
+
+{ id:'mcleodganj', name:'McLeodganj', country:'India', region:'South Asia', lat:32.24, lon:76.32,
+  crowd:[30,32,42,55,62,45,38,35,42,55,48,40],
+  cost:{budget:1000,mid:2400,luxury:5800},
+  brk:{flights:0,stay:900,food:500,act:500,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[3,4,5,9,10], interests:['spiritual','trekking','cafes','culture','yoga'],
+  food:['Tibetan momos','Thukpa','Israeli-Tibetan fusion cafes','Butter tea'],
+  gems:['Triund trek at sunrise','Dalai Lama Temple morning prayers','Bhagsu waterfall before the crowds','Naddi viewpoint for the Dhauladhar range'],
+  tags:['spiritual','trekking','offbeat'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Triund works as a day trek but staying overnight at the top for sunrise is worth the extra weight. July-August brings leeches and landslide-prone roads \u2014 not the best trekking window despite decent weather.' },
+
+{ id:'jaisalmer', name:'Jaisalmer', country:'India', region:'South Asia', lat:26.92, lon:70.91,
+  crowd:[70,62,45,25,12,8,10,14,22,45,68,85],
+  cost:{budget:1100,mid:2600,luxury:7000},
+  brk:{flights:0,stay:1000,food:550,act:600,misc:450},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[11,12,1,2], interests:['desert','heritage','camel safari','photography','culture'],
+  food:['Dal baati churma','Ker sangri','Rajasthani thali','Makhaniya lassi'],
+  gems:['Sam sand dunes at sunrise, before the sunset crowds','Kuldhara abandoned village','Desert National Park for the great Indian bustard','Bada Bagh cenotaphs at golden hour'],
+  tags:['desert','heritage','offbeat'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'April to June regularly crosses 45C in open desert \u2014 camel safaris go from uncomfortable to dangerous. Book overnight desert camps directly, not through street agents, to avoid bait-and-switch tents.' },
+
+{ id:'udaipur', name:'Udaipur', country:'India', region:'South Asia', lat:24.59, lon:73.71,
+  crowd:[68,60,48,35,25,20,22,26,32,52,68,88],
+  cost:{budget:1300,mid:3200,luxury:9000},
+  brk:{flights:0,stay:1300,food:600,act:700,misc:600},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['heritage','lakes','architecture','honeymoon','photography'],
+  food:['Dal baati churma','Laal maas','Mirchi bada','Gatte ki sabzi'],
+  gems:['Sunset boat ride on Lake Pichola','Monsoon Palace at dawn before the crowds','Bagore ki Haveli evening dance show','Jaisamand Lake day trip'],
+  tags:['heritage','lakes','honeymoon'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'April to June is brutally hot for a city built around walking between palaces. Lake levels vary a lot by year \u2014 check current levels before booking a "lake view" room.' },
+
+{ id:'mysore', name:'Mysore', country:'India', region:'South Asia', lat:12.30, lon:76.64,
+  crowd:[55,50,38,28,24,20,22,26,45,78,65,72],
+  cost:{budget:900,mid:2200,luxury:5500},
+  brk:{flights:0,stay:900,food:500,act:450,misc:350},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['heritage','palace','culture','food','shopping'],
+  food:['Mysore pak','Mysore masala dosa','Bisi bele bath','Filter coffee'],
+  gems:['Mysore Palace lit up on Sunday evening','Chamundi Hill steps at dawn','Devaraja Market spice tour','St. Philomena\u2019s Cathedral'],
+  tags:['heritage','culture','food'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Palace illumination only runs Sunday evenings and during Dasara \u2014 time your visit or you will miss the famous lights. Dasara (Sep-Oct) triples hotel prices; book two months ahead if traveling then.' },
+
+{ id:'wayanad', name:'Wayanad', country:'India', region:'South Asia', lat:11.69, lon:76.13,
+  crowd:[55,50,42,48,55,20,15,15,22,42,55,72],
+  cost:{budget:1200,mid:2800,luxury:6800},
+  brk:{flights:0,stay:1200,food:550,act:550,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,3], interests:['wildlife','nature','trekking','waterfalls','photography'],
+  food:['Kerala sadya','Wayanad bamboo rice','Kappa with fish curry','Estate black coffee'],
+  gems:['Edakkal Caves petroglyphs','Chembra Peak heart-shaped lake trek','Wayanad Wildlife Sanctuary night safari','Soochipara waterfalls'],
+  tags:['wildlife','nature','trekking'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Chembra Peak needs a forest-department permit and guide \u2014 walk-ins get turned away in peak season. Wildlife safaris fill up online days ahead; do not rely on showing up at the gate.' },
+
+{ id:'auli', name:'Auli', country:'India', region:'South Asia', lat:30.53, lon:79.57,
+  crowd:[65,60,35,25,20,15,10,10,15,25,35,70],
+  cost:{budget:1400,mid:3200,luxury:7500},
+  brk:{flights:0,stay:1300,food:600,act:800,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[12,1,2,4,5], interests:['skiing','snow','mountains','cable car','adventure'],
+  food:['Garhwali thali','Aloo ke gutke','Bhang ki chutney','Hot ginger tea at the ropeway station'],
+  gems:['Auli ropeway at sunrise before the ski crowds','Gorson Bugyal meadow trek','Nanda Devi viewpoint','Chhatra Kund frozen lake in winter'],
+  tags:['mountain','adventure','snow'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Skiing is only viable late December to early March with real snow \u2014 outside that window the slopes are just grass. The ropeway is the best cheap thrill even if you never ski.' },
+
+{ id:'kaziranga', name:'Kaziranga', country:'India', region:'South Asia', lat:26.58, lon:93.17,
+  crowd:[45,42,30,10,5,0,0,0,0,10,50,60],
+  cost:{budget:1500,mid:3200,luxury:7500},
+  brk:{flights:0,stay:1400,food:600,act:800,misc:400},
+  visa:{type:'None',cost:'Domestic',days:0,note:'Park closed mid-April to mid-October for monsoon flooding'},
+  bestM:[11,12,1,2,3], closedM:[5,6,7,8,9,10], interests:['wildlife','safari','birdwatching','nature','photography'],
+  food:['Assamese thali','Khar','Duck curry','Assam tea'],
+  gems:['Central Range jeep safari for one-horned rhinos','Elephant-back safari where available','Diphlu River birdwatching','Kaziranga orchid park'],
+  tags:['wildlife','nature','offbeat'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'The park is fully closed mid-April through mid-October \u2014 monsoon floods the grasslands and animals move to higher ground outside the reserve. Jeep permits sell out at dawn; book the previous evening at the range office.' },
+
+{ id:'khajuraho', name:'Khajuraho', country:'India', region:'South Asia', lat:24.83, lon:79.92,
+  crowd:[55,50,38,28,20,15,15,18,25,45,60,68],
+  cost:{budget:900,mid:2200,luxury:5800},
+  brk:{flights:0,stay:850,food:500,act:500,misc:350},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[10,11,12,1,2], interests:['heritage','temples','architecture','photography','culture'],
+  food:['Bundelkhandi thali','Poha','Kalakand sweets','Dal bafla'],
+  gems:['Western Group temples at opening time, before the buses','Sound and light show at the Western Group','Raneh Falls canyon','Panna Tiger Reserve day trip'],
+  tags:['heritage','architecture','offbeat'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Arrive at the Western Group gate at opening \u2014 by 10am tour buses from Jhansi flood the complex. The town itself is tiny; most travelers day-trip the Eastern and Southern temple groups by bicycle.' },
+
+{ id:'chopta', name:'Chopta', country:'India', region:'South Asia', lat:30.42, lon:79.17,
+  crowd:[15,15,30,50,60,25,10,8,15,40,35,20],
+  cost:{budget:900,mid:2000,luxury:4500},
+  brk:{flights:0,stay:800,food:450,act:450,misc:300},
+  visa:{type:'None',cost:'Domestic',days:0,note:'No permit needed'},
+  bestM:[4,5,9,10,11], interests:['trekking','mountains','camping','photography','offbeat'],
+  food:['Garhwali dal','Maggi at the trailhead dhabas','Bhatt ki churkani','Hot pahadi tea'],
+  gems:['Tungnath \u2014 the world\u2019s highest Shiva temple, at dawn','Chandrashila peak sunrise summit','Deoriatal lake reflecting Chaukhamba','Camping under a genuinely dark sky'],
+  tags:['mountain','trekking','offbeat'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Tungnath-Chandrashila works as a day hike but the summit sunrise needs a pre-dawn start from Chopta itself. Snow can close the trail December to March \u2014 it is not a year-round trek.' },
+
+{ id:'leh', name:'Leh', country:'India', region:'South Asia', lat:34.15, lon:77.58,
+  crowd:[2,2,3,10,45,75,85,80,55,20,5,2],
+  cost:{budget:1600,mid:3500,luxury:8000},
+  brk:{flights:0,stay:1400,food:700,act:900,misc:500},
+  visa:{type:'None',cost:'Domestic',days:0,note:'Inner Line Permit needed for Nubra, Pangong, Tso Moriri'},
+  bestM:[6,7,8,9], interests:['mountains','adventure','monasteries','photography','biking'],
+  food:['Thukpa','Momos','Skyu','Butter tea','Apricot everything'],
+  gems:['Pangong Lake at sunrise before the day-trippers','Magnetic Hill viewpoint','Nubra Valley dunes on a Bactrian camel','Khardung La summit at dawn for empty roads'],
+  tags:['mountain','adventure','offbeat'], cur:'INR', sym:'\u20b9', rate:1,
+  local:'Take a mandatory acclimatization day doing nothing on arrival \u2014 altitude sickness above 3,500m is not optional to skip. The Manali-Leh highway opens only around June and shuts by October; fly in outside that window.' },
+
   {id:"chiang_mai",name:"Chiang Mai",country:"Thailand",region:"Southeast Asia",lat:18.79,lon:98.99,
    crowd:[45,50,55,40,28,22,25,28,22,32,55,68],
    cost:{budget:550,mid:950,luxury:2200},brk:{flights:280,stay:160,food:90,act:70,misc:50},
    visa:{type:"Free e-Visa",cost:"Free for Indians",days:30,note:"Apply at thaievisa.go.th before travel"},
-   bestM:[9,10,11],interests:["culture","temples","food","nature","trekking","wellness","photography"],
+   bestM:[10,11,12],interests:["culture","temples","food","nature","trekking","wellness","photography"],
    food:["Khao Soi","Pad Thai","Mango Sticky Rice","Som Tam","Larb"],
    gems:["Doi Inthanon National Park","Elephant Nature Park","Sunday Walking Street Wualai","Wat Umong"],
    tags:["budget","nature","culture","food","solo","couple","digital_nomad"],
@@ -132,7 +338,7 @@ var DB = [
    crowd:[55,60,58,50,35,30,75,78,40,45,55,62],
    cost:{budget:600,mid:1100,luxury:2500},brk:{flights:320,stay:200,food:100,act:80,misc:50},
    visa:{type:"Free Visa on Arrival",cost:"Free 30 days",days:30,note:"Extended to 60 days for free — check Imigrasi Indonesia"},
-   bestM:[4,5,8,9],interests:["culture","wellness","photography","nature","food","art","temples"],
+   bestM:[5,6,9,10],interests:["culture","wellness","photography","nature","food","art","temples"],
    food:["Nasi Goreng","Babi Guling","Bebek Betutu","Gado Gado","Ayam Betutu"],
    gems:["Tegallalang Rice Terraces","Campuhan Ridge Walk","Tirta Empul Temple","Pura Taman Saraswati"],
    tags:["wellness","culture","photography","couple","luxury"],
@@ -144,7 +350,7 @@ var DB = [
    crowd:[60,65,58,50,35,28,32,38,30,45,58,65],
    cost:{budget:450,mid:800,luxury:1800},brk:{flights:260,stay:130,food:70,act:60,misc:40},
    visa:{type:"E-Visa",cost:"$25 USD",days:90,note:"Apply at evisa.xuatnhapcanh.gov.vn — single entry 90 days"},
-   bestM:[1,2,3,9,10,11],interests:["history","culture","food","photography","beaches","cycling","tailoring"],
+   bestM:[2,3,4,10,11,12],interests:["history","culture","food","photography","beaches","cycling","tailoring"],
    food:["Cao Lau","White Rose Dumplings","Banh Mi","Mi Quang","Com Ga"],
    gems:["An Bang Beach","My Son Sanctuary","Tra Que Herb Village","Marble Mountains Da Nang","Cham Island snorkeling"],
    tags:["budget","history","food","solo","couple","photography"],
@@ -156,7 +362,7 @@ var DB = [
    crowd:[50,55,88,85,65,55,65,68,55,90,82,70],
    cost:{budget:1200,mid:2000,luxury:4000},brk:{flights:550,stay:400,food:280,act:200,misc:120},
    visa:{type:"E-Visa Required",cost:"Free (processing fee varies)",days:90,note:"Apply at Indian Consulate — takes 5-7 business days"},
-   bestM:[0,1,5,6,8],interests:["culture","temples","history","photography","food","nature","art"],
+   bestM:[1,2,6,7,9],interests:["culture","temples","history","photography","food","nature","art"],
    food:["Kaiseki","Yudofu","Matcha sweets","Kyoto-style ramen","Tofu dishes"],
    gems:["Fushimi Inari at 5am","Arashiyama bamboo grove at dawn","Philosopher's Path in autumn","Nishiki Market","Kurama Onsen"],
    tags:["culture","history","photography","couple","luxury"],
@@ -168,7 +374,7 @@ var DB = [
    crowd:[40,45,55,65,50,38,35,40,50,55,42,45],
    cost:{budget:700,mid:1200,luxury:2800},brk:{flights:380,stay:200,food:100,act:120,misc:80},
    visa:{type:"Visa Free",cost:"Free",days:90,note:"Indian passport holders get 90 days visa-free — NO visa needed!"},
-   bestM:[2,3,9,10,0,1],interests:["culture","history","food","souks","photography","architecture","desert"],
+   bestM:[3,4,10,11,1,2],interests:["culture","history","food","souks","photography","architecture","desert"],
    food:["Tagine","Couscous","Pastilla","Harira soup","Msemen","Mint tea"],
    gems:["Erg Chebbi Desert at sunset","Chefchaouen Blue City","Ourika Valley","Madrasa Ben Youssef","El Badi Palace ruins"],
    tags:["culture","food","photography","couple","solo","adventure"],
@@ -180,7 +386,7 @@ var DB = [
    crowd:[20,22,30,45,55,60,65,65,55,45,28,22],
    cost:{budget:600,mid:1000,luxury:2200},brk:{flights:350,stay:160,food:80,act:60,misc:40},
    visa:{type:"Visa Free",cost:"Free",days:365,note:"Indians get 365 days visa-free in Georgia — one year stay allowed!"},
-   bestM:[3,4,5,8,9],interests:["culture","wine","history","trekking","food","architecture","nightlife"],
+   bestM:[4,5,6,9,10],interests:["culture","wine","history","trekking","food","architecture","nightlife"],
    food:["Khinkali","Khachapuri","Mtsvadi","Lobiani","Georgian wine and chacha"],
    gems:["Kazbegi National Park Gergeti Trinity Church","Vardzia Cave Monastery","Sighnaghi Wine Town","Svaneti region","Mtskheta ancient capital"],
    tags:["budget","culture","wine","solo","couple","digital_nomad"],
@@ -192,7 +398,7 @@ var DB = [
    crowd:[35,38,55,70,60,55,65,68,62,55,40,35],
    cost:{budget:850,mid:1500,luxury:3200},brk:{flights:400,stay:280,food:120,act:180,misc:80},
    visa:{type:"E-Visa",cost:"$51 USD",days:90,note:"Apply at evisa.gov.tr — instant approval, valid 180 days"},
-   bestM:[3,4,8,9],interests:["photography","ballooning","history","caves","hiking","culture","wine"],
+   bestM:[4,5,9,10],interests:["photography","ballooning","history","caves","hiking","culture","wine"],
    food:["Testi Kebab","Manti Turkish dumplings","Baklava","Turkish breakfast","Gözleme"],
    gems:["Hot air balloon at sunrise","Ihlara Valley gorge hike","Underground city Derinkuyu","Rose Valley sunset hike","Local wine tasting Urgup"],
    tags:["photography","couple","luxury","culture","adventure"],
@@ -204,7 +410,7 @@ var DB = [
    crowd:[28,30,40,55,65,75,88,85,65,50,32,28],
    cost:{budget:1100,mid:1800,luxury:3500},brk:{flights:580,stay:280,food:140,act:120,misc:80},
    visa:{type:"Schengen Visa",cost:"~€80",days:90,note:"Apply at Portuguese Embassy or VFS Global India — 90 days in 180"},
-   bestM:[3,4,8,9,0,1],interests:["food","wine","history","architecture","culture","photography","beaches"],
+   bestM:[4,5,9,10,1,2],interests:["food","wine","history","architecture","culture","photography","beaches"],
    food:["Francesinha","Bacalhau","Pastel de nata","Porto wine","Tripas à moda do Porto"],
    gems:["Douro Valley wine country day trip","Livraria Lello bookshop","Fado music in Alfama","Sintra day trip from Lisbon","Costa Nova striped houses"],
    tags:["culture","food","wine","couple","history","photography"],
@@ -216,7 +422,7 @@ var DB = [
    crowd:[30,32,45,62,70,78,88,85,68,55,35,30],
    cost:{budget:1000,mid:1700,luxury:3500},brk:{flights:550,stay:260,food:130,act:110,misc:70},
    visa:{type:"Schengen Visa",cost:"~€80",days:90,note:"Czech Republic is in Schengen — apply at Embassy in India"},
-   bestM:[3,4,9,10,0,1],interests:["history","architecture","food","beer","culture","photography","Christmas markets"],
+   bestM:[4,5,10,11,1,2],interests:["history","architecture","food","beer","culture","photography","Christmas markets"],
    food:["Svíčková beef","Trdelník","Czech goulash","Pilsner beer","Smažený sýr"],
    gems:["Prague Castle at dawn","Charles Bridge before 7am","Český Krumlov day trip","Josefov Jewish Quarter","Vinohrady local neighborhood"],
    tags:["culture","history","beer","couple","budget","photography"],
@@ -228,7 +434,7 @@ var DB = [
    crowd:[45,40,35,38,55,50,65,62,45,48,50,52],
    cost:{budget:800,mid:1400,luxury:2800},brk:{flights:650,stay:180,food:80,act:200,misc:90},
    visa:{type:"Visa Free",cost:"Free",days:183,note:"Indian passport holders get 183 days visa-free in Peru!"},
-   bestM:[5,6,7,8],interests:["history","trekking","adventure","culture","photography","ruins","nature"],
+   bestM:[6,7,8,9],interests:["history","trekking","adventure","culture","photography","ruins","nature"],
    food:["Ceviche","Lomo Saltado","Cuy roasted guinea pig","Chicha morada","Quinoa soup"],
    gems:["Machu Picchu at sunrise","Rainbow Mountain","Huacachina desert oasis","Lake Titicaca","Sacred Valley Pisac market"],
    tags:["adventure","history","trekking","solo","photography"],
@@ -240,7 +446,7 @@ var DB = [
    crowd:[38,40,45,52,42,38,40,38,42,48,40,38],
    cost:{budget:700,mid:1200,luxury:2400},brk:{flights:600,stay:150,food:70,act:80,misc:50},
    visa:{type:"Visa Free",cost:"Free",days:90,note:"Colombian tourist card issued on arrival — 90 days free"},
-   bestM:[0,1,2,7,8,9],interests:["culture","food","nightlife","nature","coffee","paragliding","art"],
+   bestM:[1,2,3,8,9,10],interests:["culture","food","nightlife","nature","coffee","paragliding","art"],
    food:["Bandeja Paisa","Arepas","Sancocho","Colombian coffee","Empanadas","Horchata"],
    gems:["Pablo Escobar tours (controversial)","Guatapé rock El Peñol","Coffee region Salento","Parque Arví cable car","El Poblado neighborhood"],
    tags:["culture","food","nightlife","solo","digital_nomad","couple"],
@@ -252,7 +458,7 @@ var DB = [
    crowd:[30,35,50,55,48,38,35,38,45,52,35,28],
    cost:{budget:1100,mid:1800,luxury:3500},brk:{flights:500,stay:250,food:130,act:180,misc:80},
    visa:{type:"Jordan Pass",cost:"$70 JOD (includes entry to Petra)",days:14,note:"Jordan Pass covers visa + Petra entry — buy at jordanpass.jo"},
-   bestM:[2,3,9,10,0,1],interests:["history","archaeology","desert","hiking","photography","culture","adventure"],
+   bestM:[3,4,10,11,1,2],interests:["history","archaeology","desert","hiking","photography","culture","adventure"],
    food:["Mansaf","Maqluba","Falafel and hummus","Knafeh","Bedouin tea"],
    gems:["Petra by Night candles ceremony","Little Petra","Wadi Rum desert camping","Dead Sea float","Jerash Roman ruins"],
    tags:["history","photography","couple","culture","adventure"],
@@ -264,7 +470,7 @@ var DB = [
    crowd:[35,38,55,45,30,25,30,28,30,45,52,40],
    cost:{budget:500,mid:900,luxury:2000},brk:{flights:220,stay:150,food:80,act:60,misc:40},
    visa:{type:"ETA Online",cost:"$20-50 USD",days:30,note:"Apply at eta.gov.lk — instant approval"},
-   bestM:[0,1,6,7,8,9],interests:["culture","tea","temples","wildlife","beaches","nature","trekking"],
+   bestM:[1,2,7,8,9,10],interests:["culture","tea","temples","wildlife","beaches","nature","trekking"],
    food:["Rice and curry","Kottu roti","Hoppers","String hoppers","Pol sambol","Ceylon tea"],
    gems:["Temple of the Tooth Relic ceremony","Sinharaja rainforest","Ella nine arch bridge","Yala wildlife safari","Mirissa whale watching"],
    tags:["budget","culture","nature","food","solo","couple"],
@@ -276,7 +482,7 @@ var DB = [
    crowd:[62,58,50,40,35,30,32,38,45,52,55,62],
    cost:{budget:2200,mid:3500,luxury:6000},brk:{flights:1100,stay:600,food:280,act:400,misc:150},
    visa:{type:"NZeTA",cost:"NZD 17 online",days:90,note:"Apply at immigration.govt.nz — New Zealand ETA for Indians"},
-   bestM:[5,6,7,8],interests:["adventure","skiing","bungee","nature","photography","wine","hiking"],
+   bestM:[6,7,8,9],interests:["adventure","skiing","bungee","nature","photography","wine","hiking"],
    food:["Hāngi Maori feast","Whitebait fritters","Green-lipped mussels","Hokey pokey ice cream","Pinot Noir Central Otago"],
    gems:["Milford Sound cruise","Routeburn Track hike","Fiordland National Park","Glenorchy Lord of the Rings","Cardrona ski resort"],
    tags:["adventure","nature","luxury","couple","skiing","photography"],
@@ -288,14 +494,184 @@ var DB = [
    crowd:[40,38,45,55,50,42,60,55,42,45,35,42],
    cost:{budget:700,mid:1200,luxury:2500},brk:{flights:680,stay:150,food:80,act:80,misc:50},
    visa:{type:"Tourist Card FMM",cost:"Free",days:180,note:"Free tourist card on arrival — no pre-visa needed for Indians!"},
-   bestM:[9,10,0,1,2],interests:["food","culture","art","mezcal","history","archaeology","textiles"],
+   bestM:[10,11,1,2,3],interests:["food","culture","art","mezcal","history","archaeology","textiles"],
    food:["Mole negro sauce","Tlayuda","Chapulines grasshoppers","Memelas","Mezcal","Tasajo"],
    gems:["Day of the Dead Dia de Muertos festival","Monte Albán Zapotec ruins","Hierve el Agua petrified waterfalls","Tule Tree","Etla Valley markets"],
    tags:["food","culture","solo","photography","art"],
    cur:"MXN",sym:"$",rate:17,local:{meal:"60-150 MXN",restaurant:"200-500 MXN",hotel:"600-1800 MXN",colectivo:"15 MXN",mezcal:"80-150 MXN"},
    photos:["oaxaca mexico monte alban ruins sunset","day of dead oaxaca mexico calavera","oaxaca colorful streets buildings","hierve agua petrified waterfalls oaxaca","oaxaca mole negro food market"],
-   yt:"Oaxaca Mexico travel guide food culture",wiki:"Oaxaca_City",flag:"MX"}
+   yt:"Oaxaca Mexico travel guide food culture",wiki:"Oaxaca_City",flag:"MX"},
+
+/* ---------------------------------------------------------------------------
+   EASY-VISA + MONSOON-COVERAGE expansion (rw-v129). The "Easy visa for Indians"
+   row was starving because most international entries carry visas that are
+   genuinely NOT low-friction (Schengen, Jordan Pass, multi-day e-Visas), and
+   "In season" was thin for Jun-Aug because almost every existing international
+   pick peaks in the Northern winter/spring. These eight are all destinations
+   Indian passport holders can enter with little to no visa friction, and most
+   of them are genuinely at their best during the monsoon months back home.
+--------------------------------------------------------------------------- */
+  {id:"pokhara",name:"Pokhara",country:"Nepal",region:"South Asia",lat:28.21,lon:83.99,
+   crowd:[45,50,65,70,45,20,15,15,35,90,95,55],
+   cost:{budget:450,mid:800,luxury:1800},brk:{flights:150,stay:220,food:120,act:150,misc:80},
+   visa:{type:"Visa Free",cost:"Free — no visa needed",days:0,note:"India-Nepal open border treaty: Indian nationals need no visa. For India-Nepal air travel specifically, carry a valid Indian passport OR an original Indian Voter ID — Aadhaar, PAN card and driving licence are NOT accepted."},
+   bestM:[10,11,3,4],interests:["trekking","mountains","lakes","paragliding","adventure"],
+   food:["Dal bhat","Newari khaja set","Momos","Sel roti","Gundruk soup"],
+   gems:["Sarangkot sunrise over the Annapurnas","World Peace Pagoda across Phewa Lake","Begnas Lake away from the tourist crowds","Mahendra Cave"],
+   tags:["mountain","adventure","budget"],
+   cur:"NPR",sym:"Rs",rate:133,local:{meal:"150-300 Rs",restaurant:"400-900 Rs",hotel:"800-2500 Rs",taxi:"200-400 Rs",sim:"300 Rs"},
+   photos:["pokhara phewa lake annapurna reflection","nepal pokhara paragliding sarangkot","annapurna base camp trek nepal","pokhara world peace pagoda sunset","nepal himalaya mountain range clear sky"],
+   yt:"Pokhara Nepal travel guide",wiki:"Pokhara",flag:"NP"},
+
+  {id:"paro_bhutan",name:"Paro",country:"Bhutan",region:"South Asia",lat:27.43,lon:89.42,
+   crowd:[25,30,55,70,50,20,15,15,45,75,60,30],
+   cost:{budget:2200,mid:3800,luxury:7000},brk:{flights:300,stay:900,food:300,act:500,misc:200},
+   visa:{type:"Permit on Arrival",cost:"No visa fee — Sustainable Development Fee ~₹1,200/day for Indians",days:0,note:"Indian nationals need no visa, just an online entry permit issued within a day, plus a daily Sustainable Development Fee that is far lower than the fee other nationalities pay."},
+   bestM:[3,4,5,9,10],interests:["monasteries","mountains","trekking","culture","festivals"],
+   food:["Ema datshi","Red rice","Momos","Suja butter tea","Kewa datshi"],
+   gems:["Tiger's Nest (Paro Taktsang) at dawn","Chele La Pass viewpoint","Punakha Dzong at the river confluence","Paro Tshechu masked-dance festival"],
+   tags:["mountain","culture","offbeat"],
+   cur:"BTN",sym:"Nu.",rate:83,local:{meal:"150-300 Nu.",restaurant:"400-800 Nu.",hotel:"1500-4000 Nu.",taxi:"300-600 Nu.",sdf:"~1200 Nu./day for Indians"},
+   photos:["tigers nest monastery bhutan paro","bhutan punakha dzong river","paro valley bhutan mountains","bhutan monk festival tshechu","bhutan prayer flags himalaya"],
+   yt:"Bhutan Paro Thimphu travel guide",wiki:"Paro,_Bhutan",flag:"BT"},
+
+  {id:"maldives_male",name:"Malé",country:"Maldives",region:"South Asia",lat:4.17,lon:73.51,
+   crowd:[85,80,70,55,40,35,35,38,40,45,60,90],
+   cost:{budget:2500,mid:4500,luxury:12000},brk:{flights:280,stay:1800,food:400,act:400,misc:200},
+   visa:{type:"Free Visa on Arrival",cost:"Free",days:30,note:"A 30-day free tourist visa is stamped on arrival for every nationality, including India — but all arriving travellers must submit the free IMUGA Traveller Declaration electronically within 96 hours before arrival."},
+   bestM:[11,12,1,2,3],interests:["beach","diving","snorkeling","honeymoon","island"],
+   food:["Mas huni","Garudhiya fish soup","Fihunu mas grilled fish","Bondibaiy","Rihaakuru"],
+   gems:["Local-island guesthouses instead of a private resort island","Sandbank picnic on a day trip","Manta ray point at Hanifaru Bay (seasonal)","Bioluminescent plankton beaches at night"],
+   tags:["beach","island","honeymoon","luxury"],
+   cur:"MVR",sym:"Rf",rate:15.4,local:{meal:"40-90 Rf",restaurant:"150-400 Rf",resort:"3000-15000 Rf",speedboat_transfer:"500-2500 Rf",sim:"150 Rf"},
+   photos:["maldives overwater villa turquoise lagoon","maldives male aerial atoll","maldives snorkeling coral reef","maldives sandbank picnic sunset","maldives local island beach"],
+   yt:"Maldives travel guide budget",wiki:"Maldives",flag:"MV"},
+
+  {id:"mauritius_pl",name:"Port Louis",country:"Mauritius",region:"East Africa",lat:-20.16,lon:57.50,
+   crowd:[42,38,32,38,42,55,72,75,58,50,45,78],
+   cost:{budget:1400,mid:2400,luxury:5500},brk:{flights:450,stay:600,food:250,act:250,misc:150},
+   visa:{type:"Visa Free",cost:"Free",days:60,note:"Indian passport holders get visa-free entry for up to 60 days — no application, just book and fly."},
+   bestM:[6,7,8,9],interests:["beach","hiking","wildlife","whale watching","watersports"],
+   food:["Dholl puri","Gateau piment","Rougaille","Mine frite","Alouda"],
+   gems:["Le Morne Brabant hike at dawn","Black River Gorges National Park trails","Chamarel seven-coloured earth","Whale and dolphin watching off Tamarin (Jul-Oct)"],
+   tags:["beach","nature","adventure"],
+   cur:"MUR",sym:"Rs",rate:46,local:{meal:"150-300 Rs",restaurant:"500-1200 Rs",hotel:"2000-6000 Rs",taxi:"300-600 Rs",sim:"250 Rs"},
+   photos:["mauritius le morne brabant beach","mauritius chamarel seven colored earth","mauritius black river gorges hike","mauritius whale watching tamarin","port louis mauritius aerial"],
+   yt:"Mauritius travel guide",wiki:"Mauritius",flag:"MU"},
+
+  {id:"seychelles_mahe",name:"Victoria",country:"Seychelles",region:"East Africa",lat:-4.62,lon:55.45,
+   crowd:[55,52,48,50,48,50,62,65,50,48,50,68],
+   cost:{budget:1800,mid:3200,luxury:7500},brk:{flights:500,stay:900,food:350,act:350,misc:150},
+   visa:{type:"Free Visa on Arrival",cost:"Free",days:30,note:"A free Visitor's Permit is issued on arrival to every nationality, including India — extendable up to 3 months total, no pre-visa needed."},
+   bestM:[6,7,8,9],interests:["beach","diving","snorkeling","nature","honeymoon"],
+   food:["Grilled red snapper","Octopus curry","Ladob banana","Bat curry (chauve-souris)","Kat kat banann"],
+   gems:["Anse Source d'Argent at opening time","Vallée de Mai palm forest (coco de mer)","La Digue by bicycle","Aldabra giant tortoise sanctuaries"],
+   tags:["beach","island","honeymoon","luxury"],
+   cur:"SCR",sym:"Rs",rate:13.5,local:{meal:"100-200 Rs",restaurant:"350-800 Rs",hotel:"2500-8000 Rs",taxi:"200-500 Rs",sim:"200 Rs"},
+   photos:["seychelles anse source dargent beach rocks","la digue seychelles bicycle","seychelles vallee de mai coco de mer","seychelles mahe island aerial","seychelles snorkeling clear water"],
+   yt:"Seychelles travel guide",wiki:"Seychelles",flag:"SC"},
+
+  {id:"perhentian_islands",name:"Perhentian Islands",country:"Malaysia",region:"Southeast Asia",lat:5.91,lon:102.73,
+   crowd:[0,0,25,35,45,60,85,90,55,40,0,0],
+   cost:{budget:600,mid:1100,luxury:2600},brk:{flights:300,stay:250,food:130,act:150,misc:80},
+   visa:{type:"Visa Free",cost:"Free",days:30,note:"Malaysia has granted Indian passport holders visa-free entry for up to 30 days since December 2023 (periodically extended) — no application needed."},
+   bestM:[6,7,8],closedM:[11,12,1,2],interests:["diving","snorkeling","beach","island","backpacking"],
+   food:["Nasi lemak","Char kway teow","Roti canai","Ais kacang","Grilled satay"],
+   gems:["Turtle Point night snorkel","Rainforest jungle-trek across the island","Coral Bay sunset","Shark Point reef dive (blacktip reef sharks)"],
+   tags:["beach","island","budget","adventure"],
+   cur:"MYR",sym:"RM",rate:4.7,local:{meal:"8-15 RM",restaurant:"25-60 RM",chalet:"60-150 RM",boat_transfer:"70-90 RM",sim:"30 RM"},
+   photos:["perhentian islands malaysia turquoise water","perhentian island snorkeling turtle","malaysia island beach jungle","perhentian kecil long beach sunset","malaysia coral reef diving"],
+   yt:"Perhentian Islands Malaysia travel guide",wiki:"Perhentian_Islands",flag:"MY"},
+
+  {id:"maasai_mara",name:"Maasai Mara",country:"Kenya",region:"East Africa",lat:-1.50,lon:35.14,
+   crowd:[52,55,28,22,25,52,82,88,78,58,32,58],
+   cost:{budget:1600,mid:3000,luxury:8000},brk:{flights:450,stay:1200,food:300,act:800,misc:200},
+   visa:{type:"eTA",cost:"$30 USD",days:90,note:"Kenya requires an Electronic Travel Authorization — apply online at etakenya.go.ke, typically approved in 2-3 business days (not instant, so plan ahead)."},
+   bestM:[7,8,9],interests:["wildlife","safari","photography","nature","birdwatching"],
+   food:["Nyama choma","Ugali","Sukuma wiki","Pilau","Kenyan chai"],
+   gems:["Great Migration river crossings at the Mara River (Jul-Sep)","Hot air balloon safari at sunrise","Maasai village cultural visit","Mara Triangle for lower crowds than the main reserve"],
+   tags:["wildlife","adventure","photography"],
+   cur:"KES",sym:"KSh",rate:129,local:{meal:"300-600 KSh",restaurant:"1000-2500 KSh",safari_lodge:"8000-25000 KSh",game_drive:"often included or 3000-6000 KSh",sim:"500 KSh"},
+   photos:["maasai mara great migration river crossing","kenya safari lion savanna","maasai mara hot air balloon sunrise","kenya wildebeest herd plains","maasai village kenya culture"],
+   yt:"Maasai Mara Kenya safari guide",wiki:"Maasai_Mara",flag:"KE"},
+
+  {id:"nadi_fiji",name:"Nadi",country:"Fiji",region:"Oceania",lat:-17.80,lon:177.42,
+   crowd:[45,42,40,45,55,65,78,78,65,55,45,60],
+   cost:{budget:2000,mid:3500,luxury:7500},brk:{flights:900,stay:900,food:300,act:300,misc:150},
+   visa:{type:"Visa Free",cost:"Free",days:120,note:"Indian nationals get visa-free entry to Fiji for up to 4 months — no visa needed, just an onward ticket and proof of funds."},
+   bestM:[6,7,8,9,10],interests:["beach","diving","island","watersports","honeymoon"],
+   food:["Kokoda (Fijian ceviche)","Lovo feast","Palusami","Fijian curry","Kava ceremony"],
+   gems:["Cloud 9 floating platform day trip","Mamanuca Islands hop by boat","Sabeto mud pools and hot springs","Sigatoka sand dunes"],
+   tags:["beach","island","honeymoon","adventure"],
+   cur:"FJD",sym:"FJ$",rate:2.25,local:{meal:"8-15 FJ$",restaurant:"25-50 FJ$",resort:"150-500 FJ$",boat_day_trip:"80-150 FJ$",sim:"30 FJ$"},
+   photos:["fiji nadi beach turquoise water","mamanuca islands fiji aerial","fiji kava ceremony tradition","fiji snorkeling coral reef","sigatoka sand dunes fiji"],
+   yt:"Fiji Nadi travel guide",wiki:"Nadi,_Fiji",flag:"FJ"}
 ];
+/* ==================== IATA LOOKUP (rw-v95) ====================
+   Skyscanner deep-links need real 3-letter airport codes, not free-text city
+   names. This is a compact, hand-checked lookup — every destination in DB
+   above, plus the major Indian cities travellers most often fly from — NOT
+   an exhaustive worldwide gazetteer. Where a place has no airport of its own
+   (hill towns, valleys) it maps to the nearest airport actually used to
+   reach it; where even that isn't confident enough to state as fact, the
+   place is deliberately left OUT of this table rather than guessed, so the
+   caller falls back to the always-correct Google Flights link instead of a
+   broken Skyscanner URL. Keys are lower-cased for lookup. */
+var RW_IATA = {
+  /* ---- India: DB destinations ---- */
+  'goa':'GOI', 'manali':'KUU', 'rishikesh':'DED', 'spiti valley':'KUU',
+  'alleppey':'COK', 'jaipur':'JAI', 'varanasi':'VNS', 'munnar':'COK',
+  'coorg':'IXE', 'hampi':'HBX', 'pondicherry':'PNY', 'rann of kutch':'BHJ',
+  'havelock island':'IXZ', 'darjeeling':'IXB', 'gangtok':'IXB',
+  'mcleodganj':'DHM', 'jaisalmer':'JSA', 'udaipur':'UDR', 'mysore':'MYQ',
+  'wayanad':'CCJ', 'auli':'DED', 'kaziranga':'JRH', 'khajuraho':'HJR',
+  'leh':'IXL',
+  /* ziro valley and chopta intentionally omitted — no airport within a
+     distance confident enough to call "the" airport for that place. */
+
+  /* ---- International: DB destinations ---- */
+  'chiang mai':'CNX', 'ubud':'DPS', 'hoi an':'DAD', 'kyoto':'KIX',
+  'marrakech':'RAK', 'tbilisi':'TBS', 'cappadocia':'NAV', 'porto':'OPO',
+  'prague':'PRG', 'cusco':'CUZ', 'medellín':'MDE', 'medellin':'MDE',
+  'petra':'AMM', 'kandy':'CMB', 'queenstown':'ZQN', 'oaxaca':'OAX',
+  'pokhara':'PKR', 'paro':'PBH', 'malé':'MLE', 'male':'MLE',
+  'port louis':'MRU', 'victoria':'SEZ', 'perhentian islands':'KBR',
+  'maasai mara':'NBO', 'nadi':'NAN',
+
+  /* ---- Major Indian cities (common trip origins) ---- */
+  'delhi':'DEL', 'new delhi':'DEL', 'mumbai':'BOM', 'bangalore':'BLR',
+  'bengaluru':'BLR', 'chennai':'MAA', 'kolkata':'CCU', 'hyderabad':'HYD',
+  'pune':'PNQ', 'ahmedabad':'AMD', 'kochi':'COK', 'cochin':'COK',
+  'lucknow':'LKO', 'chandigarh':'IXC', 'indore':'IDR', 'guwahati':'GAU',
+  'bhubaneswar':'BBI', 'amritsar':'ATQ', 'srinagar':'SXR', 'nagpur':'NAG',
+  'patna':'PAT'
+};
+/* Best-effort resolve: exact match, then match on the part before the first
+   comma (handles "Goa, India" style strings). Returns null — never a guess —
+   when nothing confident is found. */
+function rwIata(place){
+  if(!place) return null;
+  var k = String(place).trim().toLowerCase();
+  if(RW_IATA[k]) return RW_IATA[k];
+  var first = k.split(',')[0].trim();
+  if(RW_IATA[first]) return RW_IATA[first];
+  return null;
+}
+/* Builds a real Skyscanner route URL, or returns null if either end can't be
+   resolved to a real IATA code — callers MUST fall back to Google Flights
+   in that case rather than ever emitting a broken Skyscanner link. */
+function rwSkyscannerUrl(origin, dest){
+  var o = rwIata(origin), d = rwIata(dest);
+  if(!o || !d) return null;
+  return rwAffLink('skyscanner', 'https://www.skyscanner.co.in/transport/flights/'+o.toLowerCase()+'/'+d.toLowerCase()+'/');
+}
+/* Destination-only Skyscanner "flights to X" browse URL — needs just the
+   destination resolved, no origin. */
+function rwSkyscannerToUrl(dest){
+  var d = rwIata(dest);
+  if(!d) return null;
+  return rwAffLink('skyscanner', 'https://www.skyscanner.co.in/transport/flights-to/'+d.toLowerCase()+'/');
+}
 /* Static country reference data — zero network calls needed. */
 var COUNTRY_INFO = {
   'afghanistan':{iso:'AF',capital:'Kabul',currency:'Afghan Afghani',language:'Pashto, Dari'},
@@ -1553,20 +1929,27 @@ function openRoomBook(id){
   var r=rwRoomById(id); if(!r) return;
   var t=new Date(), inD=new Date(t.getTime()+86400000), outD=new Date(t.getTime()+2*86400000);
   var f=function(d){ return d.toISOString().slice(0,10); };
-  rwForm('\ud83c\udfe1 '+r.property, [
-    { id:'bk_in',    label:'Check in',  type:'date', value:f(inD) },
-    { id:'bk_out',   label:'Check out', type:'date', value:f(outD) },
-    { id:'bk_g',     label:'Guests',    type:'number', value:'2' },
-    { id:'bk_nm',    label:'Your name' },
-    { id:'bk_ph',    label:'Your phone', ph:'10-digit mobile' },
-    { id:'bk_note',  label:'Anything they should know', ph:'arrival time, food needs' }
-  ], function(v){
-    if(!v.bk_nm || !v.bk_ph){ showToast('Name and phone are needed to confirm'); return; }
+  /* rwForm reads out[field.key] and renders field.placeholder (see rwFormSubmit),
+     so these MUST use key:/placeholder:. They previously used id:/ph:, which made
+     every value read back undefined and the "Name and phone are needed" guard fire
+     on every submit. */
+  var bkFields=[
+    { key:'bk_in',    label:'Check in',  type:'date', value:f(inD) },
+    { key:'bk_out',   label:'Check out', type:'date', value:f(outD) },
+    { key:'bk_g',     label:'Guests',    type:'number', value:'2' },
+    { key:'bk_nm',    label:'Your name' },
+    { key:'bk_ph',    label:'Your phone', placeholder:'10-digit mobile' },
+    { key:'bk_note',  label:'Anything they should know', placeholder:'arrival time, food needs' }
+  ];
+  /* VIEWING-ONLY: no live booking partnerships are connected yet. */
+  bkFields._notice='\ud83d\udd0e Preview only \u2014 real booking isn\u2019t live yet (no partner hotels connected). This saves your interest; booking opens soon.';
+  rwForm('\ud83c\udfe1 '+r.property, bkFields, function(v){
+    if(!v.bk_nm || !v.bk_ph){ showToast('Name and phone are needed to save your interest'); return; }
     if(!/^\d{10}$/.test(String(v.bk_ph).replace(/\D/g,'').slice(-10))){ showToast('Enter a valid 10-digit mobile'); return; }
     var n=rwNights(v.bk_in, v.bk_out);
     rwBookPay(r, { inD:v.bk_in, outD:v.bk_out, nights:n, guests:+v.bk_g||2,
                    name:v.bk_nm, phone:v.bk_ph, note:v.bk_note||'' });
-  }, esc2(r.room)+' \u00b7 \u20b9'+r.price.toLocaleString('en-IN')+' per night');
+  });
 }
 
 /* ---------------- pay: UPI now, or at the property ---------------- */
@@ -1603,15 +1986,22 @@ function rwBookPay(r, b){
 function rwBookConfirm(mode){
   var P=window._pendingBooking; if(!P) return;
   var r=P.r, b=P.b, total=P.total, ref=P.ref;
-  var rec={ ref:ref, roomId:r.id, partnerId:r.partnerId, property:r.property,
+  var rec={ ref:ref, roomId:r.id, partnerUid:r.partnerId, guestUid:(user&&user.uid)||'',
+    property:r.property,
     room:r.room, zone:r.zone, area:r.area,
     checkIn:b.inD, checkOut:b.outD, nights:b.nights, guests:b.guests,
     guestName:b.name, guestPhone:b.phone, note:b.note,
     amount:total, payMode:(mode==='paid'?'upi':'at-property'),
+    /* commissionPct/commission are CLIENT DISPLAY ONLY. They are written for
+       the owner's WhatsApp receipt and the local record; the actual payable
+       commission MUST be recomputed and validated server-side at settlement.
+       Never trust these client-sent amounts for money movement. */
     commissionPct:8, commission:Math.round(total*0.08),
     status:(mode==='paid'?'paid-unverified':'confirmed-pay-later'),
     at:new Date().toISOString() };
-  try{ rec.ref_code=rwRefActive()||''; }catch(e){}
+  /* Attribution hint only, and stored via the canonical stored code. Sanitised
+     at capture (rwRefCapture) / entry (rwRefApply); server recomputes any payout. */
+  try{ rec.ref_code=rwSanitizeRefCode(rwRefActive()||''); }catch(e){}
   try{ if(window.db) db.collection('roomBookings').doc(ref).set(rec).catch(function(){}); }catch(e){}
   try{ lsSet('rw_last_booking', JSON.stringify(rec)); }catch(e){}
   rwOverlayClose('bkPayOv');
@@ -1640,7 +2030,7 @@ function rwBookDone(rec){
   rwPageOpen('booked', function(body){
     body.innerHTML='<div class="bkd-wrap">'
       +'<div class="bkd-tick">\u2713</div>'
-      +'<h2 class="bkd-h">Booking sent</h2>'
+      +'<h2 class="bkd-h">Interest saved</h2>'
       +'<div class="bkd-ref">'+esc2(rec.ref)+'</div>'
       +'<div class="bkd-card">'
       +'<div class="bk-sr"><span>Property</span><b>'+esc2(rec.property)+'</b></div>'
@@ -1650,8 +2040,8 @@ function rwBookDone(rec){
       +'<div class="bk-sr tot"><span>'+(rec.payMode==='upi'?'Paid':'Pay at property')+'</span><b>\u20b9'+rec.amount.toLocaleString('en-IN')+'</b></div>'
       +'</div>'
       +'<div class="bkd-next"><b>What happens now</b>'
-      +'<div>The property has your details on WhatsApp already.</div>'
-      +'<div>They confirm the room \u2014 usually within a few hours.</div>'
+      +'<div>\ud83d\udd0e This is a preview \u2014 real booking isn\u2019t live yet (no partner hotels are connected). We\u2019ve saved your interest, not a confirmed booking.</div>'
+      +'<div>Booking opens soon. We\u2019ll reach out on the number you entered when this property goes live.</div>'
       +'<div>Save your reference: <b>'+esc2(rec.ref)+'</b></div></div>'
       +'<button class="bk-go" onclick="rwBookShare()">\ud83d\udcac Send to the property again</button>'
       +'<button class="tact" style="width:100%;margin-top:8px;padding:12px" onclick="rwShareMyBooking()">\ud83d\udce4 Share this booking with my group</button>'
@@ -2006,6 +2396,11 @@ function rwBasketBadge(){
 }
 function rwBookTotal(b){ return b.reduce(function(a,x){ return a+(+x.price||0); },0); }
 function rwCommissionOn(b){
+  /* DISPLAY ONLY. This estimate is shown to the user for transparency; it must
+     never be treated as the real commission. The payable amount is recomputed
+     server-side (Cloud Function / admin at settlement) from the authoritative
+     per-category rate — a client can trivially edit x.price or the RW_BOOK_CATS
+     percentages, so nothing financial should trust this number. */
   var cats={}; (window.RW_BOOK_CATS||[]).forEach(function(c){ cats[c.id]=c.pct; });
   return b.reduce(function(a,x){ return a+((+x.price||0)*((cats[x.cat]||8)/100)); },0);
 }
@@ -2017,7 +2412,7 @@ function openBooking(){
     if(!b.length){
       html='<div class="bk-empty"><div style="font-size:46px">\ud83e\uddf3</div>'
         +'<b style="display:block;margin:10px 0 6px;font-size:16px">Your trip is empty</b>'
-        +'<span class="note">Add a stay, a guide, a driver or something to do \u2014 then send one request and we\u2019ll get it all confirmed.</span>'
+        +'<span class="note">Add a stay or an experience \u2014 then send one request and we\u2019ll get it all confirmed. (Guides, transport, food and celebrations bookings are coming soon.)</span>'
         +'<button class="tact" style="margin-top:14px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0A0A0C;border:none" onclick="rwPageClose();openPartners()">Browse stays &amp; experiences \u2192</button></div>';
     } else {
       html='<div class="bk-list">'+b.map(function(x){
@@ -2042,11 +2437,11 @@ function openBooking(){
 function rwBookRequest(){
   var b=rwBasket(); if(!b.length) return;
   rwForm('\ud83d\udce8 Send your trip request', [
-    { id:'bk_name',  label:'Your name' },
-    { id:'bk_phone', label:'Phone (partners reply here)' },
-    { id:'bk_dates', label:'Dates', ph:'e.g. 14-17 Sept' },
-    { id:'bk_people',label:'How many people', ph:'e.g. 4' },
-    { id:'bk_notes', label:'Anything they should know', ph:'dietary needs, arrival time, budget ceiling' }
+    { key:'bk_name',  label:'Your name' },
+    { key:'bk_phone', label:'Phone (partners reply here)' },
+    { key:'bk_dates', label:'Dates', placeholder:'e.g. 14-17 Sept' },
+    { key:'bk_people',label:'How many people', placeholder:'e.g. 4' },
+    { key:'bk_notes', label:'Anything they should know', placeholder:'dietary needs, arrival time, budget ceiling' }
   ], function(v){
     if(!v.bk_name || !v.bk_phone){ showToast('Name and phone are needed so partners can reply'); return; }
     var rec={ items:b, name:v.bk_name, phone:v.bk_phone, dates:v.bk_dates||'',
@@ -3053,6 +3448,13 @@ var RWPricing = (function(){
     /* The app's public launch date — the founder offer expires at whichever
        comes first: 1000 signups, or 365 days after this date. */
     LAUNCH_DATE: '2026-06-01',
+    /* FOUNDER OFFER: Rs 100 one-time = lifetime Pro, capped at 1000 members
+       (500 free NMIMS seats + 500 paid founders). Once the 1000-seat cap (or
+       the 365-day window) is hit, the founder offer closes permanently and the
+       STANDARD post-founder Pro pricing ladder below applies:
+         Daily Rs 19 / Weekly Rs 99 / Monthly Rs 299 / Quarterly Rs 749 /
+         Yearly Rs 2,499 (30% off Rs 299x12=Rs 3,588) / Lifetime Rs 14,999.
+       Longer duration = bigger discount, so per-day cost falls monotonically. */
     FOUNDER_OFFER: { priceINR:100, maxUsers:1000, maxDays:365, label:'Founder Pro \u2014 \u20b9100 lifetime' },
 
     /* Ongoing freemium tiers, once the founder offer window closes.
@@ -3064,7 +3466,7 @@ var RWPricing = (function(){
         features:['smartAI'] },
       { id:'plus',  label:'Plus',  priceMonthly:99,  priceYearly:999,
         features:['smartAI','proAI','pdfExport','cardStylesBasic'] },
-      { id:'pro',   label:'Pro',   priceMonthly:299, priceYearly:2999,
+      { id:'pro',   label:'Pro',   priceMonthly:299, priceYearly:2499,
         features:['smartAI','proAI','pdfExport','cardStylesBasic','cardStylesAll','adFree','squadsPost','unlimitedPdf'] },
       { id:'elite', label:'Elite', priceMonthly:499, priceYearly:4999,
         features:['smartAI','proAI','pdfExport','cardStylesBasic','cardStylesAll','adFree','squadsPost','unlimitedPdf','movieFree','earlyAccess','prioritySupport'] }
@@ -3082,17 +3484,43 @@ var RWPricing = (function(){
       { tier:'pro',   tierLabel:'Pro',   options:[
         { id:'pro_y3',   years:3,  priceINR:7499 },
         { id:'pro_y5',   years:5,  priceINR:9999 },
-        { id:'pro_y10',  years:10, priceINR:14999 } ] },
+        /* The Pro "longest one-time" is a true LIFETIME pass at Rs 14,999 — the
+           headline post-founder lifetime price. It replaces the old 10-year
+           pass so nothing longer/cheaper undercuts it. Rendered as "Lifetime"
+           via the optional `label`/`lifetime` fields (see renderPlanGrid). */
+        { id:'pro_life', years:99, lifetime:true, label:'Lifetime', priceINR:14999 } ] },
       { tier:'elite', tierLabel:'Elite', options:[
         { id:'elite_y3', years:3,  priceINR:12499 },
         { id:'elite_y5', years:5,  priceINR:17499 },
         { id:'elite_y10',years:10, priceINR:24999 } ] }
     ],
-    /* Short-term micro-passes for a single trip or a quick trial. */
+    /* Short-term Pro passes for a single trip or a quick trial. Priced on the
+       standard post-founder ladder — per-day cost falls as the window grows:
+       Day Rs 19 (Rs 19/day), Week Rs 99 (~Rs 14/day), 3-Month Rs 749
+       (~Rs 8/day). Monthly (Rs 299) and Yearly (Rs 2,499) live in TIERS.pro. */
     SHORT_TERM: [
-      { id:'day',  days:1, priceINR:15, label:'Day Pass' },
-      { id:'week', days:7, priceINR:29, label:'Week Pass' }
+      { id:'day',     days:1,  priceINR:19,  label:'Day Pass' },
+      { id:'week',    days:7,  priceINR:99,  label:'Week Pass' },
+      { id:'quarter', days:90, priceINR:749, label:'3-Month Pass' }
     ]
+  };
+
+  /* Short, human-readable display strings for every feature key used across
+     TIERS[*].features — kept here, next to TIERS, so a new feature key added
+     to a tier is a two-line change (the key + its label) instead of a key
+     that silently renders as nothing in the pay modal's feature checklist. */
+  var FEATURE_LABELS = {
+    smartAI:         'Smart AI itinerary builder',
+    proAI:           'Pro AI trip enhancement',
+    pdfExport:       'PDF export',
+    cardStylesBasic: 'Basic card styles',
+    cardStylesAll:   'All card styles',
+    adFree:          'Ad-free',
+    squadsPost:      'Post to Squads',
+    unlimitedPdf:    'Unlimited PDF exports',
+    movieFree:       'Free trip movie/reel',
+    earlyAccess:     'Early access to new features',
+    prioritySupport: 'Priority support'
   };
 
   function daysSinceLaunch(){ return (Date.now()-new Date(CONFIG.LAUNCH_DATE).getTime())/864e5; }
@@ -3147,6 +3575,7 @@ var RWPricing = (function(){
 
   return {
     CONFIG: CONFIG,
+    FEATURE_LABELS: FEATURE_LABELS,
     founderOfferOpen: founderOfferOpen,
     founderGateLoad: founderGateLoad,
     founderGate: function(){ return _founderGate; },
@@ -3157,6 +3586,46 @@ var RWPricing = (function(){
     yearlySavingsPct: yearlySavingsPct
   };
 })();
+
+/* ===== HONEST STATUS LABEL — the ONLY place a Pro/tier status is turned
+   into user-facing text. This exists because a client-side 7-day founder
+   trial (never written as pro:true in Firestore — see the trialUntil
+   comment near line 9382) used to render the exact same "Pro Active" badge
+   as a genuinely paid/granted account, which is actively misleading: a real
+   user saw "PRO ACTIVE" on-device while an admin panel correctly showed
+   them as FREE. This function computes the TRUE current state and returns a
+   distinct, never-ambiguous label for each one. It changes NOTHING about
+   feature gating — isPro / hasFeature() stay exactly as they were; this is
+   purely about what text gets shown. Every call site that used to hardcode
+   "Pro Active"/"PRO ACTIVE" must call this instead. */
+function rwStatusLabel(){
+  var trialUntil = parseInt(lsGet('rw_trial_until')||'0',10);
+  var trialActive = !!(trialUntil && trialUntil > Date.now());
+  var method = lsGet('rw_pro_method')||'';
+  var tierId = lsGet('rw_tier')||'';
+
+  if(trialActive){
+    var daysLeft = Math.max(1, Math.ceil((trialUntil-Date.now())/864e5));
+    return { code:'trial', text:'TRIAL · '+daysLeft+'d left',
+      sentence:'Your free founding-traveler trial is active — '+daysLeft+' day'+(daysLeft===1?'':'s')+' of Pro left' };
+  }
+  if(typeof isPro==='undefined' || !isPro){
+    return { code:'free', text:'FREE', sentence:'No active Pro entitlement — you’re on the Free plan' };
+  }
+  if(method==='partner'){
+    return { code:'partner', text:'PARTNER PASS',
+      sentence:'Your Partner Pass Pro is active — granted via a free partner/campaign code, not a purchase' };
+  }
+  if(tierId){
+    var t = (typeof RWPricing!=='undefined') ? RWPricing.tierById(tierId) : null;
+    var lbl = (t ? t.label : tierId).toUpperCase();
+    return { code:tierId, text:lbl, sentence:'Your '+lbl+' plan is active' };
+  }
+  /* isPro, but no rw_tier / partner method / active trial → legacy ₹100
+     lifetime founder-offer buyer, grandfathered to elite forever. */
+  return { code:'founder', text:'FOUNDER',
+    sentence:'Your lifetime Founder Pro (₹100 offer) is active' };
+}
 
 /* Country-code (ISO 3166-1 alpha-2) → continent, covering common countries.
    Used to compute a real "N/7 continents" stat instead of just counting
@@ -3387,7 +3856,8 @@ function refreshProUI(){
   isPro = lsGet('rwPro')==='1';
   var btn=el('proBtn'), bar=el('freeBar'), promo=el('promoBar');
   if(isPro){
-    if(btn){ btn.textContent='Pro Active'; btn.className='btn btn-pro active'; btn.onclick=function(){ showToast('Pro active on this device!'); }; }
+    var st=rwStatusLabel();
+    if(btn){ btn.textContent=st.text; btn.className='btn btn-pro active'; btn.onclick=function(){ showToast(st.sentence); }; }
     if(bar) bar.classList.add('hide');
     if(promo) promo.classList.add('hide');
   } else {
@@ -3495,15 +3965,39 @@ function renderForYou(){
   try{
     var live=activeEvents(), evCity=live.length? live[0].city:null;
     var curM=new Date().getMonth();
+    var isClosedNow=function(d){ return d.closedM && d.closedM.indexOf(curM+1)>-1; };
     var seedH=function(str){var x=0;for(var i=0;i<str.length;i++)x=(x*31+str.charCodeAt(i))>>>0;return (x+new Date().getDate())%97;};
     /* Month-aware: in-season (bestM) first, LIVE-event city pinned, daily-shuffled —
        genuinely different by season AND by day, and it scales as DB grows. */
-    var pool=(typeof DB!=='undefined'? DB:[]).slice();
+    var pool=(typeof DB!=='undefined'? DB:[]).slice()
+      .filter(function(d){ return !isClosedNow(d); });
     pool.sort(function(a,b){
       var ea=(evCity===a.name)?-200:0, eb=(evCity===b.name)?-200:0;
       var sa=((a.bestM||[]).indexOf(curM+1)>-1)?-100:0, sb=((b.bestM||[]).indexOf(curM+1)>-1)?-100:0;
       return (ea+sa+seedH(a.name))-(eb+sb+seedH(b.name)); });
-    var picks=pool.slice(0,6);
+    /* "In season" and "Easy visa" are specialty rows that starve fast if generic
+       rows (Popular-now, Low-crowd) get first pick of the shared pool \u2014 so they
+       claim their up-to-10 picks from the FULL pool first, and everything else
+       becomes filler for the generic rows via the shared `used` map. */
+    var EASY_VISA_TYPES={'visa free':1,'free e-visa':1,'free visa on arrival':1,'eta':1,'eta online':1,'nzeta':1,'tourist card fmm':1};
+    function isEasyVisaFor(d){
+      if(!d || d.country==='India' || !d.visa || d.visa.type==='None') return false;
+      var t=(d.visa.type||'').toLowerCase();
+      if(EASY_VISA_TYPES[t]) return true;
+      /* A plain "E-Visa"/"E-Visa Required" usually means a multi-day document-
+         upload process (Vietnam, Japan) \u2014 not low-friction. The one exception
+         is a country whose own visa note confirms genuinely instant/same-day
+         approval (Turkey's e-Visa is instant online). */
+      if(t==='e-visa' && /instant/i.test(d.visa.note||'')) return true;
+      return false;
+    }
+    var used={};
+    var inSeason=pool.filter(function(d){ return (d.bestM||[]).indexOf(curM+1)>-1; }).slice(0,10)
+      .map(function(d){ d._tag='\ud83c\udf1e'; used[d.name]=1; return d; });
+    var visaEasy=pool.filter(function(d){ return isEasyVisaFor(d) && !used[d.name]; }).slice(0,10)
+      .map(function(d){ d._tag='\ud83d\udec2'; used[d.name]=1; return d; });
+    var picks=pool.filter(function(d){ return !used[d.name]; }).slice(0,10);
+    picks.forEach(function(d){ used[d.name]=1; });
     var EMO={beach:'\ud83c\udfd6\ufe0f',metro:'\ud83c\udf06',sacred:'\ud83d\uded5',tech:'\ud83c\udf03',peak:'\ud83c\udfd4\ufe0f',classic:'\ud83e\udded'};
     var row=document.createElement('div');
     row.innerHTML='<div class="rowhead"><b>Popular now</b><a onclick="tabGo(\'explore\')">All \u2192</a></div><div class="prow">'
@@ -3531,14 +4025,12 @@ function renderForYou(){
         setTimeout(function(){ rwPaintPhotos(r, list); }, 900); /* stagger behind Popular-now's queue */
         return r;
       }
-      var used={}; picks.forEach(function(d){used[d.name]=1;});
-      var inSeason=pool.filter(function(d){ return (d.bestM||[]).indexOf(curM+1)>-1 && !used[d.name]; }).slice(0,6)
-        .map(function(d){ d._tag='\ud83c\udf1e'; used[d.name]=1; return d; });
-      var lowCrowd=pool.filter(function(d){ return d.crowd && !used[d.name]; })
-        .sort(function(a,b){ return a.crowd[curM]-b.crowd[curM]; }).slice(0,6)
+      /* inSeason and visaEasy were already carved out of the full pool above,
+         before Popular-now/picks ran \u2014 this row only needs the leftover-based
+         Low-crowd list; used{} already reflects inSeason+visaEasy+picks. */
+      var lowCrowd=pool.filter(function(d){ return d.crowd && !used[d.name] && !isClosedNow(d); })
+        .sort(function(a,b){ return a.crowd[curM]-b.crowd[curM]; }).slice(0,10)
         .map(function(d){ d._tag=d.crowd[curM]+'%'; used[d.name]=1; return d; });
-      var visaEasy=pool.filter(function(d){ return d.visa && /free|arrival/i.test(d.visa.type) && !used[d.name]; }).slice(0,6)
-        .map(function(d){ d._tag='\ud83d\udec2'; return d; });
       var hero=el('copilotHero'), after=hero;
       [miniRow('\ud83c\udf1e In season \u2014 '+MOx[curM], inSeason),
        miniRow('\ud83e\udd2b Low-crowd escapes this month', lowCrowd),
@@ -3885,8 +4377,9 @@ function musRender(mode){
 var ADSENSE_ID='ca-pub-4943859484482348'; /* live */
 var ADSENSE_SLOT=''; /* set in admin Config once you create an ad unit */
 var AFF_BOOKING=''; /* Booking.com affiliate aid (optional) */
-function stayUrl(place){ var u='https://www.booking.com/searchresults.html?ss='+encodeURIComponent(place);
-  if(AFF_BOOKING) u+='&aid='+AFF_BOOKING; return u; }
+function stayUrl(place){
+  return rwAffLink('booking', 'https://www.booking.com/searchresults.html?ss='+encodeURIComponent(place));
+}
 var WA_NUMBER='', WA_CHANNEL='', WA_GROUP='';
 (function(){
   /* AdSense loads on the WEBSITE ONLY — never inside the app WebView.
@@ -4085,7 +4578,7 @@ function reportSquad(id){
 
 /* ===== 60-SECOND AI KEY WIZARD ===== */
 var WIZ=[
- {p:'groq',n:'Groq (Llama 3.3 70B)',url:'https://console.groq.com/keys',why:'\u2705 No card ever \u00b7 fastest replies \u00b7 ~1,000 calls/day',ph:'gsk_\u2026',
+ {p:'groq',n:'Groq (auto-picks best model)',url:'https://console.groq.com/keys',why:'\u2705 No card ever \u00b7 fastest replies \u00b7 ~1,000 calls/day',ph:'gsk_\u2026',
   steps:['Sign up free (Google login works \u2014 no card asked)','Tap \u201cCreate API Key\u201d, give it any name','Copy it NOW \u2014 Groq shows it only once'],
   trouble:'Lost it? Just create another key \u2014 unlimited keys, still no card.'},
  {p:'cerebras',n:'Cerebras',url:'https://cloud.cerebras.ai',why:'\u2705 No card \u00b7 biggest daily volume (~1M tokens/day)',ph:'csk-\u2026',
@@ -4254,10 +4747,14 @@ function pdfPreviewHtml(){
   var t=(typeof DAY_TEMPLATES!=='undefined'&&DAY_TEMPLATES[0])||{title:'Arrival',morning:'Check in & wander',afternoon:'The icon sight',evening:'Local dinner',tip:'Get cash from a bank ATM'};
   var box=el('pdfPrev');
   box.style.display='';
+  /* This live preview is the one part of the download flow the user actually
+     SEES on-screen — the downloaded PDF itself can only be static colour, but
+     this box can carry the app's real animated gold gradient (same recipe as
+     .hero h1 em / .intro .it in app.css) so the flow still feels alive. */
   box.innerHTML=
-   '<div style="background:#0E1018;border:2px solid #C8913E;border-radius:10px;padding:18px;text-align:center;margin-bottom:8px">'
+   '<div style="background:#0C1020;border:2px solid #C8913E;border-radius:10px;padding:18px;text-align:center;margin-bottom:8px">'
    +'<div style="font-size:9px;letter-spacing:.2em;color:#8A8880">A ROAMWISE PREMIUM ITINERARY</div>'
-   +'<div style="font-family:Georgia,serif;font-weight:700;font-size:22px;color:#E8BA6C;margin:6px 0 2px">'+d.name.toUpperCase()+'</div>'
+   +'<div style="font-family:Georgia,serif;font-weight:700;font-size:22px;margin:6px 0 2px;background:linear-gradient(120deg,var(--gold2),var(--crim2),var(--pm2),#2AE8B8,var(--gold2));background-size:280% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 8s ease infinite">'+d.name.toUpperCase()+'</div>'
    +'<div style="font-size:11px;color:#EDEAE2">'+(d.country||'')+' \u00b7 '+Math.min(C.days||5,10)+' days \u00b7 '+(C.month||'')+'</div>'
    +'<div style="font-size:10px;color:#B8B4A8;margin-top:8px">crafted for</div>'
    +'<div style="font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:16px;color:#E8BA6C">'+nm+'</div>'
@@ -4361,13 +4858,18 @@ function gcode(q){
     .then(function(r){return r.json();}).then(function(d){ var h=d.results&&d.results[0];
       return h? {lat:h.latitude, lon:h.longitude} : null; }).catch(function(){return null;});
 }
+/* Colours pulled straight from the app's own palette (app.css :root) so a
+   downloaded itinerary reads as unmistakably RoamWise, not a generic PDF —
+   deep = one of the app's dark backgrounds (--bg/--bg2/--bg3), acc = one of
+   the app's five accent colours (--gold/--gold2/--teal/--pm/--crim/--crim2),
+   each used once so the six themes stay visually distinct. */
 var PDF_THEMES={
- beach:{deep:[10,42,56],acc:[32,178,170],line:'Sun, salt and slow mornings'},
- metro:{deep:[26,16,42],acc:[171,102,255],line:'Neon nights, skyline days'},
- sacred:{deep:[48,28,14],acc:[224,150,54],line:'Bells, rivers and quiet dawns'},
- tech:{deep:[8,22,38],acc:[64,156,255],line:'Glass towers, future streets'},
- peak:{deep:[16,22,36],acc:[136,116,190],line:'Thin air, tall silence'},
- classic:{deep:[14,16,24],acc:[200,145,62],line:'Old roads, new eyes'}};
+ beach:{deep:[12,16,32],acc:[22,191,150],line:'Sun, salt and slow mornings'},      /* --bg2, --teal */
+ metro:{deep:[7,9,15],acc:[155,89,245],line:'Neon nights, skyline days'},          /* --bg, --pm */
+ sacred:{deep:[18,24,40],acc:[200,145,62],line:'Bells, rivers and quiet dawns'},   /* --bg3, --gold */
+ tech:{deep:[7,9,15],acc:[234,90,80],line:'Glass towers, future streets'},         /* --bg, --crim2 */
+ peak:{deep:[18,24,40],acc:[196,48,43],line:'Thin air, tall silence'},             /* --bg3, --crim */
+ classic:{deep:[12,16,32],acc:[232,186,108],line:'Old roads, new eyes'}};          /* --bg2, --gold2 */
 function hueRGB(h,s,l){ s/=100; l/=100; var k=function(n){return (n+h/30)%12;},
   a=s*Math.min(l,1-l), f=function(n){return l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));};
   return [Math.round(255*f(0)),Math.round(255*f(8)),Math.round(255*f(4))]; }
@@ -4445,8 +4947,17 @@ function genPdf(sample){
       'Years from now, you will not remember every mile. You will remember how it felt.',
       'Adventure begins where the ordinary ends.',
       'Every journey ends. The stories never do.'];
-    var THT=themeFor(d), THK=THT.key, TH={deep:THT.deep, acc:THT.acc, line:THT.line};
-    var GOLD='#C8913E', GOLD2='#E8BA6C', CRIM='#C4302B', INK='#1A1A22', PAP='#F7F3EA', MUT='#6B675C', DARK='#0E1018';
+    /* Theme KEY still comes from the shared per-destination detector (used by
+       the homepage carousels too), but the PDF's actual colours are pinned to
+       PDF_THEMES — fixed, on-brand RGB rather than themeFor()'s per-destination
+       hash hue — so every downloaded itinerary carries real RoamWise colours. */
+    var THT=themeFor(d), THK=THT.key, THC=PDF_THEMES[THK], TH={deep:THC.deep, acc:THC.acc, line:THC.line};
+    /* GOLD/GOLD2/CRIM already match app.css --gold/--gold2/--crim exactly; DARK
+       now matches --bg2 too. PAP stays a light cream (not an app dark bg) —
+       the page is deliberately printable, with brand colour carried in the
+       gold frame, footer band and per-theme accents rather than an all-dark
+       fill that would be expensive/impractical to print. */
+    var GOLD='#C8913E', GOLD2='#E8BA6C', CRIM='#C4302B', INK='#1A1A22', PAP='#F7F3EA', MUT='#6B675C', DARK='#0C1020';
     function wm(){
       pdf.setTextColor(229,212,178); pdf.setFont('helvetica','bold'); pdf.setFontSize(23);
       for(var wy=100;wy<790;wy+=128) for(var wx=-50;wx<640;wx+=185) pdf.text('ROAMWISE',wx,wy,{angle:31});
@@ -4760,21 +5271,21 @@ function genPdf(sample){
         ty += 52;
         /* food + tip + budget band */
         var fd=(A&&A.food)||((d.food||[])[i%Math.max(1,(d.food||[]).length)]||'');
-        pdf.setFillColor('#F3E2C0'); pdf.roundedRect(44,y-8,512,58,7,7,'F');
+        pdf.setFillColor('#F3E2C0'); pdf.roundedRect(44,ty-8,512,58,7,7,'F');
         pdf.setTextColor('#7A2E1E'); pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
-        pdf.text('\ud83c\udf5b EAT TODAY',56,y+8);
+        pdf.text('\ud83c\udf5b EAT TODAY',56,ty+8);
         pdf.setFont('helvetica','normal'); pdf.setTextColor(INK); pdf.setFontSize(10);
-        pdf.text(pdf.splitTextToSize(fd||'Ask three locals one question: \u201cwhere do YOU eat?\u201d',300),56,y+22);
+        pdf.text(pdf.splitTextToSize(fd||'Ask three locals one question: \u201cwhere do YOU eat?\u201d',300),56,ty+22);
         pdf.setTextColor('#7A5A16'); pdf.setFontSize(9);
-        pdf.text(pdf.splitTextToSize('\ud83e\udd77 '+((A&&A.tip)||T2.tip||'Carry small notes; big bills slow every purchase.'),190),380,y+8);
+        pdf.text(pdf.splitTextToSize('\ud83e\udd77 '+((A&&A.tip)||T2.tip||'Carry small notes; big bills slow every purchase.'),190),380,ty+8);
         if(perDay){ pdf.setTextColor(MUT); pdf.setFontSize(9.5);
-          pdf.text('\ud83d\udcb0 Day budget ('+o.party.toLowerCase()+', '+o.pace.toLowerCase()+'): ~$'+Math.round(perDay*paceAdj*partyMul),44,y+66); }
+          pdf.text('\ud83d\udcb0 Day budget ('+o.party.toLowerCase()+', '+o.pace.toLowerCase()+'): ~$'+Math.round(perDay*paceAdj*partyMul),44,ty+66); }
         /* ---- Fill the previously-blank lower half with real, grounded data ----
            Two-column panel: destination fast facts (region/country/tags — all
            already in the database, not invented) + an actual crowd-by-month
            comparison (d.crowd is real per-destination data used elsewhere in
            the app, e.g. the ninja-hacks crowd-dodge callouts). */
-        var fy = y + 84;
+        var fy = ty + 84;
         if(fy < 700){
           pdf.setDrawColor(TH.acc[0],TH.acc[1],TH.acc[2]); pdf.setLineWidth(0.8);
           pdf.line(44, fy, 556, fy);
@@ -4928,7 +5439,7 @@ function genPdf(sample){
         }catch(e){ pdf.save(fname); } }
       xpAdd(20,'Premium itinerary forged');
       try{ track('pdf_generated'); lsSet('rw_pdf_count', String((parseInt(lsGet('rw_pdf_count')||'0',10)||0)+1)); }catch(e){}
-    });
+    }).catch(function(err){ console.error('genPdf failed', err); showToast('Could not build the PDF — please try again'); });
   });
 }
 
@@ -5131,6 +5642,42 @@ function track(ev){
        surfaced instead of guessed at. */
     db.collection('stats').doc(day).set(inc, {merge:true})
       .catch(function(e){ try{ lsSet('rw_track_err', (e.code||'')+' '+(e.message||e)); }catch(_){} });
+  }catch(e){}
+}
+/* Per-response thumbs up/down on Ailon Tusk bot bubbles (see cpFinish). No
+   per-message record and no user identity — just bumps the same anonymous
+   daily counter track() already writes, under two new event names. Also
+   visually locks the row so a bubble can't be voted twice. */
+function rwTuskFeedback(btn, helpful){
+  try{
+    var row = btn && btn.closest ? btn.closest('.tk-fb') : (btn && btn.parentNode);
+    if(row){
+      if(row.dataset && row.dataset.voted) return; /* already voted, ignore repeat taps */
+      if(row.dataset) row.dataset.voted='1';
+      [].forEach.call(row.querySelectorAll('button'), function(b){
+        b.disabled = true; b.style.cursor='default'; b.style.opacity = (b===btn)? '1':'.3';
+      });
+      if(btn && btn.style) btn.style.transform='scale(1.3)';
+    }
+    track(helpful? 'tusk_helpful' : 'tusk_unhelpful');
+  }catch(e){}
+}
+/* Closes the loop the daily tusk-daily.yml Action was built for but never
+   received data for: log the place name whenever Ailon Tusk's curated engine
+   recognises a destination-shaped query but has nothing for it. Anonymous —
+   place name only, keyed by a slug, so repeats just increment a counter
+   instead of piling up per-user records. An admin can export this collection
+   into data/misses.txt to feed the existing OpenStreetMap resolver. */
+function rwTuskMiss(place){
+  if(!AUTH_READY || !place) return;
+  try{
+    var slug = String(place).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
+    if(!slug) return;
+    db.collection('tuskMisses').doc(slug).set({
+      place: String(place).slice(0,80),
+      count: firebase.firestore.FieldValue.increment(1),
+      lastAsked: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true}).catch(function(){});
   }catch(e){}
 }
 (function(){ try{
@@ -5803,7 +6350,7 @@ function rwFitnessRender(dest, geo, venues){
   }
   var stayHtml='<div class="fit-h" style="margin-top:16px">\ud83c\udfe8 Where to stay (fitness-friendly)</div>'
     + tiers.map(function(ti){
-        var url='https://www.booking.com/searchresults.html?ss='+encodeURIComponent(ti.q+' '+dest);
+        var url=stayUrl(ti.q+' '+dest);
         return '<a class="fit-tier" target="_blank" rel="noopener" href="'+url+'">'
           +'<span class="fit-tier-ic">'+ti.ic+'</span>'
           +'<span class="fit-tier-body"><b>'+ti.t+'</b><span>'+ti.note+'</span></span>'
@@ -6103,7 +6650,21 @@ function rwShareSheet(text, url, whatLabel){
   ov.innerHTML=html; ov.style.display='flex';
 }
 function rwCloseShare(){ var ov=el('rwShareOverlay'); if(ov) ov.style.display='none'; }
-function rwShareTrip(){ var nm=(window._lastItin&&_lastItin.name)||'trip'; rwShareSheet('Check out my '+nm+' plan on RoamWise \u2708\ufe0f','https://roamwise.co.in','trip plan'); }
+function rwShareTrip(){
+  var nm=(window._lastItin&&_lastItin.name)||'trip';
+  /* If the itinerary on screen came from the ready-made preset library,
+     share the actual cached page (named for the sharer) instead of the
+     generic homepage link \u2014 RW_PRESETS.shareUrl() adds share=1 and shows
+     "Made by RoamWise for <name>" on the shared page. */
+  if(window._lastItin && _lastItin.preset && _lastItin.hit && typeof RW_PRESETS!=='undefined' && RW_PRESETS.shareUrl){
+    var who = (typeof user!=='undefined' && user && (user.displayName || (user.email||'').split('@')[0])) || lsGet('rw_name') || '';
+    var theme = (_lastItin.hit && _lastItin.hit.theme) || undefined;
+    var url = RW_PRESETS.shareUrl(_lastItin.hit, who, theme);
+    rwShareSheet('Check out my '+nm+' plan on RoamWise \u2708\ufe0f', url, 'trip plan');
+    return;
+  }
+  rwShareSheet('Check out my '+nm+' plan on RoamWise \u2708\ufe0f','https://roamwise.co.in','trip plan');
+}
 function rwShareGo(id, href){
   var ctx=window._rwShareCtx||{text:'',url:''};
   if(id==='copy'){ try{ navigator.clipboard.writeText(ctx.text+' '+ctx.url); showToast('Link copied \u2713'); }catch(e){}; return; }
@@ -6682,8 +7243,11 @@ function drawCard(L, name, tiles, heroPhoto){
     x.fillStyle='#8A8880'; x.font='400 11px Outfit,Arial';
     x.fillText(b2[1].toUpperCase(), bx+bw/2, sy+54);
   });
-  if(isPro){ x.fillStyle='#E8BA6C'; x.font='700 15px Outfit,Arial'; x.textAlign='center';
-    x.fillText('\ud83d\udc51 LIFETIME PRO MEMBER', W/2, sy-16); }
+  if(isPro){ var _cst=rwStatusLabel(); x.fillStyle='#E8BA6C'; x.font='700 15px Outfit,Arial'; x.textAlign='center';
+    /* Honest cert label: never claim "LIFETIME" for a trial or a free
+       partner-code grant \u2014 see rwStatusLabel(). */
+    var certTxt = _cst.code==='trial' ? ('\u23f3 '+_cst.text) : ('\ud83d\udc51 '+_cst.text+' MEMBER');
+    x.fillText(certTxt, W/2, sy-16); }
   /* ===== CERTIFICATE OF ACHIEVEMENT: seal + signature + date ===== */
   var dateStr=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
   var certY=H-152;
@@ -6730,7 +7294,170 @@ function drawCard(L, name, tiles, heroPhoto){
   if(un) showToast(un+' place(s) still locating \u2014 regenerate in a minute for full pins');
   else showToast('Souvenir-grade \u2014 2400\u00d73200px, ready to print & frame \ud83d\uddbc\ufe0f');
   if(!lsGet('rw_card_xp')){ lsSet('rw_card_xp','1'); xpAdd(25,'Journey Card forged'); }
+  try{ var eb=el('cardEarnBox'); if(eb) eb.style.display='block'; }catch(e){}
 }
+/* ---- Travel & Earn: Journey Card viral share ---- */
+function cardShareWa(){
+  var caption='Just mapped all my trips on RoamWise \u2728\u2708\ufe0f The Journey Card feature is unreal.\n\n'
+    +'AI itineraries + crowd calendars + real local prices, built solo from the Himalayas.\n\n'
+    +'One-time \u20b9100 \u2014 no subscription: roamwise.co.in\n\n'
+    +'#RoamWise #TravelIndia #AITravel #ShinobiMode #IndieApp';
+  try{ navigator.clipboard.writeText(caption).then(function(){ showToast('\ud83d\udcf8 Caption copied! Post on Reels/Shorts, tag @mohucool \u2014 100+ views = free Pro pass for a friend'); }).catch(function(){ if(navigator.share) navigator.share({text:caption}); }); }catch(e){}
+}
+
+/* ============================================================
+   PARTNER CODE REDEMPTION (rw-v115) — NMIMS + future partners
+   User enters code like NMIMS-A1B2C3 in Settings → gets Pro.
+   Admin can see all claims in the admin console.
+   ============================================================ */
+function openPartnerRedeem(){
+  rwForm('&#127891; Redeem a partner code',[
+    /* key:/placeholder: — rwFormSubmit reads out[field.key] and renders
+       field.placeholder; id:/ph: silently read back undefined. */
+    {key:'code', label:'Enter your claim code (e.g. NMIMS-A1B2C3)', placeholder:'NMIMS-XXXXXX'}
+  ], async function(v){
+    var code=rwSanitizeRefCode(v.code);
+    if(!code){ showToast('Enter your code first'); return; }
+    if(!user){ openLogin(); return; }
+    if(!db){ showToast('Not connected — try again in a moment'); return; }
+    /* partnerClaims' doc ID IS the code itself (rw-v116 hardening) — fetch by
+       known path with .doc(), not a `where('code','==',...)` query. Firestore
+       rules can only validate a specific doc by path (get()/exists()), never
+       an arbitrary query, so this is also what lets the rules confirm — via
+       isRedeemedByCaller() — that THIS caller already redeemed this exact
+       code before granting Pro below (see the two-step write further down). */
+    var claimRef=db.collection('partnerClaims').doc(code);
+    var snap=await claimRef.get().catch(function(){return null;});
+    if(!snap||!snap.exists){ showToast('Code not found. Check it and try again, or email founder@roamwise.co.in'); return; }
+    var data=snap.data()||{};
+    // Soft UX check only — only the person who was emailed the code SHOULD
+    // redeem it, but the real security boundary against replay/reuse now
+    // lives in firestore.rules (one-time redemption via two sequential,
+    // awaited writes — see below), not in this client-side email comparison.
+    if(data.email && user.email && data.email.toLowerCase()!==user.email.toLowerCase()){
+      showToast('This code was claimed with a different email. Sign in with '+data.email.split('@')[0]+'@…');
+      return;
+    }
+    // A claim already flipped to redeemed by THIS SAME uid is not "nothing to
+    // do" — it means a PRIOR attempt got as far as flipping partnerClaims but
+    // then failed on the users/{uid} grant write below (see the create-vs-
+    // update gap explained next to that write). That must be resumable on a
+    // later attempt, not treated as a dead end, so only block here when the
+    // code was redeemed by a DIFFERENT uid.
+    var alreadyRedeemedByMe = !!(data.proRedeemed && data.redeemedUid===user.uid);
+    if(data.proRedeemed && !alreadyRedeemedByMe){
+      showToast('Code already redeemed — your Pro is active. Check your profile.');
+      return;
+    }
+    // Claim codes are issued inside a time-boxed campaign window (e.g. the
+    // NMIMS 30-day claim window) and shouldn't be redeemable indefinitely
+    // after that — expiresAt is a Firestore Timestamp set at claim time
+    // (see nmims/index.html). Absent expiresAt (older claims predating this
+    // field) is treated as no expiry, same precedent as proRedeemed above.
+    // Skip this check when alreadyRedeemedByMe: that means partnerClaims was
+    // already validly flipped to redeemed by this exact user BEFORE expiry,
+    // and this attempt is only resuming the Pro-grant write that failed last
+    // time — firestore.rules already allows that retry regardless of
+    // subsequent expiry, so blocking it here would defeat that fix.
+    if(!alreadyRedeemedByMe && data.expiresAt && typeof data.expiresAt.toMillis==='function' && data.expiresAt.toMillis()<Date.now()){
+      showToast('This code’s claim window has expired. Email founder@roamwise.co.in if you believe this is a mistake.');
+      return;
+    }
+    /* Flip the claim to redeemed FIRST, as its own separate, AWAITED write,
+       THEN grant Pro on users/{uid} — in that exact order, NOT as one atomic
+       batch. firestore.rules' users/{uid} partner-grant rule now calls
+       isRedeemedByCaller(code), which get()s partnerClaims/{code} and only
+       approves the grant once proRedeemed==true and redeemedUid==this uid
+       are ALREADY committed — a get() inside a security rule only ever sees
+       already-committed state, never a sibling pending write in the same
+       batch, so batching these two writes together would make the grant
+       rule reject every time. Sequencing them like this (redeem, await,
+       then grant) is what actually stops a code being redeemed twice: once
+       the flip commits, isRedeemedByCaller() only ever matches this one uid,
+       so no other account can replay the same code again. The users/{uid}
+       write must touch ONLY pro/proAt/proMethod/proCode — that exact field
+       set is what the rules' partner-redeem exception checks for; anything
+       else in this write (e.g. the old proPartner/proAmount fields) would be
+       rejected.
+       Skip this flip entirely when alreadyRedeemedByMe — partnerClaims'
+       update rule only allows proRedeemed false/absent -> true (see
+       firestore.rules), so re-sending it once it's already true would be
+       REJECTED by the rules, aborting this retry before it ever reaches the
+       grant step below that actually needs resuming. */
+    if(!alreadyRedeemedByMe){
+      try{
+        await claimRef.update({proRedeemed:true, redeemedAt:new Date().toISOString(), redeemedUid:user.uid});
+      }catch(e){
+        showToast('Redemption error: '+(e.message||'try again'));
+        return;
+      }
+    }
+    try{
+      /* CodeRabbit-flagged gap: set(data,{merge:true}) against a users/{uid}
+         doc that does NOT yet exist is a CREATE, not an update, in Firestore
+         semantics — and the users/{uid} create rule explicitly forbids
+         pro/proAt/proMethod/proPayId on create (users can never self-grant
+         Pro at signup). If this profile doc hadn't been created yet (e.g.
+         the onAuthStateChanged first-sign-in write, ~line 9582, hadn't landed
+         yet), this whole write used to be silently rejected — AFTER the
+         claim above was already flipped to redeemed, permanently, with no
+         path to ever retry it (a create can only happen once, and it would
+         always be rejected the same way).
+         Fix: explicitly check existence first. If missing, create the SAME
+         bare minimal profile shape used on first sign-in (no pro fields —
+         satisfies the create rule) as its own separate write, THEN grant Pro
+         via a genuine update() (not a merge-set) — since the doc now exists,
+         this is a real update and the isRedeemedByCaller()-gated update rule
+         applies normally, same as the already-exists case. */
+      var userRef=db.collection('users').doc(user.uid);
+      var uSnap=await userRef.get();
+      if(!uSnap.exists){
+        await userRef.set({email:user.email||'', phone:user.phoneNumber||'', name:user.displayName||'', created:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+      }
+      await userRef.update({
+        pro:true, proAt:new Date().toISOString(),
+        proMethod:'partner', proCode:code
+      });
+      showToast('\ud83c\udf89 Partner Pass activated! Welcome, '+esc2(data.name?data.name.split(' ')[0]:'friend')+'.');
+      window._proUnlocked=true;
+      /* Reuse the SAME UI-refresh path a real Firestore pro:true write
+         triggers (the users/{uid} onSnapshot listener, ~line 9403, calls this
+         too) — there is no separate applyPro() anywhere in the app; calling
+         it here used to be a guaranteed crash (ReferenceError) that no UI
+         caller had ever exercised. Set rw_pro_method locally too (not just via
+         the snapshot round-trip) so rwStatusLabel() shows "PARTNER PASS", not
+         a paid-sounding badge, the instant this resolves. */
+      isPro=true; lsSet('rwPro','1'); lsSet('rw_pro_uid',user.uid); lsSet('rw_pro_method','partner'); refreshProUI();
+    }catch(e){
+      /* The claim is ALREADY marked redeemed at this point (the first write
+         above succeeded) — it cannot be silently retried by re-running this
+         flow, since the code now shows as redeemed. Surface that clearly
+         instead of a generic error so the user contacts support rather than
+         assuming the code is simply broken. */
+      showToast('Your code was redeemed, but activating Pro failed — contact founder@roamwise.co.in with your code so we can finish this manually.');
+    }
+  }, 'Enter the NMIMS-XXXXXX code you received after claiming on the partnership page.');
+}
+
+/* ---- Crowd Spotter (Travel & Earn) ---- */
+function openCrowdSpot(place,lat,lon){
+  var labels=['&#127881; Empty','&#129300; Quiet','&#128513; Moderate','&#128548; Busy','&#128561; Very crowded'];
+  rwForm('&#128205; Report crowd now',[
+    {key:'level',label:'How crowded is it right now?',widget:'buttons',options:labels.map(function(l,i){return {value:String(i+1),label:l};})},
+    {key:'note',label:'Anything unusual? (optional)',placeholder:'festival, roadblock, weather event\u2026'}
+  ],function(v){
+    var level=parseInt(v.level||'3',10);
+    if(!level||level<1||level>5){showToast('Pick a crowd level');return;}
+    var rec={level:level,place:String(place||'').slice(0,80),lat:lat||null,lon:lon||null,at:Date.now(),note:String(v.note||'').slice(0,120)};
+    if(window.user) rec.uid=window.user.uid;
+    if(window.db){
+      db.collection('crowdReports').doc(String(place||'spot').replace(/[^a-z0-9]/gi,'_').slice(0,40)+'_'+Date.now()).set(rec)
+        .then(function(){ xpAdd(5,'Crowd Spotter report'); showToast('Report logged \u2014 +5 XP! Thank you from everyone planning this trip.'); })
+        .catch(function(){ showToast('Saved locally \u2014 will sync when connection is back'); });
+    } else { xpAdd(5,'Crowd Spotter report (offline)'); showToast('+5 XP! Report will sync when connected.'); }
+  },'Your report helps other travellers and earns you Shinobi XP.');
+}
+
 function offerOpen(label){
   var ov=el('openPromptOv');
   if(!ov){ ov=document.createElement('div'); ov.id='openPromptOv'; ov.className='overlay';
@@ -7385,13 +8112,31 @@ function buildHacks(d, mi, month){
 
 var UPI_VPA = 'coolmohit@ybl', UPI_NAME = 'RoamWise Pro', UPI_AMT = '100';
 var _selectedPlan = null; /* set by pickPlan() — drives the amount/label for whatever the user is actually buying */
-function pickPlan(planId, priceINR, label){
-  _selectedPlan = {id:planId, priceINR:priceINR, label:label};
+/* Renders the real feature checklist for whatever the user just picked, into
+   #planFeatures, reusing the same .features-grid/.feat-item/.feat-ck markup
+   the static pre-selection teaser uses so it looks native. tierId is the
+   RWPricing.CONFIG.TIERS id whose benefits this purchase actually grants —
+   every purchasable option (monthly/yearly tier, long-term pass, short-term
+   pass, or the legacy founder offer) maps to one, so this never renders blank. */
+function _renderPlanFeatures(tierId){
+  var box = el('planFeatures'); if(!box) return;
+  var tier = RWPricing.tierById(tierId);
+  var labels = RWPricing.FEATURE_LABELS;
+  box.innerHTML = (tier.features||[]).map(function(f){
+    return '<div class="feat-item"><span class="feat-ck">✓</span>'+(labels[f]||f)+'</div>';
+  }).join('');
+}
+function pickPlan(planId, priceINR, label, tierId){
+  _selectedPlan = {id:planId, priceINR:priceINR, label:label, tierId:tierId};
   UPI_AMT = String(priceINR); UPI_NAME = 'RoamWise '+label;
   qrBuilt = false; /* force QR rebuild for the new amount */
   var qc = el('qrcode'); if(qc) qc.innerHTML='';
   buildQR();
   var ph = el('planHeader'); if(ph) ph.textContent = label+' \u2014 \u20b9'+priceINR;
+  /* Founder offer (and any legacy call site that doesn't pass a tierId) grants
+     the same lifetime benefits legacy \u20b9100 buyers get \u2014 see currentTier(). */
+  _renderPlanFeatures(tierId || 'elite');
+  var teaser = el('staticFeaturesTeaser'); if(teaser) teaser.style.display='none';
   var picker = el('planPicker'); if(picker) picker.style.display='none';
   var methods = el('payMethods'); if(methods){
     methods.style.display='block';
@@ -7407,6 +8152,7 @@ function pickPlan(planId, priceINR, label){
 function backToPlanPicker(){
   var picker = el('planPicker'); if(picker) picker.style.display='block';
   var methods = el('payMethods'); if(methods) methods.style.display='none';
+  var teaser = el('staticFeaturesTeaser'); if(teaser) teaser.style.display='';
 }
 /* setTier() removed — replaced by pickPlan(), which drives the full tier grid */
 function upiParams(){ return 'pa='+UPI_VPA+'&pn='+encodeURIComponent(UPI_NAME)+'&am='+UPI_AMT+'&cu=INR&tn='+encodeURIComponent('RoamWise Pro Lifetime'); }
@@ -7455,16 +8201,31 @@ function buildQR(){
 function smartSearch(month, budUSD, ctryQuery, crowd, interests){
   var mi = MONTHS.indexOf(month);
   var ctry = (ctryQuery||'').toLowerCase().trim();
+  /* If the destination is an autocomplete-style "City, Country" value (the common/default
+     flow — see DEST_NAMES and the live Photon-typeahead dropdown), the part before the first
+     comma IS the city the user actually picked. Match against d.name specifically in that case
+     so a query like "Rishikesh, India" doesn't match every other destination in India via the
+     country segment. A bare, comma-free query (e.g. just "India") keeps the broader OR-based
+     name/country/region matching so browsing-by-country still works. */
+  var ctryCity = ctry.indexOf(',')>=0 ? ctry.split(',')[0].trim() : '';
   var scores = [];
   DB.forEach(function(d){
     var budgetGap = Math.max(0, d.cost.budget - budUSD);
     var budgetPenalty = budgetGap / 25; /* soft penalty, never excludes */
+    var nameLc = d.name.toLowerCase();
+    var exactCityMatch = false;
     if(ctry && ctry!=='anywhere in the world' && ctry.indexOf('anywhere')<0){
-      var hit = d.name.toLowerCase().indexOf(ctry)>=0
-             || d.country.toLowerCase().indexOf(ctry)>=0
-             || d.region.toLowerCase().indexOf(ctry)>=0
-             || ctry.indexOf(d.country.toLowerCase())>=0
-             || ctry.indexOf(d.name.toLowerCase())>=0;
+      var hit;
+      if(ctryCity){
+        hit = nameLc.indexOf(ctryCity)>=0 || ctryCity.indexOf(nameLc)>=0;
+        if(hit) exactCityMatch = true;
+      } else {
+        hit = nameLc.indexOf(ctry)>=0
+           || d.country.toLowerCase().indexOf(ctry)>=0
+           || d.region.toLowerCase().indexOf(ctry)>=0
+           || ctry.indexOf(d.country.toLowerCase())>=0
+           || ctry.indexOf(nameLc)>=0;
+      }
       if(!hit) return;
     }
     var sc=0, cs=d.crowd[mi];
@@ -7477,7 +8238,13 @@ function smartSearch(month, budUSD, ctryQuery, crowd, interests){
     });
     sc += Math.max(0, 60 - Math.abs(d.cost.mid-budUSD)/30);
     sc -= budgetPenalty;
-    if(d.bestM.indexOf(mi)>=0) sc += 28;
+    if(d.bestM.indexOf(mi+1)>=0) sc += 28; /* mi is 0-based (MONTHS.indexOf), bestM is 1-based */
+    /* Defense-in-depth: strongly favor an exact/near-exact city-name match against the parsed
+       "City, Country" query so the destination the user actually asked for always ranks first,
+       even in edge cases where multiple destinations legitimately pass the filter above.
+       Bonus is well above the realistic combined max of the other bonuses (~50 crowd + 18*few
+       interests + 60 budget-fit + 28 month-fit) so it always wins. */
+    if(exactCityMatch) sc += 500;
     scores.push({d:d, sc:sc, cs:cs});
   });
   scores.sort(function(a,b){ return b.sc-a.sc; });
@@ -7615,14 +8382,24 @@ function loadPhotosForCard(d, ci){
 }
 
 /* OPTIONAL AI ENHANCEMENT */
+/* Static per-provider fallback chains. NOTE on groq: llama-3.3-70b-versatile
+   and llama-3.1-8b-instant were BOTH deprecated by Groq on 2026-08-16 for
+   free/developer-tier keys (still usable on enterprise committed-spend
+   plans, hence kept as a last-resort entry here) — a key that only ever
+   tried those two used to exhaust this list and surface a scary "model does
+   not exist" error even though the KEY itself was perfectly valid. The
+   current recommended replacements are the openai/gpt-oss models. This list
+   is only the fallback of last resort, though: testKey()/aiCall() prefer a
+   LIVE model list fetched from Groq's own /openai/v1/models endpoint with
+   the user's key when possible, since that's always current. */
 var AI_MODELS = {
-  groq: ['llama-3.3-70b-versatile','llama-3.1-8b-instant'],
+  groq: ['openai/gpt-oss-120b','openai/gpt-oss-20b','llama-3.3-70b-versatile'],
   cerebras: ['llama-3.3-70b','llama3.1-8b'],
   github: ['gpt-4o','Meta-Llama-3.1-70B-Instruct'],
   gemini: ['gemini-2.5-flash','gemini-flash-latest'],
   openrouter: ['meta-llama/llama-3.3-70b-instruct:free','mistralai/mistral-small-3.1-24b-instruct:free','google/gemma-3-27b-it:free'],
   mistral: ['mistral-small-latest','open-mistral-nemo'],
-  anthropic: ['claude-sonnet-4-20250514']
+  anthropic: ['claude-sonnet-5']
 };
 var lastAiSource = null; /* {prov, model} of the last successful AI call, or null */
 function extractJSON(txt){
@@ -7690,7 +8467,15 @@ function aiRequest(prov, key, model, prompt, maxTok, jsonMode){
 function aiCall(prompt, maxTok, cb, jsonMode){
   var prov=activeProv, key=lsGet('rwKey_'+prov);
   if(prov==='smart' || !key){ lastAiSource=null; cb(null,null); return; }
-  var models = AI_MODELS[prov]||[]; var i=0;
+  var models = AI_MODELS[prov]||[];
+  /* Groq: put whatever testKey() last discovered as a REAL working model for
+     THIS key (via Groq's live /models endpoint) first in line, ahead of the
+     static guesses — it's always at least as current as this hardcoded list. */
+  if(prov==='groq'){
+    var discovered = lsGet('rwKey_groq_model');
+    if(discovered && models.indexOf(discovered)===-1) models=[discovered].concat(models);
+  }
+  var i=0;
   function attempt(lastErr){
     if(i>=models.length){ lastAiSource=null; cb(lastErr||'All models failed', null); return; }
     var m=models[i++];
@@ -7735,22 +8520,61 @@ function aiCallAny(prompt, maxTok, cb, jsonMode){
 
 /* Key tester
  — used by the Test buttons in Settings */
-function testKey(prov){
-  var key=(el(prov+'Key').value||'').trim() || lsGet('rwKey_'+prov);
-  var st=el(prov+'Status');
-  if(!key){ st.textContent='no key'; st.className='key-status ks-empty'; return; }
-  st.textContent='testing…'; st.className='key-status ks-empty';
-  var models=AI_MODELS[prov], i=0;
+function testKeyFallbackChain(prov, key, st){
+  var models=AI_MODELS[prov]||[], i=0;
   (function tryM(lastErr){
     if(i>=models.length){ st.textContent='✗ '+String(lastErr).slice(0,60); st.className='key-status ks-bad'; showToast('Key failed: '+String(lastErr).slice(0,80)); return; }
     var m=models[i++];
     aiRequest(prov,key,m,'Reply with exactly: OK',10)
-      .then(function(){ st.textContent='✓ working ('+m+')'; st.className='key-status ks-ok'; showToast(prov+' key verified \u2713'); })
+      .then(function(){ st.textContent='✓ working ('+m+')'; st.className='key-status ks-ok'; showToast(prov+' key verified ✓'); if(prov==='groq') lsSet('rwKey_groq_model', m); })
       .catch(function(e){
         if(e.httpStatus===401||e.httpStatus===403){ st.textContent='✗ invalid key'; st.className='key-status ks-bad'; showToast('Key rejected — regenerate it and paste again'); }
         else tryM(e.message||e);
       });
   })(null);
+}
+function testKey(prov){
+  var key=(el(prov+'Key').value||'').trim() || lsGet('rwKey_'+prov);
+  var st=el(prov+'Status');
+  if(!key){ st.textContent='no key'; st.className='key-status ks-empty'; return; }
+  st.textContent='testing…'; st.className='key-status ks-empty';
+
+  /* GROQ: ask Groq itself which models this key can actually use right now,
+     via its OpenAI-compatible /models endpoint, instead of betting everything
+     on one hardcoded model string. This is what actually fixes "the model
+     `llama-3.1-8b-instant` does not exist" — that model (and
+     llama-3.3-70b-versatile) were both deprecated by Groq on 2026-08-16, so a
+     fixed test model can go stale again the same way; a live lookup can't. */
+  if(prov==='groq'){
+    fetch('https://api.groq.com/openai/v1/models', {headers:{'Authorization':'Bearer '+key}})
+      .then(function(r){ return r.json().then(function(d){ return {status:r.status, data:d}; }); })
+      .then(function(res){
+        if(res.status===401 || res.status===403){
+          st.textContent='✗ invalid key'; st.className='key-status ks-bad';
+          showToast('Key rejected — regenerate it and paste again');
+          return;
+        }
+        var ids=((res.data && res.data.data)||[]).map(function(m){ return m.id; }).filter(Boolean);
+        if(!ids.length){ testKeyFallbackChain(prov, key, st); return; }
+        /* Prefer a current flagship "versatile"/70B-class model if this key
+           can use one, else just take the first non-audio/non-guard model —
+           the user only cares that SOMETHING works, not the exact name. */
+        var pick = ids.filter(function(id){ return /gpt-oss-120b/i.test(id); })[0]
+                || ids.filter(function(id){ return /70b/i.test(id) && !/whisper|guard|tts/i.test(id); })[0]
+                || ids.filter(function(id){ return !/whisper|guard|tts|distil/i.test(id); })[0]
+                || ids[0];
+        lsSet('rwKey_groq_model', pick);
+        st.textContent='✓ working ('+pick+')'; st.className='key-status ks-ok';
+        showToast('groq key verified ✓');
+      })
+      .catch(function(){
+        /* Live list unreachable (network hiccup, CORS, etc.) — fall back to
+           the static chain rather than blocking the user. */
+        testKeyFallbackChain(prov, key, st);
+      });
+    return;
+  }
+  testKeyFallbackChain(prov, key, st);
 }
 
 /* MAIN SEARCH */
@@ -7787,6 +8611,13 @@ function runSearch(){
   var isGenericResult = false;
   var destLower = (dest||'').toLowerCase().trim();
   var wantsSpecificPlace = destLower && destLower !== 'anywhere' && destLower.indexOf('anywhere') < 0;
+  /* A "City, Country" style query (the autocomplete/typeahead flow) went through smartSearch's
+     city-specific matching path, which legitimately narrows to just the matched city/cities.
+     Padding that out with an unfiltered global search would reintroduce unrelated destinations
+     (e.g. "Rishikesh, India" pulling in Munnar), defeating the point of that narrowing — so for
+     a city-qualified query that found at least one real match, show fewer than 3 cards instead
+     of topping up with unrelated places. */
+  var isCityQualified = destLower.indexOf(',') >= 0;
 
   if(wantsSpecificPlace && topR.length < 3){
     if(topR.length === 0){
@@ -7797,8 +8628,10 @@ function runSearch(){
         return r.d.name.toLowerCase() !== generic.name.toLowerCase();
       });
       topR = [{ d:generic, sc:999, cs:generic.crowd[MONTHS.indexOf(month)] }].concat(alts0).slice(0,3);
-    } else {
-      /* Found some curated matches but fewer than 3 — top up with global best */
+    } else if(!isCityQualified){
+      /* Found some curated matches but fewer than 3 — top up with global best.
+         Skipped for city-qualified queries (see isCityQualified note above) since a specific
+         city legitimately matching just 1-2 destinations is expected, not a gap to fill. */
       var foundIds = topR.map(function(r){ return r.d.id; });
       var alts1 = smartSearch(month, budUSD, '', crowd, interests).filter(function(r){
         return foundIds.indexOf(r.d.id) < 0;
@@ -7816,7 +8649,11 @@ function runSearch(){
   var hasKey = lsGet('rwKey_'+activeProv);
   if(activeProv!=='smart' && hasKey){
     var destList = topR.map(function(r){ return r.d.name+'/'+r.d.country; }).join(' | ');
-    var aiPrompt = 'Briefly enhance these travel destinations for a traveler from '+origin+' in '+month+' ($'+budUSD+' budget, interests: '+interests.join(',')+'). Destinations: '+destList+'. Return ONLY valid JSON with this exact shape: {"e":[{"id":"'+topR[0].d.id+'","desc":"2 vivid sentences","tip":"1 practical tip for '+month+'"},{"id":"'+topR[1].d.id+'","desc":"2 vivid sentences","tip":"1 tip"},{"id":"'+topR[2].d.id+'","desc":"2 vivid sentences","tip":"1 tip"}]}';
+    var shapeItems = topR.map(function(r, i){
+      var tipCopy = i===0 ? '1 practical tip for '+month : '1 tip';
+      return '{"id":"'+r.d.id+'","desc":"2 vivid sentences","tip":"'+tipCopy+'"}';
+    }).join(',');
+    var aiPrompt = 'Briefly enhance these travel destinations for a traveler from '+origin+' in '+month+' ($'+budUSD+' budget, interests: '+interests.join(',')+'). Destinations: '+destList+'. Return ONLY valid JSON with this exact shape: {"e":['+shapeItems+']}';
     aiCall(aiPrompt, 600, function(err, txt){
       clearInterval(tick); btn.disabled=false; btn.innerHTML='<span class="shim-line"></span>🔍 Find My Destinations — Works Without Any API Key';
       var aiData = null;
@@ -7831,6 +8668,7 @@ function runSearch(){
 
 /* RENDER RESULTS — built entirely with template literals */
 function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, isGenericResult){
+  itinBuilt = {};
   var mi = MONTHS.indexOf(month);
   var provLabel = activeProv==='smart' ? 'Smart Search' : (lsGet('rwKey_'+activeProv) ? activeProv.charAt(0).toUpperCase()+activeProv.slice(1)+' AI' : 'Smart Search');
 
@@ -7839,7 +8677,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
   H += `<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>Destination</th><th>Crowd in ${month}</th><th>Mid budget</th><th>Visa (India)</th><th>Best months</th></tr></thead><tbody>`;
   results.forEach(function(r){
     var d=r.d, cs=r.cs, bl = cs<35?'badge-low':cs<60?'badge-mid':'badge-hi', ct = cs<35?'Low':cs<60?'Moderate':'Busy';
-    var bm = d.bestM.length ? d.bestM.slice(0,3).map(function(m){return MO[m];}).join(', ') : 'Year-round';
+    var bm = d.bestM.length ? d.bestM.slice(0,3).map(function(m){return MO[m-1]||m;}).join(', ') : 'Year-round';
     H += `<tr><td><strong>${flagEmoji(d.flag)} ${d.name}</strong>${d.country?`<br><span style="font-size:10px;color:#4A4946">${d.country}</span>`:''}</td><td><span class="badge ${bl}" style="font-size:11px">${cs}% ${ct}</span></td><td>${fmtMoney(d.cost.mid)}</td><td style="font-size:11px">${d.visa.type}<br><span style="color:#16BF96">${d.visa.cost}</span></td><td style="font-size:11px">${bm}</td></tr>`;
   });
   H += `</tbody></table></div>`;
@@ -7880,7 +8718,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
 
     /* Card head */
     var flagIco = flagEmoji(d.flag);
-    var bestMonthsLabel = d.bestM.length ? d.bestM.slice(0,3).map(function(m){return MO[m];}).join(', ') : 'Year-round';
+    var bestMonthsLabel = d.bestM.length ? d.bestM.slice(0,3).map(function(m){return MO[m-1]||m;}).join(', ') : 'Year-round';
     H += `<div class="card-head">
       <div>
         <div class="card-rank${feat?' gold':''}">${feat ? (isGenericResult ? '📍 Your pick' : '⭐ Top pick for '+month) : (isGenericResult ? 'Alternative '+ci : 'Option '+(ci+1))}</div>
@@ -7939,7 +8777,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
       }).join('')}</div>
       <div class="sec-label">📅 Best months to visit</div>
       <div class="bm-grid">${MO.map(function(m,idx){
-        var best = d.bestM.indexOf(idx)>=0;
+        var best = d.bestM.indexOf(idx+1)>=0; /* idx is 0-based (MO array), bestM is 1-based */
         return `<div class="bm${best?' best':''}${idx===mi?' sel':''}">${m}</div>`;
       }).join('')}</div>
     </div>`;
@@ -8034,15 +8872,7 @@ function renderCards(results, month, budUSD, origin, days, aiData, travelStyle, 
     /* BOOK TAB */
     H += `<div class="tab-pane" id="${T}-bk"><div class="card-body" style="padding-top:0">
       <div class="sec-label" style="margin-top:4px">Book this trip</div>
-      <div class="book-grid">
-        <a class="book-link" href="https://www.skyscanner.com/transport/flights/${encodeURIComponent(origin)}/${enc}/" target="_blank" rel="noopener"><span class="book-ico">✈️</span><span class="book-name">Skyscanner</span><span class="book-sub">Flights</span></a>
-        <a class="book-link" href="https://www.booking.com/search.html?ss=${enc}" target="_blank" rel="noopener"><span class="book-ico">🏨</span><span class="book-name">Booking.com</span><span class="book-sub">Hotels</span></a>
-        <a class="book-link" href="https://www.getyourguide.com/s/?q=${enc}" target="_blank" rel="noopener"><span class="book-ico">🎫</span><span class="book-name">GetYourGuide</span><span class="book-sub">Tours</span></a>
-        <a class="book-link" href="https://www.viator.com/search/${enc}" target="_blank" rel="noopener"><span class="book-ico">🗺️</span><span class="book-name">Viator</span><span class="book-sub">Experiences</span></a>
-        <a class="book-link" href="https://www.airbnb.com/s/${enc}/homes" target="_blank" rel="noopener"><span class="book-ico">🏠</span><span class="book-name">Airbnb</span><span class="book-sub">Stays</span></a>
-        <a class="book-link" href="https://www.safetywing.com" target="_blank" rel="noopener"><span class="book-ico">🛡️</span><span class="book-name">SafetyWing</span><span class="book-sub">Insurance</span></a>
-      </div>
-      <p style="font-size:10px;color:#4A4946;text-align:center;margin-top:7px">Affiliate links — commission at no extra cost</p>
+      ${rwBookGridHTML(origin, d.name, enc)}
     </div></div>`;
 
     /* ACTION BAR */
@@ -8183,29 +9013,92 @@ function buildItin(T, name, costMid, days){
     return '<div class="itin-src smart">\u26a1 Smart engine (built-in templates)'+(extra?' \u00b7 '+extra:'')+' \u2014 add a working AI key in Settings for a personalised plan</div>';
   }
 
-  var prov=activeProv, key=lsGet('rwKey_'+prov);
-  if(prov!=='smart' && key){
-    var p = 'You are an expert local guide. Build a '+days+'-day itinerary for '+name+' in '+((el('month')||{}).value||'any month')+'. Budget ~$'+Math.round(costMid/83.5)+' USD/person. Return ONLY JSON (no prose, no markdown): {"days":[{"day":1,"title":"short theme","morning":"SPECIFIC named place + what to do (with timing like 8:30 AM)","afternoon":"SPECIFIC named place + insider tip","evening":"named restaurant/street + exact dish to order","food":"one local speciality with 4-word description","tip":"practical money/crowd/culture tip"}]}. Exactly '+days+' days, every place REAL and specific to '+name+', each field under 110 chars.';
-    aiCall(p, 2200, function(err, txt){
-      if(txt){
-        var d=extractJSON(txt);
-        if(d && d.days && d.days.length){
-          d.days.forEach(function(x,i){ x.day=x.day||i+1; });
-          window._lastItin={name:name, days:d.days, ai:true, model:(lastAiSource||{}).model};
-          var who = lastAiSource? (lastAiSource.prov.charAt(0).toUpperCase()+lastAiSource.prov.slice(1)+' \u00b7 '+lastAiSource.model) : 'AI';
-          renderDays(d.days, '<div class="itin-src ai">\ud83e\udd16 AI \u00b7 '+who+' \u00b7 personalised for '+name+'</div>');
-          return;
-        }
-        err='AI replied in a broken format';
-      }
-      var list=[]; for(var i=0;i<days && i<DAY_TEMPLATES.length;i++){ var t=DAY_TEMPLATES[i]; list.push({day:i+1,title:t.title,morning:t.morning,afternoon:t.afternoon,evening:t.evening,tip:t.tip}); }
-      window._lastItin={name:name, days:list, ai:false};
-      renderDays(list, err? '<div class="itin-src err">\u26a0 '+String(err).slice(0,90)+' \u2014 showing the built-in Smart plan instead. Test your key in Settings.</div>' : smartBadge());
-    }, true);
-  } else {
+  /* ---- Ready-made preset library (itinerary-library/) -----------------
+     Additive cache in front of / behind the live planner. It never
+     replaces this Classic renderer or the premium Cinematic engine.
+     - Pre-check: try a cached preset first for broad, unconstrained asks
+       so the user gets an instant result without spending an AI call.
+     - Fallback: if the live AI generation actually fails (network error,
+       timeout, broken reply), try the preset library again \u2014 loosening
+       the query \u2014 before ever showing the user a bare error. */
+  function rwPresetQuery(loose){
+    var q = { destination:name, duration:days };
+    if(!loose){
+      q.month = (el('month')||{}).value||'';
+      q.budgetExact = (el('budgetExact')||{}).value||'';
+      q.crowd = (el('crowd')||{}).value||'';
+    } else {
+      q.forcePreset = true; /* bypass the "too specific" guard as a last resort */
+    }
+    return q;
+  }
+  function rwDisplayName(){
+    try{ return (typeof user!=='undefined' && user && (user.displayName || (user.email||'').split('@')[0])) || lsGet('rw_name') || ''; }catch(e){ return ''; }
+  }
+  function presetBadge(offline){
+    return '<div class="itin-src preset'+(offline?' preset-offline':'')+'">'
+      + (offline ? '\ud83d\udcbe Ready-made \u00b7 offline/cached (live planner unavailable)' : '\ud83d\udce6 Ready-made \u00b7 cached itinerary for '+esc2(name))
+      + '</div>';
+  }
+  function renderPreset(hit, offline){
+    if(!hit) return false;
+    var displayName = rwDisplayName();
+    var ok = RW_PRESETS.renderInto(cnt, hit, displayName?{user:displayName}:{});
+    if(!ok) return false;
+    cnt.insertAdjacentHTML('afterbegin', presetBadge(offline));
+    ph.style.display='none'; cnt.style.display='block'; itinBuilt[T]=true;
+    window._lastItin={name:name, preset:true, hit:hit, offline:!!offline, days:hit.days};
+    try{ badgeBump('trip'); }catch(e){}
+    return true;
+  }
+  function rwHasPresets(){ return typeof RW_PRESETS!=='undefined' && RW_PRESETS.find; }
+
+  function smartFallback(err){
     var list=[]; for(var i=0;i<days && i<DAY_TEMPLATES.length;i++){ var t=DAY_TEMPLATES[i]; list.push({day:i+1,title:t.title,morning:t.morning,afternoon:t.afternoon,evening:t.evening,tip:t.tip}); }
     window._lastItin={name:name, days:list, ai:false};
-    renderDays(list, smartBadge());
+    renderDays(list, err? '<div class="itin-src err">\u26a0 '+String(err).slice(0,90)+' \u2014 showing the built-in Smart plan instead. Test your key in Settings.</div>' : smartBadge());
+  }
+  /* Live generation failed (network/AI error) \u2014 try the cached preset
+     library (progressively loosened) before ever surfacing an error. */
+  function rwOfflineFallback(err){
+    if(!rwHasPresets()){ smartFallback(err); return; }
+    RW_PRESETS.find(rwPresetQuery(false)).then(function(hit){
+      if(hit) return hit;
+      return RW_PRESETS.find(rwPresetQuery(true));
+    }).then(function(hit){
+      if(!hit || !renderPreset(hit, true)) smartFallback(err);
+    }).catch(function(){ smartFallback(err); });
+  }
+
+  function runLive(){
+    var prov=activeProv, key=lsGet('rwKey_'+prov);
+    if(prov!=='smart' && key){
+      var p = 'You are an expert local guide. Build a '+days+'-day itinerary for '+name+' in '+((el('month')||{}).value||'any month')+'. Budget ~$'+Math.round(costMid/83.5)+' USD/person. Return ONLY JSON (no prose, no markdown): {"days":[{"day":1,"title":"short theme","morning":"SPECIFIC named place + what to do (with timing like 8:30 AM)","afternoon":"SPECIFIC named place + insider tip","evening":"named restaurant/street + exact dish to order","food":"one local speciality with 4-word description","tip":"practical money/crowd/culture tip"}]}. Exactly '+days+' days, every place REAL and specific to '+name+', each field under 110 chars.';
+      aiCall(p, 2200, function(err, txt){
+        if(txt){
+          var d=extractJSON(txt);
+          if(d && d.days && d.days.length){
+            d.days.forEach(function(x,i){ x.day=x.day||i+1; });
+            window._lastItin={name:name, days:d.days, ai:true, model:(lastAiSource||{}).model};
+            var who = lastAiSource? (lastAiSource.prov.charAt(0).toUpperCase()+lastAiSource.prov.slice(1)+' \u00b7 '+lastAiSource.model) : 'AI';
+            renderDays(d.days, '<div class="itin-src ai">\ud83e\udd16 AI \u00b7 '+who+' \u00b7 personalised for '+name+'</div>');
+            return;
+          }
+          err='AI replied in a broken format';
+        }
+        rwOfflineFallback(err);
+      }, true);
+    } else {
+      smartFallback();
+    }
+  }
+
+  if(rwHasPresets()){
+    RW_PRESETS.find(rwPresetQuery(false)).then(function(hit){
+      if(!hit || !renderPreset(hit, false)) runLive();
+    }).catch(function(){ runLive(); });
+  } else {
+    runLive();
   }
 }
 
@@ -8360,7 +9253,7 @@ function openPay(){
     showToast('\ud83c\udf89 Pro is FREE for early adopters on this version \u2014 already active on your account!');
     return;
   }
-  if(isPro){ showToast('Pro is already active!'); return; }
+  if(isPro){ showToast(rwStatusLabel().sentence); return; }
   try{ rwRotateTesti(); }catch(e){}
   el('payOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -8393,26 +9286,30 @@ function renderPlanGrid(founderOpen){
 
   var html='';
   if(founderOpen){
-    html += '<button class="pay-tab on" style="width:100%;margin-bottom:14px" onclick="pickPlan(\'founder\','+C.FOUNDER_OFFER.priceINR+',\'Founder Pro \u2014 Lifetime\')">'
+    html += '<button class="pay-tab on" style="width:100%;margin-bottom:14px" onclick="pickPlan(\'founder\','+C.FOUNDER_OFFER.priceINR+',\'Founder Pro \u2014 Lifetime\',\'elite\')">'
       +'\ud83c\udf1f Founder Pro \u2014 \u20b9'+C.FOUNDER_OFFER.priceINR+' <small>One payment, forever \u2014 this exact price never comes back</small></button>';
   }
 
   /* Monthly / yearly tiers */
   var yearly = lsGet('rw_pay_yearly')==='1';
+  /* Headline "save up to N%" — derived from the real ladder (Pro yearly is ~30%
+     off, the biggest), so this can never drift out of sync with TIERS again. */
+  var maxSave = 0;
+  C.TIERS.forEach(function(t){ var s=RWPricing.yearlySavingsPct(t); if(s>maxSave) maxSave=s; });
   html += '<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 12px">'
     +'<span style="font-size:12px;color:'+(!yearly?'var(--gold2)':'var(--t3)')+'">Monthly</span>'
     +'<label style="position:relative;display:inline-block;width:38px;height:20px">'
     +'<input type="checkbox" id="yearlyToggle" '+(yearly?'checked':'')+' onchange="lsSet(\'rw_pay_yearly\',this.checked?\'1\':\'0\');renderPlanGrid('+(founderOpen?'true':'false')+')" style="opacity:0;width:0;height:0">'
     +'<span style="position:absolute;inset:0;background:'+(yearly?'var(--gold2)':'#333')+';border-radius:20px;transition:.2s"></span>'
     +'<span style="position:absolute;left:'+(yearly?'20px':'2px')+';top:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s"></span>'
-    +'</label><span style="font-size:12px;color:'+(yearly?'var(--gold2)':'var(--t3)')+'">Yearly <b style="color:#16BF96">(save up to 17%)</b></span></div>';
+    +'</label><span style="font-size:12px;color:'+(yearly?'var(--gold2)':'var(--t3)')+'">Yearly <b style="color:#16BF96">(save up to '+maxSave+'%)</b></span></div>';
 
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">';
   C.TIERS.filter(function(t){return t.id!=='free';}).forEach(function(t){
     var price = yearly? t.priceYearly : t.priceMonthly;
     var per = yearly? '/yr' : '/mo';
     var save = RWPricing.yearlySavingsPct(t);
-    html += '<button class="tact" style="text-align:left;padding:12px" onclick="pickPlan(\''+t.id+(yearly?'_y':'_m')+'\','+price+',\''+t.label+' '+(yearly?'Yearly':'Monthly')+'\')">'
+    html += '<button class="tact" style="text-align:left;padding:12px" onclick="pickPlan(\''+t.id+(yearly?'_y':'_m')+'\','+price+',\''+t.label+' '+(yearly?'Yearly':'Monthly')+'\',\''+t.id+'\')">'
       +'<div style="font-weight:800;color:var(--gold2);font-size:13px">'+t.label+'</div>'
       +'<div style="font-size:17px;font-weight:800;margin-top:2px">\u20b9'+price+'<span style="font-size:11px;color:var(--t3);font-weight:400">'+per+'</span></div>'
       +(yearly&&save>0? '<div style="font-size:10px;color:#16BF96">save '+save+'%</div>' : '')
@@ -8427,8 +9324,12 @@ function renderPlanGrid(founderOpen){
     html += '<div style="font-size:11.5px;font-weight:700;color:var(--gold2);margin-bottom:6px">'+group.tierLabel+'-tier long-term</div>'
       +'<div style="display:flex;gap:8px;margin-bottom:12px">';
     group.options.forEach(function(p){
-      html += '<button class="tact" style="flex:1;text-align:center;padding:10px 6px" onclick="pickPlan(\''+p.id+'\','+p.priceINR+',\''+group.tierLabel+' '+p.years+'-Year Pass\')">'
-        +'<div style="font-size:12px;font-weight:700">'+p.years+'-Year</div><div style="font-size:14px;font-weight:800;color:var(--gold2)">\u20b9'+p.priceINR+'</div></button>';
+      /* A lifetime pass renders with its own label instead of "99-Year", and its
+         pickPlan title reads "<Tier> Lifetime". Non-lifetime passes are unchanged. */
+      var topLabel = p.label || (p.years+'-Year');
+      var payTitle = group.tierLabel+' '+(p.lifetime? 'Lifetime' : p.years+'-Year Pass');
+      html += '<button class="tact" style="flex:1;text-align:center;padding:10px 6px" onclick="pickPlan(\''+p.id+'\','+p.priceINR+',\''+payTitle+'\',\''+group.tier+'\')">'
+        +'<div style="font-size:12px;font-weight:700">'+topLabel+'</div><div style="font-size:14px;font-weight:800;color:var(--gold2)">\u20b9'+p.priceINR+'</div></button>';
     });
     html += '</div>';
   });
@@ -8437,7 +9338,7 @@ function renderPlanGrid(founderOpen){
   html += '<div class="section-label">\u26a1 Just need it for one trip?</div>'
     +'<div style="display:flex;gap:8px;margin-bottom:6px">';
   C.SHORT_TERM.forEach(function(p){
-    html += '<button class="tact" style="flex:1;text-align:center;padding:10px 6px" onclick="pickPlan(\''+p.id+'\','+p.priceINR+',\''+p.label+'\')">'
+    html += '<button class="tact" style="flex:1;text-align:center;padding:10px 6px" onclick="pickPlan(\''+p.id+'\','+p.priceINR+',\''+p.label+'\',\'pro\')">'
       +'<div style="font-size:12px;font-weight:700">'+p.label+'</div><div style="font-size:14px;font-weight:800;color:var(--gold2)">\u20b9'+p.priceINR+'</div></button>';
   });
   html += '</div>';
@@ -8625,7 +9526,7 @@ function secPanelHTML(){
 }
 
 var PROV_META = {
-  groq:     {label:'Groq \u00b7 Llama 3.3 70B', hint:'console.groq.com/keys \u2014 free, no card. Starts with gsk_', url:'https://console.groq.com/keys', ph:'gsk_...'},
+  groq:     {label:'Groq \u00b7 auto-picks best model', hint:'console.groq.com/keys \u2014 free, no card. Starts with gsk_', url:'https://console.groq.com/keys', ph:'gsk_...'},
   cerebras: {label:'Cerebras \u00b7 Llama 3.3 70B', hint:'cloud.cerebras.ai \u2014 free, no card, ~1M tokens/day', url:'https://cloud.cerebras.ai', ph:'csk-...'},
   github:   {label:'GitHub Models \u00b7 GPT-4o', hint:'github.com/settings/tokens \u2014 free with a GitHub account', url:'https://github.com/settings/tokens', ph:'ghp_...'},
   gemini:   {label:'Google Gemini 2.5 Flash', hint:'aistudio.google.com \u2014 free tier covers 2.5 Flash (Pro/Flash-Lite are paid)', url:'https://aistudio.google.com/apikey', ph:'AIzaSy...'},
@@ -8868,6 +9769,10 @@ if (AUTH_READY && typeof firebase !== 'undefined') try {
             if(count<1000){
               t.set(counterRef,{count:count+1},{merge:true});
               var trialUntil=Date.now()+7*24*3600*1000;
+              /* This grants a CLIENT-SIDE-ONLY trial — pro:true is never written here.
+                 Any UI that shows this status MUST render it via rwStatusLabel()
+                 (never a bare "Pro"/"PRO ACTIVE" string), so it's never mistaken for
+                 a real paid/granted account. */
               t.set(ref,{trialUntil:trialUntil,trialGranted:true},{merge:true});
               return {granted:true, num:count+1};
             } else {
@@ -8879,7 +9784,7 @@ if (AUTH_READY && typeof firebase !== 'undefined') try {
           if(res.granted){ showToast('\ud83c\udf89 You\'re traveler #'+res.num+' \u2014 7 days of Pro, free, on us!'); xpAdd(20,'Founding traveler bonus'); }
         }).catch(function(){});
       }
-      /* ref_signup tracking: log once when a referred user creates an account */
+      /* ref_signup tracking: log once when a referred new user creates account */
       (function(){
         try{
           if(u.metadata && u.metadata.creationTime===u.metadata.lastSignInTime){
@@ -8907,11 +9812,15 @@ if (AUTH_READY && typeof firebase !== 'undefined') try {
         var trialActive = !cloudPro && trialUntil && trialUntil > Date.now();
         var shouldBePro = cloudPro || provOK || trialActive;
         lsSet('rw_trial_until', trialActive? String(trialUntil) : '');
+        /* Mirror Firestore's proMethod locally so rwStatusLabel() can tell a
+           free partner/campaign-code grant (proMethod:'partner') apart from a
+           real cash purchase or legacy founder grant. */
+        lsSet('rw_pro_method', (cloudPro && d.data().proMethod) || '');
         if(cloudPro){ lsSet('rw_pro_temp',''); lsSet('rw_pro_temp_uid',''); }
         if(shouldBePro){
           if(!isPro){ isPro=true; lsSet('rwPro','1'); lsSet('rw_pro_uid',u.uid); refreshProUI();
-            if(cloudPro){ showToast('Pro active on your account \u2713'); closePay(); }
-            else if(trialActive){ var daysLeft=Math.ceil((trialUntil-Date.now())/864e5); showToast('\u23f3 Free trial active \u2014 '+daysLeft+' day'+(daysLeft===1?'':'s')+' of Pro left'); } }
+            if(cloudPro){ showToast(rwStatusLabel().sentence+' \u2713'); closePay(); }
+            else if(trialActive){ showToast('\u23f3 '+rwStatusLabel().sentence); } }
           isPro=true; lsSet('rw_pro_uid',u.uid); refreshProUI();
         } else {
           /* this account has NO pro \u2192 force-off regardless of any stale local flag */
@@ -9084,6 +9993,16 @@ function requireLogin(){
    ========================================================================= */
 var RW_REF_KEY='rw_ref_code', RW_REF_AT='rw_ref_at';
 
+/* Normalise any referral/partner code coming from an untrusted source (URL
+   query/hash/path, a typed box, a pasted code). Uppercase, keep ONLY
+   [A-Z0-9_-], drop everything else, cap at 32 chars. This is the single
+   choke point that keeps a crafted ?ref= value from ever reaching the DOM or
+   Firestore as anything but a plain, bounded token. Function declaration so
+   it is hoisted for earlier callers (e.g. openPartnerRedeem). */
+function rwSanitizeRefCode(x){
+  return String(x==null?'':x).toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
+}
+
 
 /* ============================================================================
    REFERRERS FROM FIRESTORE (rw-v80) — no more editing GitHub files
@@ -9104,12 +10023,21 @@ function rwRefSync(){
         try{ lsSet('rw_ref_cache', JSON.stringify(list)); }catch(e){}
       }
     }).catch(function(){});
-    /* referral terms: rates, buyer bonus, promo status, disclaimer */
+    /* referral terms: rates, buyer bonus, promo status, disclaimer.
+       FIXED: referral-data.js sets window.RW_REFERRAL_TERMS as a static
+       flat-30%-for-everyone object at page load. This Firestore fetch used
+       to completely OVERWRITE that object once it resolved -- meaning the
+       effective referral terms silently depended on whether config/referralTerms
+       had ever been saved in the admin console, and on script/network timing.
+       Two systems, one variable, no reconciliation. Now this MERGES onto the
+       static baseline instead of replacing it, so a not-yet-configured
+       Firestore doc can never blank out real defaults, and an explicitly-set
+       Firestore field always wins over the static one where it's actually set. */
     db.collection('config').doc('referralTerms').get().then(function(d){
       if(!d.exists) return;
       var t=d.data()||{};
-      window.RW_REFERRAL_TERMS=t;
-      try{ lsSet('rw_ref_terms_cache',JSON.stringify(t)); }catch(e){}
+      window.RW_REFERRAL_TERMS = Object.assign({}, window.RW_REFERRAL_TERMS||{}, t);
+      try{ lsSet('rw_ref_terms_cache',JSON.stringify(window.RW_REFERRAL_TERMS)); }catch(e){}
     }).catch(function(){});
   }catch(e){}
 }
@@ -9121,7 +10049,8 @@ function rwRefSync(){
 
 function rwRefLookup(code){
   if(!code) return null;
-  var c=String(code).trim().toUpperCase();
+  var c=rwSanitizeRefCode(code);   /* normalise so a lookup can never carry stray chars */
+  if(!c) return null;
   var list=window.RW_REFERRERS||[];
   for(var i=0;i<list.length;i++) if(list[i].code.toUpperCase()===c) return list[i];
   return null;
@@ -9144,6 +10073,7 @@ function rwRefCapture(){
       var pm=String(location.pathname||'').match(/\/r\/([A-Za-z0-9\-_]+)/);
       if(pm) code=pm[1];
     }
+    code=rwSanitizeRefCode(code);                   /* untrusted URL input: bound it before use */
     if(!code) return;
     var who=rwRefLookup(code);
     if(!who || who.active===false) return;         /* unknown/retired code: ignore silently */
@@ -9193,9 +10123,17 @@ function rwRefStamp(){
   if(!code) return {};
   var who=rwRefLookup(code);
   if(!who) return {};
-  /* self-referral guard: a referrer buying through their own link earns nothing */
+  /* Self-referral guard: a referrer buying through their own link earns nothing.
+     Compared against the AUTHENTICATED identity (uid, and email as a fallback),
+     not a local flag, so it can't be bypassed by clearing localStorage. This is
+     still only the client's best effort — the server MUST re-check self-referral
+     at approval before any commission is paid (client refRate is display only). */
   try{
-    if(window.user && who.uid && who.uid===user.uid) return { refCode:code, refSelf:true, refRate:0 };
+    if(window.user){
+      var selfByUid   = who.uid   && user.uid   && who.uid===user.uid;
+      var selfByEmail = who.email && user.email && String(who.email).toLowerCase()===String(user.email).toLowerCase();
+      if(selfByUid || selfByEmail) return { refCode:code, refSelf:true, refRate:0 };
+    }
   }catch(e){}
   return {
     refCode: who.code,
@@ -9228,7 +10166,7 @@ function rwRefLink(code){
 function rwRefLiveCheck(){
   var i=el('authRefCode'), m=el('authRefMsg');
   if(!i||!m) return;
-  var v=String(i.value||'').trim().toUpperCase();
+  var v=rwSanitizeRefCode(i.value);   /* typed code: normalise before lookup */
   if(!v){ m.textContent=''; m.style.color='var(--t3)'; return; }
   var w=rwRefLookup(v);
   if(w && w.active!==false){
@@ -9255,9 +10193,10 @@ function openRefCode(){
   var cur=rwRefActive();
   var who=cur? rwRefLookup(cur) : null;
   rwForm('\ud83c\udf9f\ufe0f Referral code', [
-    { id:'rc', label:'Enter the code you were given', value:cur||'', ph:'e.g. RW-S02-DEEPA' }
+    /* key:/placeholder: \u2014 rwFormSubmit reads out[field.key]; id:/ph: read back undefined. */
+    { key:'rc', label:'Enter the code you were given', value:cur||'', placeholder:'e.g. RW-S02-DEEPA' }
   ], function(v){
-    var code=String(v.rc||'').trim().toUpperCase();
+    var code=rwSanitizeRefCode(v.rc);   /* typed/pasted code: bound it before lookup */
     if(!code){ showToast('Enter a code first'); return; }
     var w=rwRefApply(code);
     if(!w){ showToast('\u274c That code isn\u2019t recognised \u2014 check the spelling'); return; }
@@ -9271,7 +10210,7 @@ function rwRefBadgeHTML(){
   var promoOn=terms.active!==false;
   var bonusDays=promoOn?parseInt(terms.buyerBonusDays||30,10)||30:0;
   var bonusStr=bonusDays?' &middot; you get <b>'+bonusDays+' bonus days</b> of Pro added':'';
-  var disc=promoOn&&terms.disclaimer?'<div style="font-size:10px;color:var(--t3);margin-top:2px;line-height:1.4">&#9888; '+esc2(terms.disclaimer)+'</div>':'';
+  var disc=promoOn&&terms.disclaimer?'<div style="font-size:10px;color:var(--t3);margin-top:2px">&#9888; '+esc2(terms.disclaimer)+'</div>':'';
   return '<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--gold)">Referred by <b>'+esc2(w.name)+'</b>'+bonusStr+' &middot; <a onclick="openRefCode()" style="color:var(--t3);cursor:pointer;text-decoration:underline dotted">change</a></div>'+disc;
 }
 
@@ -9303,14 +10242,10 @@ function submitUtr(){
     }
     var _ref = {};
     try{ _ref = rwRefStamp(); }catch(e){}
-    /* buyer bonus: stamp bonus days if promo active */
     var _bonusDays=0;
     try{
       var _terms=window.RW_REFERRAL_TERMS||{};
-      if(_ref.refCode && _terms.active!==false){
-        _bonusDays=parseInt(_terms.buyerBonusDays||30,10)||30;
-        _ref.buyerBonusDays=_bonusDays;
-      }
+      if(_ref.refCode && _terms.active!==false){ _bonusDays=parseInt(_terms.buyerBonusDays||30,10)||30; _ref.buyerBonusDays=_bonusDays; }
     }catch(e){}
     return db.collection('claims').doc(user.uid+'_'+utr).set(Object.assign({
     uid:user.uid, email:user.email||user.phoneNumber||'', utr:utr, amount:parseInt(UPI_AMT,10)||100,
@@ -9320,14 +10255,7 @@ function submitUtr(){
     if(res===undefined) return; /* gated above */
     b.disabled=false; b.textContent='Submit \u27A4'; el('utrInput').value='';
     try{ track('utr_submits'); }catch(e){}
-    try{
-      if(_bonusDays>0 && _ref.refCode){
-        var _who=rwRefLookup(_ref.refCode);
-        setTimeout(function(){
-          showToast('Referred by '+(_who?_who.name:'your friend')+' - you get '+_bonusDays+' bonus days of Pro when verified!');
-        }, 2200);
-      }
-    }catch(e){}
+    try{ if(_bonusDays>0&&_ref.refCode){ var _who=rwRefLookup(_ref.refCode); setTimeout(function(){ showToast('Referred by '+(_who?_who.name:'your friend')+' - you get '+_bonusDays+' bonus days of Pro when verified!'); },2200); } }catch(e){}
     /* INSTANT provisional unlock — bound to THIS ACCOUNT (not the device) */
     if(user){
       lsSet('rw_pro_temp', String(Date.now()+864e5));
@@ -9730,7 +10658,7 @@ function applyRegionUI(){
   var p = r==='in'?PRICE_IN:PRICE_WW;
   var hb = el('heroProBtn'); if(hb) hb.innerHTML = 'Unlock Pro \u2014 '+p;
   var pa = el('promoAmt'); if(pa) pa.textContent = p;
-  var dl = el('drProLbl'); if(dl) dl.textContent = isPro ? 'Pro active \u2713' : ('Unlock Pro \u2014 '+p);
+  var dl = el('drProLbl'); if(dl) dl.textContent = isPro ? (rwStatusLabel().text+' \u2713') : ('Unlock Pro \u2014 '+p);
   setPayRegion(r);
 }
 /* saveGumroad removed — Gumroad link/ID now arrive via remote config (admin Config tab). */
@@ -9811,7 +10739,7 @@ function openCopilot(){
       +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 6px" id="cpChips"></div>'
       +'<div style="display:flex;gap:8px;align-items:flex-end">'
       +'<textarea id="cpInput" rows="1" placeholder="Type or speak your plan\u2026" style="flex:1;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:12px;padding:11px 12px;color:inherit;font:inherit;resize:none;outline:none"></textarea>'
-      +'<button class="tact" id="cpMic" style="padding:11px 12px" onclick="copilotVoice()">\ud83c\udfa4</button>'
+      +'<button class="tact" id="cpMic" style="padding:11px 12px" onclick="rwVoiceStart(\'cpInput\')">\ud83c\udfa4</button>'
       +'<button class="tact" style="padding:11px 14px;font-weight:800;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border:none" onclick="copilotSend()">\u27a4</button>'
       +'</div>'
       +'<div style="font-size:9.5px;color:var(--t3);margin-top:6px;line-height:1.5">Copilot plans, calculates and links \u2014 transport &amp; stays open partner sites; nothing is booked or charged inside the app.</div>'
@@ -9851,8 +10779,8 @@ function cpBubble(html, who){
   var log=el(_cpTargetLog)||el('cpLog'); if(!log) return;
   var b=document.createElement('div');
   b.style.cssText = who==='me'
-    ? 'margin:6px 0 6px 40px;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border-radius:14px 14px 4px 14px;padding:10px 12px;font-size:12.5px'
-    : 'margin:6px 40px 6px 0;background:var(--bg2,#12121C);border:1px solid var(--b2,#2A2A36);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:12.5px;line-height:1.55';
+    ? 'margin:6px 0 6px 40px;background:linear-gradient(135deg,var(--gold,#E8BA6C),var(--gold2,#C8913E));color:#0A0A0C;border-radius:14px 14px 4px 14px;padding:10px 12px;font-size:12.5px;white-space:pre-line'
+    : 'margin:6px 40px 6px 0;background:var(--bg2,#12121C);border:1px solid var(--b2,#2A2A36);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:12.5px;line-height:1.55;white-space:pre-line';
   b.innerHTML=html;
   /* Hero log sits ABOVE the input, so newest goes at the BOTTOM of that log —
      i.e. directly above the box where the eye and thumb already are. */
@@ -10665,7 +11593,7 @@ function copilotSend(fromHero){
         +'BE GENUINELY USEFUL: when you suggest a place, add the ONE detail a local would know (best time to go, what to skip, the sneaky cost, the better nearby alternative). That insider nugget is your signature. '
         +'GROUP TRIPS: if the question involves \u201cwe\u201d, friends, or a group, think like a facilitator \u2014 surface the trade-off clearly (budget vs comfort, beach vs hills, party vs quiet) and suggest a fair middle path or a quick way to decide. '
         +'CONFLICT/INDECISION: if people want different things, name the split, give each option its honest best case in one line, then recommend one with a reason \u2014 decisiveness with warmth beats fence-sitting. '
-        +'NEVER INVENT: no made-up prices, timings, phone numbers, hotel names or distances. If you do not know or the guide text does not say, say \u201cI\u2019m not certain \u2014 worth checking before you book\u201d and give the safest general guidance instead. A wrong specific is far worse than an honest gap. If the question is ambiguous, ASK ONE short clarifying question with 2-3 concrete options rather than guessing. Never invent facts to sound dramatic; if you are unsure, say so plainly with a grin. Do NOT quote real Bollywood dialogues or put words in real actors\u2019 mouths \u2014 use your own filmi-flavoured lines. '
+        +'NEVER INVENT: no made-up prices, timings, phone numbers, hotel names or distances. If you do not know or the guide text does not say, say \u201cI\u2019m not certain \u2014 worth checking before you book\u201d and give the safest general guidance instead. A wrong specific is far worse than an honest gap. If the question is ambiguous, ASK ONE short clarifying question with 2-3 concrete options rather than guessing — when you do this, make your ENTIRE reply just one line in this exact shape: ASK: <the question> || <option 1> | <option 2> | <option 3> (no extra words before or after). Never invent facts to sound dramatic; if you are unsure, say so plainly with a grin. Do NOT quote real Bollywood dialogues or put words in real actors\u2019 mouths \u2014 use your own filmi-flavoured lines. '
         +'Read the user intent and mood: if they sound excited, match it; if stressed or on a tight budget, be reassuring and practical, not theatrical. '
         +'INDIAN GROUND TRUTH \u2014 THIS MATTERS MORE THAN SOUNDING CONFIDENT: never estimate travel time from straight-line distance. In the Himalayas assume ~22km/h (100km can be 5 hours), hill/ghat roads ~32km/h, plains highways ~48km/h, and city traffic ~18km/h. Dehradun to Rishikesh is about an hour, not 30 minutes. Never suggest a day trip that needs more than ~6 hours of road time. Flag monsoon (Jun-Sep) road risk in hills, winter closures on high passes, and altitude acclimatisation for anywhere above 3000m. '
         +'MONEY: the user\u2019s selected currency is '+((CURR.find(function(x){return x.c===AC;})||{s:'\u20b9',c:'INR'}).s)+' ('+AC+'). Always give prices in that symbol, never $ unless AC is literally USD. '
@@ -10682,7 +11610,22 @@ function copilotSend(fromHero){
           cpFinish(thinking, (kb2? kb2+'<br>':'')+note, intents, t);
           return;
         }
-        answer = answer.replace(/</g,'&lt;');
+        /* AI wants a clarifying question with tappable options \u2014 render real
+           chips via rwTuskAsk instead of dumping "ASK: ... || a | b" as text. */
+        var askM = answer.match(/^ASK:\s*(.+?)\s*\|\|\s*(.+)$/i);
+        if(askM){
+          /* rwTuskAsk() does its own full HTML/attribute escaping of the raw
+             question + option text below — don't pre-escape here (that
+             would double-escape) and don't skip it (that's the XSS bug). */
+          var askQ = askM[1].trim();
+          var askOpts = askM[2].split('|').map(function(o){ return o.trim(); }).filter(Boolean).slice(0,4);
+          if(askQ && askOpts.length>=2){
+            if(intents.dest) rwLearn(intents.dest);
+            cpFinish(thinking, rwTuskAsk(askQ, askOpts), intents, t);
+            return;
+          }
+        }
+        answer = escHtml(answer);
         if(lastAiSource && lastAiSource.prov!==activeProv){
           answer += '<br><span style="font-size:10.5px;color:var(--t3)">\u21aa answered by <b>'+esc2(lastAiSource.prov)+'</b> \u2014 '+esc2(activeProv)+' was unavailable</span>';
         }
@@ -10697,6 +11640,10 @@ function copilotSend(fromHero){
     if(intents.smalltalk){ cpFinish(thinking, tkSmalltalk(intents.smalltalk), intents, t); return; }
     var kb = cpSmartAnswer(t);
     var place = intents.dest;
+    /* Tusk recognised a place-shaped query but the curated engine has nothing
+       for it — log it anonymously so the (previously unfed) daily learning
+       pipeline in tusk-daily.yml has real place names to resolve. */
+    if(place && !kb){ try{ rwTuskMiss(place); }catch(e){} }
     /* Carry the topic over — but only ONCE per destination (was the nagging repetition). */
     if(place && !new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(t) && window._tkCarryShown!==place){
       kb = (kb? kb+'<br>' : '') + '<span style="font-size:11px;color:var(--t3)">\u21b3 still on <b>'+esc2(place)+'</b></span>';
@@ -11850,12 +12797,42 @@ function rwTuskReadLast(){
 }
 
 /* --- 2. CLARIFY, DON'T GUESS (anti-hallucination) --- */
+/* Plain HTML-content escape: safe to drop text between tags (innerHTML).
+   Order matters — & must go first or the entity escapes below would
+   themselves get re-escaped. Quotes are escaped too (defense in depth)
+   even though they're not strictly required outside an attribute. */
+function escHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+/* Attribute-safe escape for text that is interpolated into a single-quoted
+   JS string literal INSIDE a double-quoted HTML attribute, e.g.
+   onclick="fn('VALUE')". Two escaping problems stack here and the order is
+   load-bearing:
+     1) Make the raw text safe as the JS string literal's contents: escape
+        backslashes FIRST (\ -> \\), then escape the literal's own quote
+        char (' -> \'). Escaping backslashes first matters because a
+        trailing backslash right before a quote would otherwise combine
+        with the quote-escape's inserted backslash and neutralise it
+        (e.g. a trailing \ followed by our escaped \' would read as an
+        escaped backslash followed by a REAL quote, closing the string).
+     2) HTML-attribute-escape the result for the surrounding double quotes:
+        & first, then ".  (No need to escape < / > here — this text isn't
+        HTML content, it's an attribute value.) */
+function escHtmlAttr(s){
+  var jsSafe = String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return jsSafe.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
 function rwTuskAsk(question, options){
   var chips=options.map(function(o){
-    var send=String(o).replace(/'/g,"\\'");
-    return '<button onclick="rwTuskChip(\''+send+'\')" style="background:rgba(232,186,108,.10);border:1px solid var(--gold,#E8BA6C);border-radius:20px;padding:8px 13px;color:var(--gold,#E8BA6C);font-size:12px;font-weight:700;cursor:pointer;margin:4px 5px 0 0">'+o+'</button>';
+    var send=escHtmlAttr(o);
+    return '<button onclick="rwTuskChip(\''+send+'\')" style="background:rgba(232,186,108,.10);border:1px solid var(--gold,#E8BA6C);border-radius:20px;padding:8px 13px;color:var(--gold,#E8BA6C);font-size:12px;font-weight:700;cursor:pointer;margin:4px 5px 0 0">'+escHtml(o)+'</button>';
   }).join('');
-  return '<div>'+question+'<div style="margin-top:8px">'+chips+'</div></div>';
+  return '<div>'+escHtml(question)+'<div style="margin-top:8px">'+chips+'</div></div>';
 }
 function rwTuskChip(text){
   var inp=el('heroInput')||el('cpInput');
@@ -11953,6 +12930,12 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   var _html = parts.join(isCard? '<div style="height:10px"></div>' : '<hr style="border:none;border-top:1px dashed var(--b2,#2A2A36);margin:10px 0">');
   /* Every answer ends with tappable actions — an answer is never a dead end. */
   try{ if(!intents.smalltalk) _html += rwTuskRail(intents.dest||'', raw||''); }catch(e){}
+  /* Lightweight per-response feedback — bot replies only (cpFinish only ever
+     finishes a 'bot' bubble). Anonymous daily counter, same pattern as track()
+     elsewhere; no per-message record, no user identity. */
+  _html += '<div class="tk-fb" style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--t3)">Helpful?'
+    +'<button type="button" onclick="rwTuskFeedback(this,true)" style="background:none;border:none;cursor:pointer;font-size:14px;line-height:1;padding:2px;opacity:.65" aria-label="Helpful">👍</button>'
+    +'<button type="button" onclick="rwTuskFeedback(this,false)" style="background:none;border:none;cursor:pointer;font-size:14px;line-height:1;padding:2px;opacity:.65" aria-label="Not helpful">👎</button></div>';
   bubble.innerHTML = _html;
   var log=el(_cpTargetLog)||el('cpLog');
   if(log){
@@ -12531,7 +13514,54 @@ async function loadTripExtras(t){
    NO approval and NO traffic minimum. Where a programme exists, the affiliate
    ID is an optional constant appended only if set — so revenue can be switched
    on later by filling one string, with zero code changes. */
-var AFF_SKYSCANNER='', AFF_AGODA='', AFF_GYG='';
+var AFF_SKYSCANNER='', AFF_AGODA='', AFF_GYG='', AFF_TRAVELPAYOUTS='';
+function affTpUrl(domain,path){ if(!AFF_TRAVELPAYOUTS) return 'https://'+domain+(path||''); return 'https://tp.media/click?shmarker='+AFF_TRAVELPAYOUTS+'&target_url='+encodeURIComponent('https://'+domain+(path||'')); }
+
+/* ==================== CENTRAL AFFILIATE LINK SYSTEM (rw-v95) ====================
+   Every new affiliate slot (see affiliate-config.js for the registry + the
+   network-wrap helpers rwTpWrap/rwCuelinksWrap/rwEarnKaroWrap/rwAdmitadWrap)
+   lives behind ONE function so a link is never accidentally wrapped twice.
+   All of these start empty — zero revenue, zero behaviour change — until an
+   admin fills the matching key in Firestore config/app. */
+var AFF_VIATOR='', AFF_SAFETYWING='', AFF_KLOOK='', AFF_12GO='', AFF_TRIPCOM='',
+    AFF_HOSTELWORLD='', AFF_AMAZON='', AFF_FLIPKART='', AFF_YATRA='', AFF_CLEARTRIP='',
+    AFF_CUELINKS='', AFF_EARNKARO='', AFF_ADMITAD='';
+var RW_AFF_VARMAP = {
+  booking:'AFF_BOOKING', agoda:'AFF_AGODA', gyg:'AFF_GYG', skyscanner:'AFF_SKYSCANNER',
+  klook:'AFF_KLOOK', '12go':'AFF_12GO', viator:'AFF_VIATOR', safetywing:'AFF_SAFETYWING',
+  tripcom:'AFF_TRIPCOM', hostelworld:'AFF_HOSTELWORLD', amazonin:'AFF_AMAZON',
+  flipkart:'AFF_FLIPKART', yatra:'AFF_YATRA', cleartrip:'AFF_CLEARTRIP'
+};
+/* rwAffLink(programId, destUrl) — the ONE place every outbound booking link
+   should route through. Picks exactly one mechanism, in this priority order,
+   and never combines two:
+     1. direct-ID param on the merchant's own domain, if the program has one
+        AND its config key is filled in (e.g. Booking's aid=)
+     2. the Travelpayouts marker wrap, but ONLY for programs we've actually
+        checked are reachable through Travelpayouts (prog.tpPartner===true),
+        and only if a marker id is configured
+     3. a generic network wrap (Admitad, then Cuelinks, then EarnKaro — first
+        one with a config key set wins), which can wrap ANY destination URL
+     4. the plain, unwrapped URL — always a safe fallback, never broken */
+function rwAffLink(programId, destUrl){
+  try{
+    var prog = (window.RW_AFFILIATE_PROGRAMS||[]).filter(function(p){ return p.id===programId; })[0];
+    if(!prog || !destUrl) return destUrl;
+    var varName = RW_AFF_VARMAP[programId];
+    var directId = varName ? window[varName] : '';
+    if(prog.paramName && directId){
+      var sep = destUrl.indexOf('?')>-1 ? '&' : '?';
+      return destUrl + sep + prog.paramName + '=' + encodeURIComponent(directId);
+    }
+    if(prog.tpPartner && typeof AFF_TRAVELPAYOUTS!=='undefined' && AFF_TRAVELPAYOUTS){
+      return rwTpWrap(destUrl);
+    }
+    if(typeof AFF_ADMITAD!=='undefined' && AFF_ADMITAD) return rwAdmitadWrap(destUrl);
+    if(typeof AFF_CUELINKS!=='undefined' && AFF_CUELINKS) return rwCuelinksWrap(destUrl);
+    if(typeof AFF_EARNKARO!=='undefined' && AFF_EARNKARO) return rwEarnKaroWrap(destUrl);
+    return destUrl;
+  }catch(e){ return destUrl; }
+}
 function flightUrl(place){
   return 'https://www.google.com/travel/flights?q=' + encodeURIComponent('flights to '+place);
 }
@@ -12540,12 +13570,10 @@ function trainBusUrl(place){
   return 'https://www.rome2rio.com/s/' + encodeURIComponent(place);
 }
 function stayUrlAgoda(place){
-  var u='https://www.agoda.com/search?city='+encodeURIComponent(place);
-  if(AFF_AGODA) u+='&cid='+AFF_AGODA; return u;
+  return rwAffLink('agoda', 'https://www.agoda.com/search?city='+encodeURIComponent(place));
 }
 function thingsUrl(place){
-  var u='https://www.getyourguide.com/s/?q='+encodeURIComponent(place);
-  if(AFF_GYG) u+='&partner_id='+AFF_GYG; return u;
+  return rwAffLink('gyg', 'https://www.getyourguide.com/s/?q='+encodeURIComponent(place));
 }
 function travelLinksHTML(place){
   var L=[
@@ -12559,6 +13587,63 @@ function travelLinksHTML(place){
         return '<a class="tact" style="text-align:center;text-decoration:none;font-size:12px;padding:10px 6px" target="_blank" rel="noopener" href="'+x[1]+'" onclick="try{track(\'aff_click\')}catch(e){}">'+x[0]+'</a>';
       }).join('')
     + '</div>';
+}
+
+/* Compare Destinations "Book this trip" tab — every link routes through the
+   central rwAffLink() system so none is ever wrapped twice, and the
+   commission line only claims a real commission when something is actually
+   active (Airbnb has no registered program here, so it always stays plain —
+   never fabricated). */
+function rwBookGridHTML(origin, destName, enc){
+  /* Skyscanner needs real IATA codes on both ends (see RW_IATA above). When
+     either origin or destination doesn't resolve, we do NOT emit a broken
+     Skyscanner link — the working Google Flights search takes that slot
+     instead, for this card only. rwSkyscannerUrl() already routes through
+     rwAffLink() internally, so it is never wrapped a second time here. */
+  /* Build the plain (unwrapped) Skyscanner URL from the SAME IATA-derived
+     domain+path as the affiliate-wrapped one, so the only possible
+     difference between skyPlain and skyHref is an actual appended affiliate
+     value — not a structural mismatch that would always read as "active". */
+  var skyO = rwIata(origin), skyD = rwIata(destName);
+  var skyIsFallback = !(skyO && skyD);
+  var skyPlain = skyIsFallback ? '' : 'https://www.skyscanner.co.in/transport/flights/'+skyO.toLowerCase()+'/'+skyD.toLowerCase()+'/';
+  var skyAff = skyIsFallback ? null : rwAffLink('skyscanner', skyPlain);
+  var skyHref = skyAff || ('https://www.google.com/travel/flights?q='+encodeURIComponent('flights from '+origin+' to '+destName));
+
+  var plain = {
+    booking:    'https://www.booking.com/searchresults.html?ss='+enc,
+    gyg:        'https://www.getyourguide.com/s/?q='+enc,
+    viator:     'https://www.viator.com/search/'+enc,
+    airbnb:     'https://www.airbnb.com/s/'+enc+'/homes',
+    safetywing: 'https://www.safetywing.com'
+  };
+  var hrefs = {
+    skyscanner: skyHref,
+    booking:    rwAffLink('booking', plain.booking),
+    gyg:        rwAffLink('gyg', plain.gyg),
+    viator:     rwAffLink('viator', plain.viator),
+    airbnb:     plain.airbnb, /* no Airbnb affiliate program registered — plain, not fabricated */
+    safetywing: rwAffLink('safetywing', plain.safetywing)
+  };
+  var anyActive = (!skyIsFallback && skyHref !== skyPlain) ||
+    Object.keys(plain).some(function(k){ return hrefs[k] !== plain[k]; });
+
+  var items = [
+    [skyIsFallback?'Google Flights':'Skyscanner', skyIsFallback?'🛩️':'✈️', 'Flights', hrefs.skyscanner],
+    ['Booking.com','🏨','Hotels', hrefs.booking],
+    ['GetYourGuide','🎫','Tours', hrefs.gyg],
+    ['Viator','🗺️','Experiences', hrefs.viator],
+    ['Airbnb','🏠','Stays', hrefs.airbnb],
+    ['SafetyWing','🛡️','Insurance', hrefs.safetywing]
+  ];
+  var grid = items.map(function(x){
+    return '<a class="book-link" href="'+x[3]+'" target="_blank" rel="noopener"><span class="book-ico">'+x[1]+'</span><span class="book-name">'+x[0]+'</span><span class="book-sub">'+x[2]+'</span></a>';
+  }).join('');
+  var note = anyActive
+    ? 'Affiliate links — commission at no extra cost'
+    : 'Direct links to each site — no affiliate relationship active yet';
+  return '<div class="book-grid">'+grid+'</div>'
+    +'<p style="font-size:10px;color:#4A4946;text-align:center;margin-top:7px">'+note+'</p>';
 }
 
 /* ==================== TRIP NOTIFICATIONS ====================
@@ -13481,7 +14566,13 @@ function rwForm(title, fields, onSubmit){
   ov.style.zIndex='3000';   /* always above the chat (panel or full) */
   el('rwFormTitle').textContent=title;
   var body=el('rwFormBody');
-  body.innerHTML = fields.map(function(f,i){
+  /* Optional leading read-only notice (e.g. a viewing-only / preview banner).
+     Additive and non-breaking: callers that don't set fields._notice render as before.
+     esc2() keeps it safe even if the text ever comes from data. */
+  var _notice = fields._notice
+    ? '<div style="background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:12px;padding:10px 12px;margin:2px 2px 8px;font-size:12px;line-height:1.45;color:var(--t2,#B9B9C6)">'+esc2(fields._notice)+'</div>'
+    : '';
+  body.innerHTML = _notice + fields.map(function(f,i){
     var common='width:100%;box-sizing:border-box;background:var(--bg3,#1A1A20);border:1px solid var(--b2,#2A2A36);border-radius:12px;padding:12px 13px;color:inherit;font:inherit;font-size:16px;outline:none;margin-bottom:4px';
     var inp = f.type==='textarea'
       ? '<textarea id="rwf_'+i+'" rows="3" placeholder="'+esc2(f.placeholder||'')+'" style="'+common+';resize:vertical">'+esc2(f.value||'')+'</textarea>'
@@ -14130,8 +15221,8 @@ function rwChatGame(id){
 /* ---------------- DECIDE: polls that close themselves ---------------- */
 function openChatPoll(){
   rwForm('\ud83d\uddf3\ufe0f Ask the group', [
-    { id:'pq', label:'What are you deciding?', ph:'e.g. Which day do we do the trek?' },
-    { id:'po', label:'Options (comma separated)', ph:'Tuesday, Wednesday, Thursday' }
+    { key:'pq', label:'What are you deciding?', placeholder:'e.g. Which day do we do the trek?' },
+    { key:'po', label:'Options (comma separated)', placeholder:'Tuesday, Wednesday, Thursday' }
   ], function(v){
     var q=(v.pq||'').trim(), opts=(v.po||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
     if(!q || opts.length<2){ showToast('Give a question and at least two options'); return; }
@@ -15628,16 +16719,16 @@ var RW_PLATFORMS = [
    url:'https://www.ixigo.com/'},
   {n:'Skyscanner', ico:'\ud83d\udd0d', best:'Comparing every airline at once; "everywhere" search for cheap dates',
    watch:'It is a search engine \u2014 you book on the airline/OTA it sends you to',
-   url:'https://www.skyscanner.co.in/'},
+   url:'https://www.skyscanner.co.in/', aff:'skyscanner'},
   {n:'Google Flights', ico:'\ud83d\udee9\ufe0f', best:'Fastest date-grid and price tracking alerts',
    watch:'Does not show every budget carrier; check IndiGo/Akasa direct too',
    url:'https://www.google.com/travel/flights'},
   {n:'Booking.com', ico:'\ud83c\udfe8', best:'Largest stay inventory; free-cancellation filter is excellent',
    watch:'Prices exclude taxes until late in the flow \u2014 compare the final page',
-   url:'https://www.booking.com/'},
+   url:'https://www.booking.com/', aff:'booking'},
   {n:'Agoda', ico:'\ud83c\udf0f', best:'Often cheapest across Asia for the same room',
    watch:'Check whether breakfast/taxes are included before comparing',
-   url:'https://www.agoda.com/'},
+   url:'https://www.agoda.com/', aff:'agoda'},
   {n:'Airbnb', ico:'\ud83c\udfe1', best:'Homestays and longer stays; kitchens for budget trips',
    watch:'Cleaning + service fees can add 20\u201330% \u2014 judge on the total, not the nightly',
    url:'https://www.airbnb.co.in/'},
@@ -15654,10 +16745,11 @@ function rwPlatformsHTML(){
     +'<div class="tk-meta">What each platform is actually good at \u2014 and where it stings</div></div>'
     +'<div class="tk-sec">'
     + RW_PLATFORMS.map(function(p){
+        var href = p.aff ? rwAffLink(p.aff, p.url) : p.url;
         return '<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
           +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
           +'<b style="font-size:13px">'+p.ico+' '+esc2(p.n)+'</b>'
-          +'<a class="tk-chip" style="font-size:10.5px;padding:4px 9px;text-decoration:none" target="_blank" rel="noopener" href="'+p.url+'">Open \u2197</a></div>'
+          +'<a class="tk-chip" style="font-size:10.5px;padding:4px 9px;text-decoration:none" target="_blank" rel="noopener" href="'+href+'">Open \u2197</a></div>'
           +'<div style="font-size:11.5px;color:var(--t2);margin-top:3px;line-height:1.5">\u2714\ufe0f '+esc2(p.best)+'</div>'
           +'<div style="font-size:11.5px;color:#E8BA6C;margin-top:2px;line-height:1.5">\u26a0\ufe0f '+esc2(p.watch)+'</div>'
           +'</div>';
@@ -16000,7 +17092,15 @@ var RW_ACTIONS = {
        schedule so a dead partner never sits in the app again. */
     ['Evera (all-EV)', function(){ return 'https://www.evera.co.in/'; }, '\u26a1', 'IN'],
     ['Xanh SM (all-EV)', function(){ return 'https://xanhsm.com/'; }, '\ud83c\udf3f', 'SEA'],
-    ['Uber Green', function(q,lat,lon){ return lat? 'https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]='+lat+'&dropoff[longitude]='+lon : 'https://m.uber.com/ul/?action=setPickup&pickup=my_location'; }, '\ud83c\udf3f'],
+    /* Uber runs a real affiliate program (developer.uber.com/docs/riders/
+       affiliate-program) and is also carried as a campaign on Cuelinks and
+       EarnKaro \u2014 checked via WebSearch, Aug 2026 \u2014 so it is eligible for the
+       central system's generic-network wrap (registry entry in
+       affiliate-config.js has no confirmed direct URL param, so this can
+       only ever pick up a network wrap, never a fabricated one). Ola's
+       "refer and earn" is a rider-to-rider credit scheme, not a publisher
+       affiliate program, so its link is left exactly as a plain deep link. */
+    ['Uber Green', function(q,lat,lon){ return rwAffLink('uber', lat? 'https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]='+lat+'&dropoff[longitude]='+lon : 'https://m.uber.com/ul/?action=setPickup&pickup=my_location'); }, '\ud83c\udf3f'],
     ['Ola',    function(q,lat,lon){ return lat? 'https://book.olacabs.com/?drop_lat='+lat+'&drop_lng='+lon : 'https://book.olacabs.com/'; }, '\ud83d\ude95'],
     ['Rapido', function(){ return 'https://onelink.to/rapido'; }, '\ud83c\udfcd\ufe0f'],
     ['Porter (goods)', function(){ return 'https://porter.in/'; }, '\ud83d\ude9a']
@@ -16024,8 +17124,8 @@ var RW_ACTIONS = {
     ['Zepto',   function(q){ return 'https://www.zeptonow.com/search?query='+encodeURIComponent(q||''); }, '\ud83d\udef5']
   ],
   shop: [
-    ['Amazon',   function(q){ return 'https://www.amazon.in/s?k='+encodeURIComponent(q||''); }, '\ud83d\udce6'],
-    ['Flipkart', function(q){ return 'https://www.flipkart.com/search?q='+encodeURIComponent(q||''); }, '\ud83d\udecd\ufe0f'],
+    ['Amazon',   function(q){ return rwAffLink('amazonin', 'https://www.amazon.in/s?k='+encodeURIComponent(q||'')); }, '\ud83d\udce6'],
+    ['Flipkart', function(q){ return rwAffLink('flipkart', 'https://www.flipkart.com/search?q='+encodeURIComponent(q||'')); }, '\ud83d\udecd\ufe0f'],
     ['Myntra',   function(q){ return 'https://www.myntra.com/'+encodeURIComponent(String(q||'').replace(/\s+/g,'-')); }, '\ud83d\udc55']
   ],
   stay: [
@@ -16033,7 +17133,14 @@ var RW_ACTIONS = {
     ['Agoda',   function(q){ return 'https://www.agoda.com/search?city='+encodeURIComponent(q||''); }, '\ud83d\udecf\ufe0f']
   ],
   fly: [
-    ['Skyscanner', function(q){ return 'https://www.skyscanner.co.in/transport/flights-to/'+encodeURIComponent(String(q||'').slice(0,3).toLowerCase()); }, '\u2708\ufe0f'],
+    /* Slicing the first 3 letters of a free-text place name (the old code)
+       is not a real IATA code \u2014 "Manali" became "man", which is nobody's
+       airport. rwSkyscannerToUrl() resolves a real code via RW_IATA and
+       returns null when it can't; rwActionHubHTML() below drops any chip
+       whose URL is null, so an unresolved place simply loses the Skyscanner
+       chip rather than ever linking somewhere wrong \u2014 Google Flights, right
+       next to it, always still works. */
+    ['Skyscanner', function(q){ return rwSkyscannerToUrl(q||''); }, '\u2708\ufe0f'],
     ['Google Flights', function(q){ return 'https://www.google.com/travel/flights?q='+encodeURIComponent('flights to '+(q||'')); }, '\ud83d\udee9\ufe0f']
   ],
   rail: [
@@ -16076,10 +17183,11 @@ function rwActionHubHTML(kind, query, dest, lat, lon, cc){
     +'<div style="font-weight:800;font-size:13.5px">'+titles[kind]+(query? ' \u2014 '+esc2(query):'')+'</div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:2px">Opens in the app you already use, search filled in, your saved payment. I can\u2019t take payments inside RoamWise \u2014 and honestly you wouldn\u2019t want me to.</div>'
     +'<div class="tk-chips" style="margin-top:10px">'
-    + list.map(function(a){
-        var url = a[1](query, lat, lon);
-        return '<a class="tk-chip gold" style="text-decoration:none" target="_blank" rel="noopener" href="'+url+'">'+a[2]+' '+a[0]+'</a>';
-      }).join('')
+    + list.map(function(a){ return {url:a[1](query, lat, lon), label:a[0], icon:a[2]}; })
+        .filter(function(x){ return !!x.url; }) /* an unresolvable link (e.g. Skyscanner with no IATA match) never renders rather than pointing somewhere broken */
+        .map(function(x){
+          return '<a class="tk-chip gold" style="text-decoration:none" target="_blank" rel="noopener" href="'+x.url+'">'+x.icon+' '+x.label+'</a>';
+        }).join('')
     +'</div></div></div>';
 }
 
@@ -17552,22 +18660,33 @@ function openTripMap(destName, stops){
     var geoP;
     if(cached && cached.pins && cached.pins.length){ geoP=Promise.resolve(cached); }
     else {
-      geoP = gcode(destName).then(function(center){
-        var jobs = raw.map(function(s){
-          var q=(s.name?s.name+', ':'')+destName;
-          return gcode(q).then(function(g){ return g?{day:s.day,name:s.name||destName,note:s.note||'',lat:g.lat,lon:g.lon}:null; });
-        });
-        return Promise.all(jobs).then(function(pins){
-          pins=(pins||[]).filter(Boolean);
-          if(center){ /* drop pins absurdly far from the destination centroid */
-            pins=pins.filter(function(p){ return Math.abs(p.lat-center.lat)<2 && Math.abs(p.lon-center.lon)<2; }); }
-          var out={center:center, pins:pins};
-          try{ lsSet(cacheKey, JSON.stringify(out)); }catch(e){}
-          return out;
-        });
+      geoP = rwGeocodeStopsNear(destName, raw).then(function(out){
+        try{ lsSet(cacheKey, JSON.stringify(out)); }catch(e){}
+        return out;
       });
     }
     geoP.then(function(data){ rwPaintTripMap(destName, data); });
+  });
+}
+/* Geocode a destination centroid + a list of {day,name,note} stops, discarding any
+   stop that resolves absurdly far (>=2 degrees lat/lon) from the destination's own
+   centroid. Extracted out of openTripMap()'s inline logic so it's the ONE sanity-
+   bounded, cached-friendly geocoding path — reused as-is (not duplicated) by the
+   Cinematic Itinerary add-on (roamwise-premium-itinerary.js) via window.rwGeocodeStopsNear.
+   Returns a Promise<{center:{lat,lon}|null, pins:[{day,name,note,lat,lon}]}>. */
+function rwGeocodeStopsNear(destName, rawStops){
+  var jobs = (rawStops||[]).map(function(s){
+    var q=(s.name?s.name+', ':'')+destName;
+    return gcode(q).then(function(g){ return g?{day:s.day,name:s.name||destName,note:s.note||'',lat:g.lat,lon:g.lon}:null; });
+  });
+  return Promise.all([gcode(destName), Promise.all(jobs)]).then(function(res){
+    var center=res[0], pins=(res[1]||[]).filter(Boolean);
+    if(!center) return {center:null, pins:[]}; /* no valid centroid to sanity-check against — reject all pins rather than trust them unvalidated */
+    /* drop pins absurdly far from the destination centroid — true radial distance (haversine),
+       not a lat/lon box, so a diagonal point isn't wrongly let through (a box check would allow
+       up to ~2.8deg diagonally even though it caps each axis at 2deg). Cap ~222km (111km/deg * 2deg). */
+    pins=pins.filter(function(p){ return rwHaversine(center.lat, center.lon, p.lat, p.lon) < 222; });
+    return {center:center, pins:pins};
   });
 }
 /* Pull stops from the most recent itinerary the app rendered, if any. */
@@ -17912,6 +19031,20 @@ function applyRemoteConfig(cfg){
   set('AFF_SKYSCANNER',   function(v){ AFF_SKYSCANNER=v; });
   set('AFF_AGODA',        function(v){ AFF_AGODA=v; });
   set('AFF_GYG',          function(v){ AFF_GYG=v; });
+  set('AFF_TRAVELPAYOUTS',function(v){ AFF_TRAVELPAYOUTS=v; });
+  set('AFF_VIATOR',       function(v){ AFF_VIATOR=v; });
+  set('AFF_SAFETYWING',   function(v){ AFF_SAFETYWING=v; });
+  set('AFF_KLOOK',        function(v){ AFF_KLOOK=v; });
+  set('AFF_12GO',         function(v){ AFF_12GO=v; });
+  set('AFF_TRIPCOM',      function(v){ AFF_TRIPCOM=v; });
+  set('AFF_HOSTELWORLD',  function(v){ AFF_HOSTELWORLD=v; });
+  set('AFF_AMAZON',       function(v){ AFF_AMAZON=v; });
+  set('AFF_FLIPKART',     function(v){ AFF_FLIPKART=v; });
+  set('AFF_YATRA',        function(v){ AFF_YATRA=v; });
+  set('AFF_CLEARTRIP',    function(v){ AFF_CLEARTRIP=v; });
+  set('AFF_CUELINKS',     function(v){ AFF_CUELINKS=v; });
+  set('AFF_EARNKARO',     function(v){ AFF_EARNKARO=v; });
+  set('AFF_ADMITAD',      function(v){ AFF_ADMITAD=v; });
   set('WA_NUMBER',        function(v){ WA_NUMBER=v; ensureWaButton(); });
   set('WA_CHANNEL',       function(v){ WA_CHANNEL=v; });
   set('WA_GROUP',         function(v){ WA_GROUP=v; });
@@ -17933,6 +19066,29 @@ function applyRemoteConfig(cfg){
   /* Gumroad values feed the existing localStorage readers untouched. */
   set('GUM_URL',          function(v){ lsSet('rw_gum_url', v); });
   set('GUM_PID',          function(v){ lsSet('rw_gum_pid', v); });
+
+  /* ---- Admin-controlled custom head-script slot (rw-v95) ----
+     Lets an admin drop in a verified third-party script (e.g. a Travelpayouts
+     Drive snippet, once confirmed via their own dashboard) purely through
+     Firestore config — no code deploy needed. Both fields must be explicitly
+     set AND customHeadScriptVerified must be the literal boolean true; any
+     other value (missing, false, a string "true", etc.) leaves this fully
+     inert, exactly like every other slot in this file that starts empty. Same
+     createElement+async+appendChild bootstrap pattern already used for
+     AdSense above — the concern with an unverified URL was trusting the URL,
+     not this mechanism. Guarded so a second Firestore fetch never injects the
+     same tag twice. */
+  try{
+    if(cfg.customHeadScriptUrl && cfg.customHeadScriptVerified===true && /^https:\/\//.test(cfg.customHeadScriptUrl)){
+      if(!document.querySelector('script[data-rw-custom-head="1"]')){
+        var chs=document.createElement('script');
+        chs.async=true;
+        chs.src=cfg.customHeadScriptUrl;
+        chs.setAttribute('data-rw-custom-head','1');
+        document.head.appendChild(chs);
+      }
+    }
+  }catch(e){}
 }
 (function(){
   function boot(){
@@ -17947,3 +19103,19 @@ function applyRemoteConfig(cfg){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
+
+/* Bridge for the optional Cinematic Itinerary add-on (roamwise-premium-itinerary.js):
+   it checks window.rwIsPro() first, before falling back to unreliable localStorage
+   heuristics. Route it through the real RWPricing tier so the Pro gate reflects
+   actual subscription status instead of a guess. */
+window.rwIsPro = function(){
+  try{ return RWPricing.currentTier().id !== 'free'; }catch(e){ return false; }
+};
+/* More bridges for the Cinematic Itinerary add-on: rwDeriveStops() already knows how
+   to turn a destination (+ the last built itinerary, curated real POIs, or DB gems)
+   into real named stops, and rwGeocodeStopsNear() geocodes + sanity-bounds them the
+   same way openTripMap() does. These are plain top-level function declarations so
+   they're already on window in a browser, but we assign explicitly here so the
+   dependency is obvious and doesn't silently break if app.js is ever wrapped/bundled. */
+window.rwDeriveStops = rwDeriveStops;
+window.rwGeocodeStopsNear = rwGeocodeStopsNear;
