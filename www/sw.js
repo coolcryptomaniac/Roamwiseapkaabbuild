@@ -12,7 +12,7 @@
  *    background. These are small and rarely change, so speed wins.
  *
  * 3) Never cached: Firebase/Firestore, ads, geocoding/weather APIs, YouTube,
- *    and promo.mp4. Live data must stay live, and the video is tens of MB —
+ *    and https://www.roamwise.co.in/promo.mp4. Live data must stay live, and the video is tens of MB —
  *    caching it would blow the origin's storage quota for no benefit.
  * ------------------------------------------------------------------------- */
 

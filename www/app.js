@@ -4300,7 +4300,7 @@ function openExternally(url){
   else { window.open(url, '_blank', 'noopener'); }
 }
 var PROMO_MP4_URL = 'https://roamwise.co.in/promo.mp4';
-var PROMO_EXT_URL = '';  /* optional external watch link from config */ /* self-hosted film — Mohit uploads promo.mp4 to the repo root (see PROJECT-STATE.md) */
+var PROMO_EXT_URL = '';  /* optional external watch link from config */ /* self-hosted film — Mohit uploads https://www.roamwise.co.in/promo.mp4 to the repo root (see PROJECT-STATE.md) */
 function filmPlayerHTML(){
   /* ONE player, used by both the billboard and the film section — there were
      two competing implementations before, which is why behaviour differed

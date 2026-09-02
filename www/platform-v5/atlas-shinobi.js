@@ -50,7 +50,7 @@
   #${ROOT_ID} .rw-film{opacity:0;z-index:2}
   #${ROOT_ID}.rw-video-ready .rw-film{opacity:1}
   #${ROOT_ID}.rw-video-ready .rw-poster{opacity:0}
-  #${ROOT_ID}.rw-video-failed .rw-poster{content:url('/assets/roamwise-opening.gif')}
+  #${ROOT_ID}.rw-video-failed .rw-poster{content:url('/assets/roamwise-opening-poster.png')}
   #${ROOT_ID} .rw-sheen{position:absolute;inset:-30%;z-index:4;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.11) 48%,rgba(255,184,244,.16) 50%,transparent 60%);transform:translateX(-65%) rotate(-4deg);animation:rwIntroSheen 3.5s ease-in-out infinite}
   #${ROOT_ID} .rw-matrix{z-index:5;opacity:.28;mix-blend-mode:screen;background-image:
     repeating-linear-gradient(90deg,transparent 0 29px,rgba(255,52,191,.13) 30px,transparent 31px 58px),
@@ -238,7 +238,7 @@
     video.addEventListener('ended', close, {once:true});
     video.addEventListener('error', function(){
       root.classList.add('rw-video-failed');
-      poster.src = '/assets/roamwise-opening.gif';
+      poster.src = '/assets/roamwise-opening-poster.png';
     }, {once:true});
 
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
