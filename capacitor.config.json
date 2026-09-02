@@ -13,11 +13,11 @@
     },
     "StatusBar": {
       "overlaysWebView": false,
-      "style": "DARK",
+      "style": "LIGHT",
       "backgroundColor": "#07090F"
     },
     "SplashScreen": {
-      "launchShowDuration": 800,
+      "launchShowDuration": 300,
       "backgroundColor": "#07090F",
       "showSpinner": false,
       "androidSplashResourceName": "splash"
