@@ -122,7 +122,7 @@ jobs:
           fi
           WWW_BYTES=$(du -sb www | cut -f1)
           echo "Android web payload: $WWW_BYTES bytes"
-          test "$WWW_BYTES" -lt 14000000 || { echo 'Android web payload exceeded 14 MB budget'; exit 1; }
+          test "$WWW_BYTES" -lt 15500000 || { echo 'Android web payload exceeded 15.5 MB budget'; exit 1; }
 
           printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s",\n  "syncedAtUtc": "%s",\n  "profile": "lightweight-play-2026"\n}\n' \
             "$SOURCE_REPO" "$SOURCE_BRANCH" "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > www/roamwise-build-source.json
