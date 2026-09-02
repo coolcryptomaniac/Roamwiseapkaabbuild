@@ -124,6 +124,13 @@ jobs:
           echo "Android web payload: $WWW_BYTES bytes"
           test "$WWW_BYTES" -lt 15500000 || { echo 'Android web payload exceeded 15.5 MB budget'; exit 1; }
 
+          # Android builds must contain the adaptive/auth/startup fixes from base RoamWise.
+          grep -q "rw_opening_seen_v61" www/rw-config.js
+          grep -q "__RW_AUTH_INFLIGHT" www/platform-v5/device-compat.js
+          grep -q "rwAudioUnlockHint" www/platform-v5/audio-theme.js
+          grep -q "safe-area-inset-top" www/creators/index.html
+          grep -q "safe-area-inset-top" www/creators/studio.css
+
           printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s",\n  "syncedAtUtc": "%s",\n  "profile": "lightweight-play-2026"\n}\n' \
             "$SOURCE_REPO" "$SOURCE_BRANCH" "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > www/roamwise-build-source.json
           rm -rf source-roamwise
@@ -199,6 +206,55 @@ jobs:
           npx cap add android
           npx cap sync android
 
+      - name: Apply Android 16 cutout and WebView compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAIN=android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          test -f "$MAIN"
+          cat > "$MAIN" <<'JAVA'
+          package com.gyanverse.roamwise;
+
+          import android.os.Bundle;
+          import android.view.View;
+          import android.webkit.WebView;
+
+          import androidx.core.graphics.Insets;
+          import androidx.core.view.ViewCompat;
+          import androidx.core.view.WindowCompat;
+          import androidx.core.view.WindowInsetsCompat;
+
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  // targetSdk 36 is edge-to-edge. Keep the WebView out of status bars,
+                  // punch-hole/display cutouts and gesture/3-button navigation on every
+                  // device instead of relying on each individual HTML page to guess insets.
+                  WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+                  final WebView webView = getBridge().getWebView();
+                  ViewCompat.setOnApplyWindowInsetsListener(webView, (View v, WindowInsetsCompat insets) -> {
+                      Insets safe = insets.getInsets(
+                          WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
+                      );
+                      v.setPadding(safe.left, safe.top, safe.right, safe.bottom);
+                      return insets;
+                  });
+                  ViewCompat.requestApplyInsets(webView);
+
+                  // The opening theme is a first-party bundled asset. Let the native app
+                  // play it with the cinematic opener; web browsers still keep their own
+                  // autoplay policy and the UI provides a tap-to-unlock fallback.
+                  webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+              }
+          }
+          JAVA
+          grep -q 'Type.displayCutout' "$MAIN"
+          grep -q 'setMediaPlaybackRequiresUserGesture(false)' "$MAIN"
+
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
@@ -255,6 +311,13 @@ jobs:
           set -euo pipefail
           test -n "$KEYSTORE_B64" || { echo "KEYSTORE_B64 secret is missing"; exit 1; }
           printf '%s' "$KEYSTORE_B64" | base64 -d > android/app/rw.keystore
+
+      - name: Show release certificate fingerprints
+        shell: bash
+        run: |
+          set -euo pipefail
+          keytool -list -v -keystore android/app/rw.keystore -alias roamwise -storepass roamwise2026 \
+            | grep -E 'SHA1:|SHA256:'
 
       - name: Configure Play-ready release signing and version
         shell: bash
