@@ -1,4 +1,4 @@
-name: Build RoamWise Android (fresh APK + AAB)
+name: Build RoamWise Android (lightweight APK + AAB)
 
 on:
   workflow_dispatch:
@@ -19,6 +19,8 @@ env:
   SOURCE_REPO: coolcryptomaniac/roamwise
   SOURCE_BRANCH: main
   BASE_VERSION_CODE: 1000
+  MAX_APK_BYTES: 18874368
+  MAX_AAB_BYTES: 18874368
 
 jobs:
   build:
@@ -27,24 +29,27 @@ jobs:
 
     steps:
       - name: Checkout Android build repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Checkout latest RoamWise web app
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.SOURCE_REPO }}
           ref: ${{ env.SOURCE_BRANCH }}
           path: source-roamwise
           fetch-depth: 1
 
-      - name: Refresh www from roamwise/main
+      - name: Refresh lightweight www from roamwise/main
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p www
-          rsync -a --delete \
+
+          # --delete-excluded matters: old web-only files must actually disappear
+          # from www/ instead of surviving forever in later APK/AAB builds.
+          rsync -a --delete --delete-excluded \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='node_modules/' \
@@ -52,36 +57,91 @@ jobs:
             --exclude='tests/' \
             --exclude='test/' \
             --exclude='firestore-rules-history/' \
+            --exclude='assets/audio/.theme-b64/' \
+            --exclude='promo.mp4' \
+            --exclude='assets/roamwise-opening.gif' \
+            --exclude='icons/app-icon-source.png' \
+            --exclude='*.pdf' \
+            --exclude='*.docx' \
             --exclude='*.md' \
             --exclude='*.txt' \
             --exclude='*.rules' \
             --exclude='*.zip' \
             --exclude='*.apk' \
             --exclude='*.aab' \
+            --exclude='*.pyfrag' \
+            --exclude='*.jsonfrag' \
             --exclude='package.json' \
             --exclude='package-lock.json' \
             --exclude='wrangler.toml' \
             --exclude='worker.js' \
             source-roamwise/ www/
+
           SOURCE_SHA=$(git -C source-roamwise rev-parse HEAD)
-          printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s",\n  "syncedAtUtc": "%s"\n}\n' \
+
+          # Stream the large promotional film from the production site instead of
+          # embedding ~11 MB of web-only video inside every Android install.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          root=Path('www')
+          for p in root.rglob('*'):
+              if not p.is_file() or p.suffix.lower() not in {'.html','.js','.css','.json'}:
+                  continue
+              try: s=p.read_text()
+              except Exception: continue
+              s2=re.sub(r'(?<![\w:/.-])(?:\./|/)?promo\.mp4', 'https://www.roamwise.co.in/promo.mp4', s)
+              # Android does not need a 5 MB animated GIF fallback; the optimized
+              # poster is the zero-risk fallback if MP4 decoding is unavailable.
+              s2=s2.replace('roamwise-opening.gif','roamwise-opening-poster.png')
+              if s2 != s: p.write_text(s2)
+          PY
+
+          # Keep the approved opening, but encode the Android copy aggressively.
+          # The web/desktop source remains untouched in the RoamWise repository.
+          if command -v ffmpeg >/dev/null && [ -f www/assets/roamwise-opening.mp4 ]; then
+            ffmpeg -y -v error -i www/assets/roamwise-opening.mp4 \
+              -vf 'scale=540:-2:flags=lanczos' -an -c:v libx264 -preset slow \
+              -crf 29 -maxrate 900k -bufsize 1800k -pix_fmt yuv420p \
+              -movflags +faststart www/assets/roamwise-opening.android.mp4
+            mv www/assets/roamwise-opening.android.mp4 www/assets/roamwise-opening.mp4
+          fi
+          if command -v ffmpeg >/dev/null && [ -f www/assets/roamwise-opening-poster.png ]; then
+            ffmpeg -y -v error -i www/assets/roamwise-opening-poster.png \
+              -vf 'scale=540:-2:flags=lanczos,format=pal8' -frames:v 1 \
+              -compression_level 9 www/assets/roamwise-opening-poster.android.png
+            mv www/assets/roamwise-opening-poster.android.png www/assets/roamwise-opening-poster.png
+          fi
+
+          # Guard against accidental payload regressions.
+          test ! -e www/promo.mp4
+          test ! -e www/assets/roamwise-opening.gif
+          test ! -e www/icons/app-icon-source.png
+          if find www -type f \( -iname '*.pdf' -o -iname '*.docx' -o -iname '*.md' \) -print -quit | grep -q .; then
+            echo 'Unexpected document asset found in Android payload'; exit 1
+          fi
+          WWW_BYTES=$(du -sb www | cut -f1)
+          echo "Android web payload: $WWW_BYTES bytes"
+          test "$WWW_BYTES" -lt 14000000 || { echo 'Android web payload exceeded 14 MB budget'; exit 1; }
+
+          printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s",\n  "syncedAtUtc": "%s",\n  "profile": "lightweight-play-2026"\n}\n' \
             "$SOURCE_REPO" "$SOURCE_BRANCH" "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > www/roamwise-build-source.json
           rm -rf source-roamwise
-          echo "Synced RoamWise web commit $SOURCE_SHA into www/"
+          echo "Synced and optimized RoamWise web commit $SOURCE_SHA into www/"
 
-      - name: Persist refreshed www snapshot
+      - name: Persist refreshed lightweight www snapshot
         if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           set -euo pipefail
           if git diff --quiet -- www/; then
-            echo "www already matches latest RoamWise source."
+            echo "www already matches latest lightweight RoamWise source."
             exit 0
           fi
           git config user.name "roamwise-build-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add www/
-          git commit -m "chore: sync latest RoamWise web into Android [skip ci]"
+          git add -A www/
+          git commit -m "chore: sync lightweight RoamWise web into Android [skip ci]"
           git push origin HEAD:main
 
       - name: Calculate monotonic Android version
@@ -95,35 +155,37 @@ jobs:
           echo "RoamWise Android versionName=$VERSION_NAME versionCode=$VERSION_CODE"
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
+          package-manager-cache: false
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
 
-      - name: Install dependencies
+      - name: Install minimal Android dependencies
         run: npm install --no-audit --no-fund
 
       - name: Recreate Android platform
         shell: bash
         run: |
+          set -euo pipefail
           rm -rf android
           npx cap add android
-
-      - name: Sync refreshed web assets into Android
-        run: npx cap sync android
+          npx cap sync android
 
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
-      - name: Ensure required Android permissions
+      - name: Configure minimal Android permissions
         shell: bash
         run: |
           set -euo pipefail
@@ -136,12 +198,37 @@ jobs:
           add_perm INTERNET
           add_perm ACCESS_NETWORK_STATE
           add_perm VIBRATE
-          add_perm POST_NOTIFICATIONS
           add_perm ACCESS_FINE_LOCATION
           add_perm ACCESS_COARSE_LOCATION
-          add_perm RECORD_AUDIO
-          add_perm CAMERA
+          # Do not request CAMERA, RECORD_AUDIO or POST_NOTIFICATIONS until a
+          # native feature genuinely needs them; unnecessary dangerous/runtime
+          # permissions create avoidable Play review and user-trust friction.
           grep -E "uses-permission" "$MANIFEST" || true
+
+      - name: Enable R8 and optimized resource shrinking
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >> android/app/proguard-rules.pro <<'RULES'
+          # Capacitor registers plugins dynamically. Keep plugin entry points while
+          # allowing R8 to shrink the rest of unused Java/Kotlin dependency code.
+          -keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
+          -keep class * extends com.getcapacitor.Plugin { *; }
+          RULES
+
+          # AGP 8.7+ supports the optimized resource shrinker; it becomes the
+          # default in AGP 9. Detect the generated Capacitor template version.
+          AGP=$(grep -RhoE 'com.android.tools.build:gradle:[0-9]+\.[0-9]+(\.[0-9]+)?' android 2>/dev/null | head -1 | awk -F: '{print $NF}' || true)
+          echo "Detected AGP: ${AGP:-unknown}"
+          if [ -n "$AGP" ]; then
+            python3 - "$AGP" <<'PY'
+          import sys
+          v=tuple(int(x) for x in sys.argv[1].split('.')[:2])
+          if (8,6) < v < (9,0):
+              with open('android/gradle.properties','a') as f:
+                  f.write('\nandroid.r8.optimizedResourceShrinking=true\n')
+          PY
+          fi
 
       - name: Decode signing keystore
         shell: bash
@@ -152,7 +239,7 @@ jobs:
           test -n "$KEYSTORE_B64" || { echo "KEYSTORE_B64 secret is missing"; exit 1; }
           printf '%s' "$KEYSTORE_B64" | base64 -d > android/app/rw.keystore
 
-      - name: Configure release signing and version
+      - name: Configure Play-ready release signing and version
         shell: bash
         run: |
           set -euo pipefail
@@ -177,36 +264,68 @@ jobs:
               buildTypes {
                   release {
                       signingConfig signingConfigs.release
+                      minifyEnabled true
+                      shrinkResources true
+                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
                   }
               }
           }
           GRADLE
 
-      - name: Build signed APK and AAB
+      - name: Lint and build signed APK + AAB
         shell: bash
         run: |
           set -euo pipefail
           cd android
           chmod +x gradlew
-          ./gradlew --no-daemon clean assembleRelease bundleRelease
+          ./gradlew --no-daemon clean lintRelease assembleRelease bundleRelease
 
-      - name: Verify build outputs
+      - name: Verify Play-ready outputs and size budget
         shell: bash
         run: |
           set -euo pipefail
-          ls -lh android/app/build/outputs/apk/release/*.apk
-          ls -lh android/app/build/outputs/bundle/release/*.aab
+          APK=$(find android/app/build/outputs/apk/release -name '*.apk' -type f | head -1)
+          AAB=$(find android/app/build/outputs/bundle/release -name '*.aab' -type f | head -1)
+          test -f "$APK" && test -f "$AAB"
+          ls -lh "$APK" "$AAB"
+
+          APK_BYTES=$(stat -c%s "$APK")
+          AAB_BYTES=$(stat -c%s "$AAB")
+          echo "APK_BYTES=$APK_BYTES"
+          echo "AAB_BYTES=$AAB_BYTES"
+          test "$APK_BYTES" -le "$MAX_APK_BYTES" || { echo "APK exceeds 18 MB budget"; exit 1; }
+          test "$AAB_BYTES" -le "$MAX_AAB_BYTES" || { echo "AAB exceeds 18 MB budget"; exit 1; }
+
+          # The large web-only assets that caused the 37 MB regression must not
+          # ever be packaged again.
+          ! unzip -Z1 "$APK" | grep -q 'assets/public/promo.mp4$'
+          ! unzip -Z1 "$APK" | grep -q 'assets/public/assets/roamwise-opening.gif$'
+          ! unzip -Z1 "$APK" | grep -q 'assets/public/icons/app-icon-source.png$'
+          ! unzip -Z1 "$APK" | grep -qiE 'assets/public/.*\.(pdf|docx|md)$'
+
+          # Verify APK signature. If no native .so libraries remain, Android's
+          # official guidance says the Java/Kotlin-only package is already 16 KB
+          # page-size compatible; otherwise verify 16 KB zip alignment.
+          apksigner verify --verbose "$APK"
+          if unzip -Z1 "$APK" | grep -qE '\.so$'; then
+            echo 'Native libraries found; checking 16 KB APK alignment.'
+            zipalign -c -P 16 -v 4 "$APK"
+          else
+            echo 'No native .so libraries packaged: 16 KB page-size compatible by construction.'
+          fi
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: RoamWise-${{ env.VERSION_NAME }}-APK
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 30
+          compression-level: 9
 
       - name: Upload AAB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: RoamWise-${{ env.VERSION_NAME }}-AAB
           path: android/app/build/outputs/bundle/release/*.aab
           retention-days: 30
+          compression-level: 9
