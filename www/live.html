@@ -66,6 +66,11 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .lcard .lt{font-size:13px;font-weight:600}
 .lcard .ls{font-size:11.5px;color:var(--mist);margin-top:2px}
 @media(max-width:580px){.frow{grid-template-columns:1fr}.lrow{grid-template-columns:1fr}#clkH{font-size:clamp(46px,18vw,90px)}}
+
+/* funding projection + cap scenarios */
+.proj{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:var(--ink2)}
+.pt{width:100%;border-collapse:collapse;min-width:720px;font-size:12.5px}.pt th,.pt td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}.pt th{color:var(--mist);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}.pt tr:last-child td{border-bottom:0}.pt .hi td{color:var(--gold);font-weight:700}
+.pnote{font-size:11.5px;color:var(--mist);line-height:1.6;margin-top:9px}
 </style>
 </head>
 <body>
@@ -78,12 +83,13 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
     <a href="/deck/" style="color:#8B93A7;font-size:12px;padding:5px 10px;border:1px solid #26304C;border-radius:20px;text-decoration:none;white-space:nowrap">&#128202; Deck</a>
     <a href="/invest/" style="color:#8B93A7;font-size:12px;padding:5px 10px;border:1px solid #26304C;border-radius:20px;text-decoration:none;white-space:nowrap">&#128300; Full details</a>
     <a href="/live" style="color:#E8BA6C;font-size:12px;padding:5px 10px;border:1px solid rgba(232,186,108,.4);border-radius:20px;text-decoration:none;white-space:nowrap">&#128200; Live</a>
+    <a href="/funding-model/" style="color:#8B93A7;font-size:12px;padding:5px 10px;border:1px solid #26304C;border-radius:20px;text-decoration:none;white-space:nowrap">&#129518; Model</a>
   </div>
 </nav>
 <div id="banner">
   <div class="bn">
     <div class="bdot"></div>
-    <div class="btxt"><em>RoamWise &middot; Seed 2026</em> &nbsp;&middot;&nbsp; Raising <em>&#8377;4 Cr</em> for 8% &nbsp;&middot;&nbsp; <span id="bStatus">Loading&hellip;</span></div>
+    <div class="btxt"><em>RoamWise &middot; Seed 2026</em> &nbsp;&middot;&nbsp; <em>$500K minimum · $2.5M target · $5M hard cap</em> &nbsp;&middot;&nbsp; <span id="bStatus">Loading&hellip;</span></div>
     <div id="bBar"><div id="bTrack"><div id="bFill"></div></div><span id="bPct">0%</span></div>
   </div>
 </div>
@@ -98,11 +104,30 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
   <div class="sh">Live numbers</div>
   <div class="srow">
     <div class="sc"><div class="sn w" id="sU">&#8212;</div><div class="sk">Registered users</div></div>
-    <div class="sc"><div class="sn g" id="sP">&#8212;</div><div class="sk">Paying users</div></div>
-    <div class="sc"><div class="sn" id="sC">&#8212;</div><div class="sk">Conversion rate</div></div>
+    <div class="sc"><div class="sn g" id="sP">&#8212;</div><div class="sk">Revenue (₹)</div></div>
+    <div class="sc"><div class="sn" id="sC">&#8212;</div><div class="sk">Monthly intern burn</div></div>
     <div class="sc"><div class="sn w" id="sN">&#8212;</div><div class="sk">Total commitments</div></div>
     <div class="sc"><div class="sn" id="sA">&#8212;</div><div class="sk">Amount pledged</div></div>
   </div>
+
+  <div class="sh">Funding projection</div>
+  <div class="proj"><table class="pt">
+    <tr><th>Close</th><th>Product 30%</th><th>Distribution 25%</th><th>Supply/data 25%</th><th>Trust/legal 10%</th><th>Reserve 10%</th></tr>
+    <tr><td>$500K minimum<br><small>₹4.75 Cr</small></td><td>₹1.43 Cr</td><td>₹1.19 Cr</td><td>₹1.19 Cr</td><td>₹0.48 Cr</td><td>₹0.48 Cr</td></tr>
+    <tr class="hi"><td>$2.5M target<br><small>₹23.75 Cr</small></td><td>₹7.13 Cr</td><td>₹5.94 Cr</td><td>₹5.94 Cr</td><td>₹2.38 Cr</td><td>₹2.38 Cr</td></tr>
+    <tr><td>$5M hard cap<br><small>₹47.50 Cr</small></td><td>₹14.25 Cr</td><td>₹11.88 Cr</td><td>₹11.88 Cr</td><td>₹4.75 Cr</td><td>₹4.75 Cr</td></tr>
+  </table></div>
+  <p class="pnote">Approximate conversion at ₹95/$; larger deployment is unlocked against measurable operating milestones.</p>
+
+  <div class="sh">Founder ownership possibilities</div>
+  <div class="proj"><table class="pt">
+    <tr><th>Illustrative path</th><th>After Seed</th><th>After A</th><th>After B</th><th>After C</th><th>After IPO</th><th>Control outcome</th></tr>
+    <tr class="hi"><td>Founder-majority</td><td>76.5%</td><td>67.3%</td><td>60.6%</td><td>55.7%</td><td>50.2%</td><td>Economic + voting majority</td></tr>
+    <tr><td>Balanced-control</td><td>72.0%</td><td>59.0%</td><td>50.2%</td><td>44.2%</td><td>37.5%</td><td>Minority economics; special voting structure required</td></tr>
+    <tr><td>Maximum-growth</td><td>67.5%</td><td>52.7%</td><td>42.1%</td><td>35.8%</td><td>29.4%</td><td>Minority; control only if lawfully negotiated</td></tr>
+    <tr><td>Total sale</td><td colspan="5">Founder percentage becomes 0% after closing unless rollover equity is retained</td><td>Control transfers to acquirer</td></tr>
+  </table></div>
+  <p class="pnote">Illustrative, starting Founder 90% / ESOP 10%. Not an issued cap table, valuation promise or securities offer. Full assumptions and control/exit structures are on the detailed investor page.</p>
 
   <div class="sh">Who&#8217;s in</div>
   <div class="card"><div id="board"><div style="font-size:13px;color:var(--mist);padding:6px 0">Loading&hellip;</div></div></div>
@@ -132,6 +157,7 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
   <div class="lrow">
     <a class="lcard" href="/deck/"><span class="li">&#128202;</span><div><div class="lt">Investor Deck</div><div class="ls">16 slides &middot; financials &middot; market</div></div></a>
     <a class="lcard" href="/invest/"><span class="li">&#128300;</span><div><div class="lt">Full Details</div><div class="ls">Cap table &middot; model &middot; compatibility engine</div></div></a>
+    <a class="lcard" href="/funding-model/"><span class="li">&#129518;</span><div><div class="lt">Funding Model</div><div class="ls">Equity &middot; ESOP &middot; cofounders &middot; runway</div></div></a>
   </div>
   <p style="font-size:12px;color:var(--mist);text-align:center;margin-top:26px">Questions? <a href="mailto:founder@roamwise.co.in" style="color:var(--gold)">founder@roamwise.co.in</a></p>
 </div>
@@ -142,7 +168,7 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 <script>
 var db=null;
 try{firebase.initializeApp({apiKey:"AIzaSyDlrtpzpOb1VEmVSd9tHmu7OpmvwWosYsU",authDomain:"roamwisepro.firebaseapp.com",projectId:"roamwisepro",storageBucket:"roamwisepro.firebasestorage.app",messagingSenderId:"299014744987",appId:"1:299014744987:web:d5c316743e6d7a10904f3e"});db=firebase.firestore();}catch(e){}
-var I=window.RW_INVEST||{},RAISE=I.raising||40000000,CLASSES=(I.classes||[]).filter(function(c){return c.id!=="institutional";}),picked=null;
+var I=window.RW_INVEST||{},RAISE=I.raising||237500000,CLASSES=(I.classes||[]).filter(function(c){return c.id!=="institutional";}),picked=null;
 function el(id){return document.getElementById(id);}
 function esc(s){return String(s==null?"":s).replace(/[<>&"]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;","\"":" &quot;"}[c];});}
 function fmt(n){return "\u20b9"+(+n).toLocaleString("en-IN");}
@@ -154,8 +180,9 @@ function cu(id,to,gold){var n=el(id);if(!n||!to)return;var t0=null,dur=1200;func
 el("cgrid").innerHTML=CLASSES.map(function(c,i){return "<button class=\"cbtn\" onclick=\"cpick("+i+")\">"+"<span class=\"ci\">"+c.icon+"</span>"+"<div class=\"cl\">"+esc(c.label)+"</div>"+"<div class=\"cr\">"+fmt(c.min)+(c.max<1000000000?" \u2013 "+fmt(c.max):"+")+  "</div></button>";}).join("");
 function cpick(i){picked=CLASSES[i];var bs=document.querySelectorAll(".cbtn");bs.forEach(function(b){b.classList.remove("on");});if(bs[i])bs[i].classList.add("on");if(!el("fAmt").value)el("fAmt").placeholder=picked.min.toLocaleString("en-IN");}
 function loadStats(){
-  if(!db){el("sU").textContent="20";el("sP").textContent="4";el("sC").textContent="20%";return;}
-  db.collection("meta").doc("publicStats").onSnapshot(function(d){var v=d.exists?(d.data()||{}):{};var u=v.users!=null?v.users:20,p=v.paid!=null?v.paid:4;cu("sU",u,false);cu("sP",p,false);var cv=el("sC");if(cv)cv.textContent=(u?Math.round(p/u*100):0)+"%";},function(){el("sU").textContent="20";el("sP").textContent="4";el("sC").textContent="20%";});
+  function baseline(){el("sU").textContent="26";el("sP").textContent="500";el("sC").textContent="₹21K/mo";}
+  if(!db){baseline();return;}
+  db.collection("meta").doc("publicStats").onSnapshot(function(d){var v=d.exists?(d.data()||{}):{};var u=v.users!=null?v.users:26,r=v.revenue!=null?v.revenue:500;cu("sU",u,false);cu("sP",r,false);var cv=el("sC");if(cv)cv.textContent="₹21K/mo";},baseline);
   db.collection("meta").doc("investorStats").onSnapshot(function(d){
     var v=d.exists?(d.data()||{}):{},count=v.count||0,total=v.total||0,pct=RAISE>0?Math.min(100,Math.round(total/RAISE*100)):0;
     cu("sN",count,false);

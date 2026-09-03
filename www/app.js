@@ -13,10 +13,64 @@ window.addEventListener('unhandledrejection', function(ev){
 function rwHaptic(kind){
   try{
     if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Haptics){
-      Capacitor.Plugins.Haptics.impact({style: kind==='heavy'?'HEAVY':'LIGHT'}); return;
-    }
-    if(navigator.vibrate){ navigator.vibrate(kind==='heavy'?18:8); }
+      Capacitor.Plugins.Haptics.impact({style: kind==='heavy'?'HEAVY':'LIGHT'});
+    } else if(navigator.vibrate){ navigator.vibrate(kind==='heavy'?18:8); }
   }catch(e){}
+  /* Every rwHaptic() call already marks a "key action" (send, pin, toggle,
+     pay-success…) — reuse that same call graph to play the matching
+     tap/success sting from the RoamWise audio manifest instead of adding
+     ad-hoc Audio() calls at each of these sites. */
+  try{ rwPlayCue(kind==='heavy' ? 'success_feedback' : 'tap_feedback'); }catch(e){}
+}
+/* ===== EVENT AUDIO CUES (assets/audio/roamwise-audio-manifest.json) =====
+   platform-v5/audio-only.js is a deliberately file-free, purely synthesized
+   Web Audio engine (see its own header comment + tests/opening-audio.integration
+   .test.js, which pins it to have zero .mp3/.ogg/media dependency for offline
+   reliability). The actual produced "Rave to Hell" stings/themes uploaded to
+   assets/audio/ therefore need a separate, small player — this one — that
+   still respects the SAME master mute (rw_audio_enabled) and volume
+   (rw_audio_volume) the Settings "Sound" toggle already controls, so there is
+   exactly one mute switch for the user regardless of which engine is playing. */
+var RW_CUE_FILES = {
+  site_opening: 'opening-theme-30s',
+  hero_cta_or_big_action: 'cta-action-10s',
+  card_transition_or_modal_open: 'transition-10s',
+  tap_feedback: 'tap-sting-5s',
+  success_feedback: 'success-sting-5s'
+};
+var _rwCueCache = {};
+var _rwCueFormat = null;
+function rwAudioThemeEnabled(){
+  try{ var v=localStorage.getItem('rw_audio_enabled'); return v===null ? true : v!=='0'; }catch(e){ return true; }
+}
+function rwAudioThemeVolume(){
+  try{ var v=Number(localStorage.getItem('rw_audio_volume')); return isFinite(v)&&v>0 ? v : 0.22; }catch(e){ return 0.22; }
+}
+function rwPlayCue(name){
+  if(!rwAudioThemeEnabled()) return false;
+  var base = RW_CUE_FILES[name];
+  if(!base || typeof window.Audio!=='function') return false;
+  try{
+    var node = _rwCueCache[name];
+    if(!node){
+      node = new Audio();
+      if(_rwCueFormat===null){
+        try{ _rwCueFormat = (node.canPlayType && node.canPlayType('audio/ogg; codecs="vorbis"')) ? '.ogg' : '.mp3'; }
+        catch(e){ _rwCueFormat = '.mp3'; }
+      }
+      node.src = 'assets/audio/'+base+_rwCueFormat;
+      node.preload = 'auto';
+      _rwCueCache[name] = node;
+    }
+    /* rw_audio_volume is stored on the engine's 0..0.55 ambient scale — map it
+       onto an audible 0..1 range for these short one-shot stings, with a
+       floor so they're not inaudible when the ambient bed is set low. */
+    node.volume = Math.max(0.18, Math.min(1, rwAudioThemeVolume()/0.55));
+    try{ node.currentTime = 0; }catch(e){}
+    var played = node.play();
+    if(played && played.catch) played.catch(function(){});
+    return true;
+  }catch(e){ return false; }
 }
 
 
@@ -9363,6 +9417,7 @@ function _adminUnlock(code){
 function activatePro(payId, method){
   isPro=true; lsSet('rwPro','1'); lsSet('rw_pro_uid',(user&&user.uid)||'device'); lsSet('rwPayId', payId||'manual');
   try{ badgeAwardFounder(); }catch(e){}
+  try{ rwHaptic('heavy'); }catch(e){}
   closePay(); el('successOverlay').classList.add('open');
   confetti(); refreshProUI();
 }
@@ -9554,6 +9609,7 @@ function renderKeyBoxes(){
 }
 function openSettings(){
   renderKeyBoxes();
+  try{ rwVoiceMountSetting(); }catch(e){}
   try{ var tp=el('tabPickWrap'); if(tp) tp.innerHTML=rwTabPickerHTML(); }catch(e){}
   /* ---- UI simplification ----
      Provider choice and API keys are power-user territory: Smart Search works
@@ -9722,6 +9778,15 @@ if (AUTH_READY && typeof firebase !== 'undefined') try {
   try{ db.enablePersistence({synchronizeTabs:true}).catch(function(){}); }catch(e){}
   try{ rwInitDataLayer(); }catch(e){}
   firebase.auth().onAuthStateChanged(function(u){
+    /* Password accounts must verify ownership before any profile, trial or cloud feature is created. */
+    if(rwIsUnverifiedPasswordUser(u)){
+      pendingVerificationEmail=(u&&u.email)||pendingVerificationEmail;
+      if(!rwEmailAuthBusy){
+        firebase.auth().signOut().catch(function(){});
+        setTimeout(function(){rwShowVerificationPane(pendingVerificationEmail,'Verify your email before using your RoamWise account.');},0);
+      }
+      u=null;
+    }
     user = u;
     try{ if(u) rwCheckBan(); }catch(e){}
     var btn = el('authBtn'), av = el('authAvatar');
@@ -9846,61 +9911,117 @@ if (AUTH_READY && typeof firebase !== 'undefined') try {
   document.addEventListener('DOMContentLoaded', function(){ var b=el('authBtn'); if(b) b.style.display='none'; });
 }
 
-function openAuth(){ el('authOverlay').classList.add('open'); }
-function closeAuth(){ el('authOverlay').classList.remove('open'); authError(''); }
-function authError(m){ var e=el('authErr'); if(!m){e.style.display='none';return;} e.textContent=m; e.style.display='block'; }
+var pendingVerificationEmail='', rwEmailAuthBusy=false;
+function rwIsUnverifiedPasswordUser(u){
+  return !!(u && !u.emailVerified && u.providerData && u.providerData.some(function(p){return p.providerId==='password';}));
+}
+function rwNativeAuthPlugin(){
+  try{
+    var c=window.Capacitor, nativePlatform=!!(c&&typeof c.isNativePlatform==='function'&&c.isNativePlatform());
+    var p=c&&c.Plugins&&c.Plugins.FirebaseAuthentication;
+    return nativePlatform&&p&&typeof p.signInWithGoogle==='function'?p:null;
+  }catch(e){return null;}
+}
+function rwIsNativePlatform(){
+  try{return !!(window.Capacitor&&typeof Capacitor.isNativePlatform==='function'&&Capacitor.isNativePlatform());}
+  catch(e){return /RoamWiseApp/i.test(navigator.userAgent);}
+}
+function authError(m){var e=el('authErr');if(!m){e.style.display='none';return;}e.textContent=m;e.style.display='block';}
+function rwShowEmailPane(){
+  var ep=el('emailPane'),vp=el('emailVerifyPane');if(ep)ep.style.display='';if(vp)vp.style.display='none';
+  authMode='in';var a=el('authAction');if(a)a.textContent='Sign in';
+  var r=el('authToggleRow');if(r)r.innerHTML='New here? <a onclick="toggleAuthMode()">Create an account</a>';
+  authError('');
+}
+function rwShowVerificationPane(email,message){
+  pendingVerificationEmail=email||pendingVerificationEmail||'your email';
+  var ep=el('emailPane'),vp=el('emailVerifyPane'),out=el('authVerifyEmail'),msg=el('authVerifyMsg');
+  if(ep)ep.style.display='none';if(vp)vp.style.display='';if(out)out.textContent=pendingVerificationEmail;
+  if(msg)msg.textContent=message||'Open the verification link we sent, then return here and sign in.';
+  el('authOverlay').classList.add('open');authError('');
+}
+function openAuth(){rwShowEmailPane();el('authOverlay').classList.add('open');}
+function closeAuth(){el('authOverlay').classList.remove('open');authError('');rwShowEmailPane();}
 function friendly(e){
   var c=(e&&e.code)||'';
-  if(c.indexOf('wrong-password')>-1||c.indexOf('invalid-credential')>-1) return 'Wrong email or password.';
-  if(c.indexOf('email-already-in-use')>-1) return 'Account exists \u2014 sign in instead.';
-  if(c.indexOf('weak-password')>-1) return 'Password needs at least 6 characters.';
-  if(c.indexOf('invalid-email')>-1) return 'That email doesn\u2019t look right.';
-  if(c.indexOf('too-many-requests')>-1) return 'Too many tries \u2014 wait a minute.';
+  if(c.indexOf('wrong-password')>-1||c.indexOf('invalid-credential')>-1)return 'Wrong email or password.';
+  if(c.indexOf('email-already-in-use')>-1)return 'Account exists — sign in instead.';
+  if(c.indexOf('weak-password')>-1)return 'Password needs at least 6 characters.';
+  if(c.indexOf('invalid-email')>-1)return 'That email doesn’t look right.';
+  if(c.indexOf('too-many-requests')>-1)return 'Too many tries — wait a minute.';
+  if(c.indexOf('network')>-1)return 'No connection — check your internet and try again.';
   return (e&&e.message)||'Something went wrong.';
 }
+function rwGoogleError(e){
+  var s=String((e&&e.code)||'')+' '+String((e&&e.message)||'');
+  if(/cancel|canceled|cancelled/i.test(s))return 'Google sign-in was cancelled.';
+  if(/developer|12500|10:|configuration/i.test(s))return 'Google sign-in is not configured for this app build yet. Update the app after Firebase Android setup is completed.';
+  return friendly(e);
+}
 function loginGoogle(){
-  if(!AUTH_READY) return showToast('Accounts not configured yet');
-  if(window.RW || /RoamWiseApp/i.test(navigator.userAgent)){
-    showToast('Google blocks its login inside apps like this one \u2014 use Email (10 seconds), or Google on roamwise.co.in: same account, same Pro.');
-    var em=el('authEmail'); if(em) em.focus();
+  if(!AUTH_READY)return showToast('Accounts not configured yet');
+  var p=rwNativeAuthPlugin(),b=el('googleAuthBtn');
+  if(p){
+    if(b){b.disabled=true;b.setAttribute('aria-busy','true');}
+    p.signInWithGoogle({skipNativeAuth:true}).then(function(r){
+      var token=r&&r.credential&&r.credential.idToken;if(!token)throw new Error('Google did not return an ID token.');
+      return firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(token));
+    }).then(function(){closeAuth();showToast('Signed in with Google ✓');})
+      .catch(function(e){authError(rwGoogleError(e));})
+      .then(function(){if(b){b.disabled=false;b.removeAttribute('aria-busy');}});
     return;
   }
+  if(rwIsNativePlatform())return authError('Google sign-in needs the latest RoamWise app build. Email sign-in works now.');
   firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
-    .then(function(){ closeAuth(); showToast('Signed in \u2713'); })
-    .catch(function(e){ authError(friendly(e)); });
-}
-function loginSocial(which){
-  if(!AUTH_READY) return showToast('Accounts not configured yet');
-  var prov = which==='facebook' ? new firebase.auth.FacebookAuthProvider()
-           : new firebase.auth.OAuthProvider('apple.com');
-  firebase.auth().signInWithPopup(prov)
-    .then(function(){ closeAuth(); showToast('Signed in \u2713'); })
-    .catch(function(e){
-      var c=(e&&e.code)||'';
-      if(c.indexOf('operation-not-allowed')>-1) authError(which.charAt(0).toUpperCase()+which.slice(1)+' login isn\u2019t switched on yet \u2014 use Google or Email meanwhile.');
-      else if(c.indexOf('account-exists-with-different-credential')>-1) authError('This email already has an account \u2014 sign in with the method you used first.');
-      else authError(friendly(e));
-    });
+    .then(function(){closeAuth();showToast('Signed in with Google ✓');})
+    .catch(function(e){authError(rwGoogleError(e));});
 }
 function toggleAuthMode(){
-  authMode = authMode==='in' ? 'up' : 'in';
-  el('authAction').textContent = authMode==='in' ? 'Sign in' : 'Create account';
-  el('authToggleRow').innerHTML = authMode==='in'
-    ? 'New here? <a onclick="toggleAuthMode()">Create an account</a>'
-    : 'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>';
+  authMode=authMode==='in'?'up':'in';el('authAction').textContent=authMode==='in'?'Sign in':'Create account';
+  el('authToggleRow').innerHTML=authMode==='in'?'New here? <a onclick="toggleAuthMode()">Create an account</a>':'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>';
+  authError('');
+}
+function rwSetAuthBusy(busy,label){
+  var b=el('authEmailBtn'),s=el('authAction');if(b)b.disabled=!!busy;if(s)s.textContent=label||(authMode==='in'?'Sign in':'Create account');
+}
+function rwSendVerificationAndSignOut(u,email,message){
+  var failed='';
+  return u.sendEmailVerification().catch(function(e){failed=friendly(e);}).then(function(){return firebase.auth().signOut().catch(function(){});})
+    .then(function(){
+      rwShowVerificationPane(email,failed?'We could not send another link: '+failed+' You can try Resend in a minute.':message);
+      return {verificationPending:true};
+    });
 }
 function loginEmail(){
-  if(!AUTH_READY) return showToast('Accounts not configured yet');
-  var em=el('authEmail').value.trim(), pw=el('authPass').value;
-  if(!em||!pw) return authError('Enter email and password.');
-  var p = authMode==='in'
-    ? firebase.auth().signInWithEmailAndPassword(em,pw)
-    : firebase.auth().createUserWithEmailAndPassword(em,pw).then(function(c){
-        try{ c.user.sendEmailVerification(); showToast('Verification email sent \u2014 check your inbox'); }catch(e){}
-        try{ track('signups'); }catch(e){}
-        return c; });
-  p.then(function(){ closeAuth(); showToast('Signed in \u2713'); }).catch(function(e){ authError(friendly(e)); });
+  if(!AUTH_READY)return showToast('Accounts not configured yet');
+  var em=el('authEmail').value.trim(),pw=el('authPass').value,creating=authMode==='up';
+  if(!em||!pw)return authError('Enter email and password.');if(pw.length<6)return authError('Password needs at least 6 characters.');
+  rwEmailAuthBusy=true;rwSetAuthBusy(true,creating?'Creating account…':'Signing in…');authError('');
+  var p=creating?firebase.auth().createUserWithEmailAndPassword(em,pw).then(function(c){
+      try{track('signups');}catch(e){}
+      return rwSendVerificationAndSignOut(c.user,em,'Verification email sent. Open the link, then return and sign in.');
+    }):firebase.auth().signInWithEmailAndPassword(em,pw).then(function(c){
+      return c.user.reload().catch(function(){}).then(function(){return c;});
+    }).then(function(c){
+      if(rwIsUnverifiedPasswordUser(c.user))return rwSendVerificationAndSignOut(c.user,em,'Your email is not verified yet. We sent a fresh verification link.');
+      return c;
+    });
+  p.then(function(r){if(!(r&&r.verificationPending)){closeAuth();showToast('Email verified — signed in ✓');}})
+    .catch(function(e){authError(friendly(e));})
+    .then(function(){rwEmailAuthBusy=false;rwSetAuthBusy(false);});
 }
+function resendVerification(){
+  var em=el('authEmail').value.trim()||pendingVerificationEmail,pw=el('authPass').value;
+  if(!em||!pw){rwShowEmailPane();return authError('Enter your email and password, then tap Sign in to resend the link.');}
+  authMode='in';loginEmail();
+}
+function resetPassword(){
+  if(!AUTH_READY)return showToast('Accounts not configured yet');
+  var em=el('authEmail').value.trim();if(!em)return authError('Enter your email address first.');
+  firebase.auth().sendPasswordResetEmail(em).then(function(){authError('');showToast('Password reset email sent ✓');})
+    .catch(function(e){authError(friendly(e));});
+}
+
 function showPhone(){ el('emailPane').style.display='none'; el('phonePane').style.display=''; }
 function showEmail(){ el('phonePane').style.display='none'; el('emailPane').style.display=''; }
 var recaptcha = null;
@@ -10417,7 +10538,7 @@ var RW_ICON_PATHS = {
    declarations hoist but `var RW_TABS = {...}` does not, so calling
    renderTabbar() inline here silently produced an empty bar. DOMContentLoaded
    fires after all deferred script has executed, which is exactly what we want. */
-document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyMode(); }catch(e){} try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(function(){ if(!rwOpeningSeen()) rwOpeningShow(); else rwMaybeOnboard(); }, 700); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} try{ setTimeout(rwInitWebPush, 2200); }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ rwApplyMode(); }catch(e){} try{ rwApplyUIScale(); }catch(e){} try{ renderTabbar(); }catch(e){ console.warn('tabbar', e); } try{ setTimeout(function(){ if(!rwOpeningSeen()) rwOpeningShow(); else rwMaybeOnboard(); }, 700); }catch(e){} try{ rwInitStatusBar(); }catch(e){} try{ rwInitBackButton(); }catch(e){} try{ setTimeout(rwInitPush, 1500); }catch(e){} try{ setTimeout(rwInitWebPush, 2200); }catch(e){} /* warm up the voice list early so it's ready by the time tuskSpeak() needs it */ try{ if(window.speechSynthesis){ speechSynthesis.getVoices(); speechSynthesis.addEventListener('voiceschanged', function(){ try{ speechSynthesis.getVoices(); }catch(e){} }, {once:true}); } }catch(e){} });
 /* ===== BACK BUTTON CONFIRMATION (report #4) =====
    In the app, pressing hardware back on the home screen closed instantly. Now:
    if a modal/overlay is open, back closes THAT; on the home screen, back asks to
@@ -10560,6 +10681,8 @@ function rwTabToggle(k){
   var host=el('tabPickWrap'); if(host) host.innerHTML=rwTabPickerHTML();
 }
 function tabGo(t){
+  /* Major screen/view transition — the manifest's card_transition_or_modal_open cue. */
+  try{ rwPlayCue('card_transition_or_modal_open'); }catch(e){}
   try{useBump('tab_'+t);}catch(e){}
   try{ if(window._rvAll) _rvAll(); }catch(e){}
   try{ rwTabMark(t); }catch(e){}
@@ -11516,6 +11639,8 @@ async function rwResolvePlace(name){
 function copilotSend(fromHero){
   var inp = el(fromHero? 'heroInput' : 'cpInput');
   var t=(inp && inp.value||'').trim(); if(!t) return;
+  /* Primary CTA of the app — asking Tusk to plan/answer something. */
+  try{ rwPlayCue('hero_cta_or_big_action'); }catch(e){}
   inp.value='';
   if(fromHero){
     /* Conversation flows vertically right on the page — no popup. */
@@ -12903,19 +13028,14 @@ function rwRemindFire(what){
       new Notification('RoamWise reminder', {body:what, icon:'/icon-512.png'});
     }
   }catch(e){}
-  try{ rwRemindChime(); }catch(e){}
+  /* Route through the same RoamWise audio-manifest cue player used elsewhere
+     (rwHaptic, copilotSend, tabGo) instead of a bespoke oscillator beep, so
+     there is one cue engine and one mute switch (rw_audio_enabled). A
+     reminder firing is a notification event, which is exactly what
+     success_feedback's "notification-success" haptic + short sting are
+     designed for. */
+  try{ rwPlayCue('success_feedback'); }catch(e){}
   try{ showToast('\u23f0 '+what); }catch(e){}
-}
-function rwRemindChime(){
-  try{
-    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
-    var ctx=new AC(); var o=ctx.createOscillator(); var g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.value=880;
-    g.gain.setValueAtTime(0.0001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime+0.03);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.9);
-    o.start(); o.stop(ctx.currentTime+1);
-  }catch(e){}
 }
 
 async function cpFinish(bubble, answerHTML, intents, raw){
@@ -18171,9 +18291,46 @@ function tuskSpeakable(text){
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
+/* Voice narration (tuskSpeak) is a separate concern from the theme/SFX engine
+   in platform-v5/audio-only.js — it's TTS, not media playback — so it gets its
+   own Settings toggle rather than being silently controlled by rw_audio_enabled. */
+var RW_VOICE_KEY = 'rw_voice_enabled';
+function rwVoiceEnabled(){
+  try{ var v=localStorage.getItem(RW_VOICE_KEY); return v===null ? true : v!=='0'; }catch(e){ return true; }
+}
+function rwVoiceSetEnabled(on){
+  try{ localStorage.setItem(RW_VOICE_KEY, on?'1':'0'); }catch(e){}
+  try{ if(!on && window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+}
+function rwVoiceMountSetting(){
+  if(el('rwVoiceSetting')) return;
+  var body = document.querySelector('#settingsOverlay .modal-body');
+  if(!body) return;
+  var section = document.createElement('section');
+  section.id = 'rwVoiceSetting';
+  section.className = 'key-section rw-sound-settings';
+  section.innerHTML = ''
+    +'<div class="rw-sound-row">'
+    +  '<div><strong>Voice narration</strong><span>Tusk’s read-aloud voice notes and guide narration</span></div>'
+    +  '<label class="rw-sound-switch" aria-label="Mute or unmute voice narration">'
+    +    '<input id="rwVoiceToggle" type="checkbox" role="switch"><i aria-hidden="true"></i>'
+    +  '</label>'
+    +'</div>';
+  var anchor = el('rwAudioSetting');
+  if(anchor && anchor.parentNode===body) anchor.insertAdjacentElement('afterend', section);
+  else body.insertBefore(section, body.firstChild);
+  var toggle = el('rwVoiceToggle');
+  toggle.checked = rwVoiceEnabled();
+  toggle.setAttribute('aria-checked', toggle.checked?'true':'false');
+  toggle.addEventListener('change', function(){
+    rwVoiceSetEnabled(toggle.checked);
+    toggle.setAttribute('aria-checked', toggle.checked?'true':'false');
+  });
+}
 function tuskSpeak(text){
   var say = tuskSpeakable(text);
   if(!say) return;
+  if(!rwVoiceEnabled()){ showToast('🔇 Voice narration is muted — turn it back on in Settings'); return; }
   if(window.RW && typeof RW.speak==='function'){ try{ RW.speak(say); return; }catch(e){} }
   /* Capacitor Text-to-Speech plugin (works in the app where WebView speechSynthesis often doesn't) */
   if(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.TextToSpeech){
@@ -18191,8 +18348,11 @@ function tuskSpeak(text){
     var vs=speechSynthesis.getVoices();
     var pick=vs.filter(function(v){ return /hi-IN|en-IN/i.test(v.lang); })[0];
     if(pick) u.voice=pick;
+    /* Android WebView often accepts .speak() but silently produces no audio
+       without throwing — surface an error toast so the user isn't left guessing */
+    u.onerror = function(){ showToast('🔊 Voice unavailable on this device'); };
     speechSynthesis.speak(u);
-  }catch(e){}
+  }catch(e){ showToast('🔊 Voice unavailable on this device'); }
 }
 /* a shareable "voice note" bubble: shows the witty line + a play button */
 function tuskVoiceNoteHTML(place, entry){
