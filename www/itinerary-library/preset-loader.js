@@ -19,7 +19,7 @@
     const m=await manifest(), ranked=m.destinations.map(d=>[score(d,o.destination||o.query),d]).sort((a,b)=>b[0]-a[0]);
     if(!ranked.length||ranked[0][0]<20)return null;
     const d=ranked[0][1], [variant,v]=nearestVariant(d,o.duration||o.days);
-    return {...d,variant,days:v.days,html:ROOT+v.html,pdf:ROOT+v.pdf,matchScore:ranked[0][0]};
+    return {...d,variant,days:v.days,html:ROOT+v.html,pdf:new URL(v.pdf,'https://www.roamwise.co.in/itinerary-library/').href,matchScore:ranked[0][0]};
   }
   function namedUrl(url,o={}){const u=new URL(url,location.href);const n=String(o.user||o.username||o.traveler||'').trim();if(n)u.searchParams.set('user',n.slice(0,64));if(o.theme)u.searchParams.set('theme',o.theme);if(o.share)u.searchParams.set('share','1');return u.href;} function renderInto(target,hit,o={}){const el=typeof target==='string'?document.querySelector(target):target;if(!el||!hit)return false;el.innerHTML='';const f=document.createElement('iframe');f.src=namedUrl(hit.html,o);f.title=hit.name+' itinerary';f.loading='eager';f.style.cssText='width:100%;min-height:86vh;border:0;border-radius:18px;background:#050507';f.setAttribute('allow','fullscreen');el.appendChild(f);return true;} function shareUrl(hit,user,theme){return namedUrl(hit.html,{user,theme,share:true})}
   async function tryRender(target,o){const h=await find(o);if(!h)return null;renderInto(target,h,o);return h;}

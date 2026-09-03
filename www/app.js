@@ -58,7 +58,7 @@ function rwPlayCue(name){
         try{ _rwCueFormat = (node.canPlayType && node.canPlayType('audio/ogg; codecs="vorbis"')) ? '.ogg' : '.mp3'; }
         catch(e){ _rwCueFormat = '.mp3'; }
       }
-      node.src = 'assets/audio/'+base+_rwCueFormat;
+      node.src = 'https://www.roamwise.co.in/assets/audio/'+base+_rwCueFormat;
       node.preload = 'auto';
       _rwCueCache[name] = node;
     }
