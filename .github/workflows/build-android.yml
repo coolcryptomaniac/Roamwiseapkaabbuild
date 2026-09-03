@@ -2,13 +2,18 @@ name: Build RoamWise Android (fresh APK + AAB)
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [ roamwise-main-updated ]
   pull_request:
     branches: [ main ]
   schedule:
-    # Sunday 09:00 IST / 03:30 UTC
-    - cron: '30 3 * * 0'
+    # Safety-net sync/build every 6 hours. repository_dispatch can build immediately.
+    - cron: '17 */6 * * *'
   push:
     branches: [ main ]
+    # The build bot persists www snapshots; do not recursively rebuild those commits.
+    paths-ignore:
+      - 'www/**'
 
 permissions:
   contents: write
@@ -41,12 +46,18 @@ jobs:
           path: source-roamwise
           fetch-depth: 1
 
-      - name: Refresh www from roamwise/main
+      - name: Refresh and optimize www from roamwise/main
         shell: bash
         run: |
           set -euo pipefail
+
+          # Resolve main again immediately before copying so every build starts from
+          # the newest source commit available, including scheduled/dispatch builds.
+          git -C source-roamwise fetch --depth=1 origin "$SOURCE_BRANCH"
+          git -C source-roamwise checkout --detach FETCH_HEAD
+
           mkdir -p www
-          rsync -a --delete \
+          rsync -a --delete --delete-excluded \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='node_modules/' \
@@ -54,9 +65,27 @@ jobs:
             --exclude='tests/' \
             --exclude='test/' \
             --exclude='firestore-rules-history/' \
+            --exclude='admin/' \
+            --exclude='agent/' \
+            --exclude='deck/' \
+            --exclude='funding-model/' \
+            --exclude='generator/' \
+            --exclude='invest/' \
+            --exclude='nmims/' \
+            --exclude='staff/' \
+            --exclude='tools/' \
+            --exclude='worker/' \
+            --exclude='assets/audio/' \
+            --exclude='assets/roamwise-opening.gif' \
+            --exclude='assets/roamwise-opening.mp4' \
+            --exclude='icons/app-icon-source.png' \
+            --exclude='promo.mp4' \
+            --exclude='investors-data.js' \
             --exclude='*.md' \
             --exclude='*.txt' \
             --exclude='*.rules' \
+            --exclude='*.pdf' \
+            --exclude='*.docx' \
             --exclude='*.zip' \
             --exclude='*.apk' \
             --exclude='*.aab' \
@@ -65,26 +94,56 @@ jobs:
             --exclude='wrangler.toml' \
             --exclude='worker.js' \
             source-roamwise/ www/
-          SOURCE_SHA=$(git -C source-roamwise rev-parse HEAD)
-          printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s",\n  "syncedAtUtc": "%s"\n}\n' \
-            "$SOURCE_REPO" "$SOURCE_BRANCH" "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > www/roamwise-build-source.json
-          rm -rf source-roamwise
-          echo "Synced RoamWise web commit $SOURCE_SHA into www/"
 
-      - name: Persist refreshed www snapshot
-        if: github.ref == 'refs/heads/main'
+          node scripts/prepare-android-web.mjs
+
+          SOURCE_SHA=$(git -C source-roamwise rev-parse HEAD)
+          printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s"\n}\n' \
+            "$SOURCE_REPO" "$SOURCE_BRANCH" "$SOURCE_SHA" > www/roamwise-build-source.json
+          echo "ROAMWISE_SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          rm -rf source-roamwise
+          echo "Prepared optimized Android web assets from $SOURCE_REPO@$SOURCE_SHA"
+
+      - name: Enforce Android web asset budget
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- www/; then
-            echo "www already matches latest RoamWise source."
-            exit 0
+          WEB_BYTES=$(find www -type f -printf '%s\n' | awk '{ total += $1 } END { print total + 0 }')
+          MAX_WEB_BYTES=$((18 * 1024 * 1024))
+          {
+            echo "### Android web payload"
+            echo ""
+            echo "- Source commit: $SOURCE_REPO@$ROAMWISE_SOURCE_SHA"
+            echo "- Uncompressed www: $WEB_BYTES bytes"
+            echo "- Budget: $MAX_WEB_BYTES bytes"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if (( WEB_BYTES > MAX_WEB_BYTES )); then
+            echo "::error::Optimized www payload is $WEB_BYTES bytes, above the $MAX_WEB_BYTES-byte budget."
+            find www -type f -printf '%s %p\n' | sort -nr | sed -n '1,25p'
+            exit 1
           fi
-          git config user.name "roamwise-build-bot"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add www/
-          git commit -m "chore: sync latest RoamWise web into Android [skip ci]"
-          git push origin HEAD:main
+
+          test ! -e www/promo.mp4
+          test ! -e www/assets/audio
+          test ! -e www/assets/roamwise-opening.gif
+          test ! -e www/assets/roamwise-opening.mp4
+          test ! -e www/icons/app-icon-source.png
+          test ! -e www/admin
+          test ! -e www/agent
+          test ! -e www/deck
+          test ! -e www/invest
+          test ! -e www/nmims
+          test ! -e www/staff
+          test ! -e www/tools
+          test ! -e www/worker
+          if find www -type f \( -iname '*.pdf' -o -iname '*.docx' -o -iname '*.md' -o -iname '*.rules' \) -print -quit | grep -q .; then
+            echo "::error::A non-runtime document survived Android asset pruning."
+            exit 1
+          fi
+          grep -q 'https://www.roamwise.co.in/assets/audio/' www/app.js
+          grep -q 'https://www.roamwise.co.in/assets/audio/' www/platform-v5/audio-only.js
+          grep -q 'https://www.roamwise.co.in/itinerary-library/' www/itinerary-library/preset-loader.js
 
       - name: Calculate monotonic Android version
         shell: bash
@@ -106,6 +165,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+
+      - name: Cache Gradle dependencies
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -211,10 +273,24 @@ jobs:
               buildTypes {
                   release {
                       signingConfig signingConfigs.release
+                      minifyEnabled true
+                      shrinkResources true
+                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
                   }
               }
           }
           GRADLE
+
+          # The authentication plugin ships handlers for optional providers. Facebook
+          # is intentionally not installed/configured; allow R8 to remove that handler.
+          cat >> android/app/proguard-rules.pro <<'RULES'
+          -dontwarn com.facebook.**
+          RULES
+
+          # Capacitor 8 currently generates an AGP 8.x project. This flag enables
+          # the optimized resource shrinker recommended for AGP 8.12/8.13.
+          grep -q '^android.r8.optimizedResourceShrinking=true$' android/gradle.properties || \
+            echo 'android.r8.optimizedResourceShrinking=true' >> android/gradle.properties
 
       - name: Build signed APK and AAB
         shell: bash
@@ -222,14 +298,78 @@ jobs:
           set -euo pipefail
           cd android
           chmod +x gradlew
-          ./gradlew --no-daemon clean assembleRelease bundleRelease
+          ./gradlew --no-daemon --parallel --build-cache clean assembleRelease bundleRelease
 
-      - name: Verify build outputs
+      - name: Verify optimized and signed build outputs
         shell: bash
         run: |
           set -euo pipefail
-          ls -lh android/app/build/outputs/apk/release/*.apk
-          ls -lh android/app/build/outputs/bundle/release/*.aab
+          APK=$(find android/app/build/outputs/apk/release -name '*.apk' -type f -print -quit)
+          AAB=$(find android/app/build/outputs/bundle/release -name '*.aab' -type f -print -quit)
+          MAPPING=android/app/build/outputs/mapping/release/mapping.txt
+          test -s "$APK"
+          test -s "$AAB"
+          test -s "$MAPPING"
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner -print | sort -V | tail -n 1)
+          test -x "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          jarsigner -verify "$AAB"
+          unzip -Z1 "$AAB" | grep -q '^BundleConfig.pb$'
+          unzip -Z1 "$AAB" | grep -q '^base/manifest/AndroidManifest.xml$'
+
+          FORBIDDEN='(^|/)assets/public/(promo\.mp4|assets/audio/|assets/roamwise-opening\.(gif|mp4)|icons/app-icon-source\.png|admin/|agent/|deck/|invest/|nmims/|staff/|tools/|worker/)|(^|/)[^/]+\.(pdf|docx|md|rules)$'
+          if unzip -Z1 "$APK" | grep -Eiq "$FORBIDDEN"; then
+            echo "::error::APK contains assets that must be delivered on demand."
+            unzip -Z1 "$APK" | grep -Ei "$FORBIDDEN" | sed -n '1,50p'
+            exit 1
+          fi
+          if unzip -Z1 "$AAB" | grep -Eiq "$FORBIDDEN"; then
+            echo "::error::AAB contains assets that must be delivered on demand."
+            unzip -Z1 "$AAB" | grep -Ei "$FORBIDDEN" | sed -n '1,50p'
+            exit 1
+          fi
+
+          APK_BYTES=$(stat -c '%s' "$APK")
+          AAB_BYTES=$(stat -c '%s' "$AAB")
+          WEB_BYTES=$(find www -type f -printf '%s\n' | awk '{ total += $1 } END { print total + 0 }')
+          REPORT=android/app/build/outputs/roamwise-size-report.txt
+          {
+            echo "source_commit=$ROAMWISE_SOURCE_SHA"
+            echo "www_uncompressed_bytes=$WEB_BYTES"
+            echo "apk_bytes=$APK_BYTES"
+            echo "aab_bytes=$AAB_BYTES"
+            echo "r8_minification=true"
+            echo "resource_shrinking=true"
+            echo "heavy_media_delivery=on-demand"
+          } > "$REPORT"
+          {
+            echo ""
+            echo "### Optimized release"
+            echo ""
+            echo "| Artifact | Bytes |"
+            echo "|---|---:|"
+            echo "| Android web payload | $WEB_BYTES |"
+            echo "| Signed APK | $APK_BYTES |"
+            echo "| Signed AAB | $AAB_BYTES |"
+            echo ""
+            echo "R8 code shrinking and Android resource shrinking are enabled. The AAB keeps Play's default language, density, and ABI configuration splits."
+          } >> "$GITHUB_STEP_SUMMARY"
+          ls -lh "$APK" "$AAB" "$MAPPING"
+
+      - name: Persist verified www snapshot
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- www/; then
+            echo "www already matches optimized $SOURCE_REPO@$ROAMWISE_SOURCE_SHA."
+            exit 0
+          fi
+          git config user.name "roamwise-build-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add www/
+          git commit -m "chore: sync optimized RoamWise web assets [skip ci]"
+          git push origin HEAD:main
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -244,3 +384,13 @@ jobs:
           name: RoamWise-${{ env.VERSION_NAME }}-AAB
           path: android/app/build/outputs/bundle/release/*.aab
           retention-days: 30
+
+      - name: Upload R8 mapping and size report
+        uses: actions/upload-artifact@v4
+        with:
+          name: RoamWise-${{ env.VERSION_NAME }}-release-metadata
+          path: |
+            android/app/build/outputs/mapping/release/mapping.txt
+            android/app/build/outputs/roamwise-size-report.txt
+          retention-days: 90
+          if-no-files-found: error
