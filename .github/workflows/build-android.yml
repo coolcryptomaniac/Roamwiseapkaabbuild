@@ -281,6 +281,12 @@ jobs:
           }
           GRADLE
 
+          # The authentication plugin ships handlers for optional providers. Facebook
+          # is intentionally not installed/configured; allow R8 to remove that handler.
+          cat >> android/app/proguard-rules.pro <<'RULES'
+          -dontwarn com.facebook.**
+          RULES
+
           # Capacitor 8 currently generates an AGP 8.x project. This flag enables
           # the optimized resource shrinker recommended for AGP 8.12/8.13.
           grep -q '^android.r8.optimizedResourceShrinking=true$' android/gradle.properties || \
