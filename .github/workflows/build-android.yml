@@ -361,7 +361,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- www/; then
+          if [[ -z "$(git status --porcelain -- www/)" ]]; then
             echo "www already matches optimized $SOURCE_REPO@$ROAMWISE_SOURCE_SHA."
             exit 0
           fi
