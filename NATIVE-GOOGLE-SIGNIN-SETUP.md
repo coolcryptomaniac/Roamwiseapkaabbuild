@@ -1,5 +1,7 @@
 # Native Google sign-in setup
 
+Web authentication source synced from `coolcryptomaniac/roamwise@7dc95a0b70198890cb15fe4eba4284f6cf6c692b`.
+
 The Android app now uses the native Google account chooser and bridges the returned Google ID token into the existing Firebase JavaScript session. This avoids the unsupported Firebase web-popup flow inside Android WebView.
 
 ## One-time Firebase Console setup
