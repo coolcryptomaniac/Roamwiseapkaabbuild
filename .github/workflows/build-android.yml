@@ -133,7 +133,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -n "${GOOGLE_SERVICES_JSON_B64:-}" ]]; then
-            printf '%s' "$GOOGLE_SERVICES_JSON_B64" | base64 -d > android/app/google-services.json
+            printf '%s' "$GOOGLE_SERVICES_JSON_B64" | base64 -di > android/app/google-services.json
           elif [[ -f google-services.json ]]; then
             cp google-services.json android/app/google-services.json
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -184,7 +184,7 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$KEYSTORE_B64" || { echo "KEYSTORE_B64 secret is missing"; exit 1; }
-          printf '%s' "$KEYSTORE_B64" | base64 -d > android/app/rw.keystore
+          printf '%s' "$KEYSTORE_B64" | base64 -di > android/app/rw.keystore
 
       - name: Configure release signing and version
         shell: bash
