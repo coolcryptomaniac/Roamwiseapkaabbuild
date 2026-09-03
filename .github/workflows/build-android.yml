@@ -310,7 +310,9 @@ jobs:
           test -s "$APK"
           test -s "$AAB"
           test -s "$MAPPING"
-          apksigner verify --verbose --print-certs "$APK"
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner -print | sort -V | tail -n 1)
+          test -x "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
           jarsigner -verify "$AAB"
           unzip -Z1 "$AAB" | grep -q '^BundleConfig.pb$'
           unzip -Z1 "$AAB" | grep -q '^base/manifest/AndroidManifest.xml$'
