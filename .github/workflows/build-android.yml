@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: roamwise-android-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   SOURCE_REPO: coolcryptomaniac/roamwise
@@ -127,7 +127,6 @@ jobs:
           node -e "const p=require('./package.json'); if(!p.dependencies['@capacitor-firebase/authentication']) process.exit(1)"
 
       - name: Configure native Firebase for release builds
-        if: github.event_name != 'pull_request'
         shell: bash
         env:
           GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
@@ -137,6 +136,9 @@ jobs:
             printf '%s' "$GOOGLE_SERVICES_JSON_B64" | base64 -d > android/app/google-services.json
           elif [[ -f google-services.json ]]; then
             cp google-services.json android/app/google-services.json
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "::warning::Native Google runtime configuration is not available to this PR build; compilation will still be verified."
+            exit 0
           else
             echo "::error::Native Google sign-in needs google-services.json. Add GOOGLE_SERVICES_JSON_B64 as a repository secret or commit the Firebase Android config at the repository root."
             exit 1
