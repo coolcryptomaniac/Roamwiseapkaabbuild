@@ -141,7 +141,7 @@ jobs:
             echo "::error::A non-runtime document survived Android asset pruning."
             exit 1
           fi
-          grep -q 'https://www.roamwise.co.in/assets/audio/' www/app.js
+          grep -q 'https://www.roamwise.co.in/assets/audio/' www/js/audio/cues.js
           grep -q 'https://www.roamwise.co.in/assets/audio/' www/platform-v5/audio-only.js
           grep -q 'https://www.roamwise.co.in/itinerary-library/' www/itinerary-library/preset-loader.js
 
@@ -172,8 +172,8 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Recreate Android platform
         shell: bash
@@ -215,6 +215,9 @@ jobs:
 
       - name: Sync refreshed web assets into Android
         run: npx cap sync android
+
+      - name: Configure opt-in Nearby trekking mesh
+        run: node scripts/configure-nearby-mesh.mjs
 
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
