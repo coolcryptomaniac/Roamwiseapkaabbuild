@@ -4,9 +4,9 @@ import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 const SITE_ORIGIN = 'https://www.roamwise.co.in';
 const edits = [
   {
-    file: 'www/app.js',
-    pattern: /node\.src\s*=\s*['"]assets\/audio\/['"]\s*\+\s*base\s*\+\s*_rwCueFormat\s*;/,
-    replacement: "node.src = '__SITE__/assets/audio/'+base+_rwCueFormat;",
+    file: 'www/js/audio/cues.js',
+    pattern: /var source\s*=\s*['"]assets\/audio\/['"]\s*\+\s*base\s*\+\s*_rwCueFormat\s*;/,
+    replacement: "var source = '__SITE__/assets/audio/'+base+_rwCueFormat;",
     label: 'event audio'
   },
   {

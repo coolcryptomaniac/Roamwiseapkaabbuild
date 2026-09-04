@@ -141,7 +141,7 @@ jobs:
             echo "::error::A non-runtime document survived Android asset pruning."
             exit 1
           fi
-          grep -q 'https://www.roamwise.co.in/assets/audio/' www/app.js
+          grep -q 'https://www.roamwise.co.in/assets/audio/' www/js/audio/cues.js
           grep -q 'https://www.roamwise.co.in/assets/audio/' www/platform-v5/audio-only.js
           grep -q 'https://www.roamwise.co.in/itinerary-library/' www/itinerary-library/preset-loader.js
 
