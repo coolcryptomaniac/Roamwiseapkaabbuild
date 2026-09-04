@@ -77,3 +77,25 @@ Just re-copy the new web files into `www/`, bump `versionCode`, and re-run
 The `www/` files here are ready and GPS-aware. The one thing that cannot happen
 in this chat is the final Gradle/native compile — that needs a real Android build
 environment. Everything up to that point is done for you.
+
+# Nearby trekking mesh
+
+Android builds include an opt-in `NearbyMesh` Capacitor plugin backed by Google
+Nearby Connections and the `P2P_CLUSTER` topology. It connects multiple nearby
+devices without internet, but it is not a guaranteed long-distance or satellite
+SOS system and it does not relay messages across unconnected hops.
+
+The feature never starts in the background and never requests permissions at
+launch. The trekking UI must explain the feature, then call:
+
+```js
+await RWNearbyMesh.requestPermissions();
+await RWNearbyMesh.start('Trail name');
+```
+
+Listen for `verificationRequired`, compare the displayed verification code on
+both devices, and call `accept(endpointId)` only after the trekkers confirm it.
+Messages are limited to 16 KiB. Call `stop()` when the trekking session ends.
+
+Useful events are `peerFound`, `peerLost`, `verificationRequired`,
+`connectionChanged`, `messageReceived`, `meshState`, and `meshError`.

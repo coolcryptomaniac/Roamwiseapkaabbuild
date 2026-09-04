@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 
 const SITE_ORIGIN = 'https://www.roamwise.co.in';
 const edits = [
@@ -32,3 +32,12 @@ for (const { file, pattern, replacement, label } of edits) {
   writeFileSync(file, output);
   console.log(`Routed ${label} to the web origin from ${file}`);
 }
+
+copyFileSync('native/nearby/nearby-mesh.js', 'www/nearby-mesh.js');
+const indexFile = 'www/index.html';
+const index = readFileSync(indexFile, 'utf8');
+if (!index.includes('nearby-mesh.js')) {
+  if (!index.includes('</body>')) throw new Error('Could not install Nearby mesh bridge: </body> missing');
+  writeFileSync(indexFile, index.replace('</body>', '  <script src="nearby-mesh.js" defer></script>\n</body>'));
+}
+console.log('Installed the opt-in Nearby trekking mesh web bridge');
