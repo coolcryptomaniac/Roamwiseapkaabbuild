@@ -115,7 +115,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=rw-v121-hollywood-smooth-read">
+<link rel="stylesheet" href="mobile-stability.css?v=rw-v121-hollywood-smooth-read">
+<script src="js/runtime/freshness.js?v=rw-v121-hollywood-smooth-read" defer></script>
 <style id="rwPolish">
 /* ===== rwPolish — press feel, elevation, motion, pill tab bar ===== */
 *{-webkit-tap-highlight-color:transparent}
@@ -330,6 +332,22 @@ html{-webkit-text-size-adjust:100%}
   #xpChipTxt{display:none}
   .xp-chip{gap:0;padding:4px 7px}
 }
+/* Android/mobile-web crowding fix: the persistent Settings gear (#rwSettingsShortcut)
+   added a 6th interactive control (search, gear, rank badge, PRO, sign-in/avatar,
+   hamburger) to a header row that only ever had breathing room budgeted for 5. At
+   real phone widths (~390px, the reported device — the SAME already-existing
+   max-width:400px "very narrow phone" tier used just above) that left the rank
+   badge squeezed to a near-invisible clipped sliver between the gear and the PRO
+   pill. Rather than shrinking every icon further (which would make them hard to
+   tap) or hiding the new gear (which defeats the reason it was added), this drops
+   the purely decorative rank/XP badge — the same "lowest priority collapses first"
+   rule already used above for its label text — one step further, freeing enough
+   width for gear + search + PRO + hamburger to sit with clear, even, tappable gaps. */
+@media(max-width:400px){
+  .nav-right .xp-chip{display:none}
+  .nav-right{gap:6px}
+  .nav-right .btn-pro{padding:6px 9px;font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -410,10 +428,10 @@ function rwDismissCreatorBanner(){
 <section class="v v-home v-copilot" id="copilotHero" style="margin:16px 14px 8px">
   <div style="display:flex;align-items:center;gap:8px;margin:0 2px 8px"><span style="font-size:17px">⚡</span><b style="font-size:15px">Ailon Tusk</b><span style="font-size:11px;color:var(--t3)">· your travel copilot</span></div>
   <div id="heroLog" style="display:none;margin-bottom:10px;max-height:52vh;overflow-y:auto"></div>
-  <div style="position:relative;background:linear-gradient(180deg,var(--bg2,#12121C),rgba(18,18,28,.55));border:1.5px solid rgba(232,186,108,.35);border-radius:22px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.35)">
+  <div class="copilot-compose" style="position:relative;background:linear-gradient(180deg,var(--bg2,#12121C),rgba(18,18,28,.55));border:1.5px solid rgba(232,186,108,.35);border-radius:22px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.35)">
     <textarea id="heroInput" rows="5" placeholder="Ask me anything &mdash; &ldquo;chill 4 days near Rishikesh under 12k&rdquo;"
       style="display:block;width:100%;box-sizing:border-box;background:transparent;border:none;padding:8px 8px 44px;color:inherit;font:inherit;font-size:16.5px;resize:none;outline:none;min-height:168px;line-height:1.6"></textarea>
-    <div style="position:absolute;right:12px;bottom:12px;display:flex;gap:8px;align-items:center">
+    <div class="copilot-actions" style="position:absolute;right:12px;bottom:12px;display:flex;gap:8px;align-items:center">
       <button onclick="scanImageOpen()" aria-label="Scan a screenshot" title="Scan a screenshot or reel"
         style="width:36px;height:36px;border-radius:50%;border:1px solid var(--b2,#2A2A36);background:var(--bg3,#1A1A20);color:var(--t2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">&#128247;</button>
       <button onclick="copilotVoiceHero()" aria-label="Voice"
@@ -432,13 +450,13 @@ function rwDismissCreatorBanner(){
     <button class="hero-btn hb-pm" onclick="openPay()" id="heroProBtn">Unlock Pro &mdash; &#8377;100</button>
   </div>
   <div class="trust-strip">
-    <span class="trust-chip"><b>195+</b> countries covered</span>
+    <span class="trust-chip"><b>195+</b> destinations covered</span>
     <span class="trust-chip"><b>No account</b> needed to start</span>
     <span class="trust-chip"><b>One-time</b> pricing, no subscription</span>
     <span class="trust-chip shinobi-chip"><b>&#129399; Shinobi mode</b> crowd-dodging routes</span>
   </div>
   <div class="stats-row">
-    <div class="stat-cell"><div class="stat-num">195+</div><div class="stat-lbl">Countries</div></div>
+    <div class="stat-cell"><div class="stat-num">195+</div><div class="stat-lbl">Destinations</div></div>
     <div class="stat-cell"><div class="stat-num">14-day</div><div class="stat-lbl">Itineraries</div></div>
     <div class="stat-cell"><div class="stat-num">10</div><div class="stat-lbl">Currencies</div></div>
     <div class="stat-cell"><div class="stat-num">12</div><div class="stat-lbl">Crowd months</div></div>
@@ -1128,7 +1146,11 @@ function rwDismissCreatorBanner(){
 </div>
 
 
-<script src="rw-config.js"></script>
+<script src="js/core/error-guard.js"></script>
+<script src="js/core/dom-utils.js"></script>
+<script src="js/core/storage-utils.js"></script>
+<script src="js/core/text-utils.js"></script>
+<script src="rw-config.js?v=rw-v121-hollywood-smooth-read"></script>
 <script src="events-data.js" defer></script>
 <script src="referral-data.js"></script>
 <script src="partners-data.js"></script>
@@ -1143,12 +1165,90 @@ function rwDismissCreatorBanner(){
 <script src="js/data/destinations.js"></script>
 <script src="js/data/iata.js"></script>
 <script src="js/pricing/tiers.js"></script>
+<script src="js/payments/checkout.js"></script>
 <script src="js/data/regions.js"></script>
+<script src="js/data-sync/rwdata.js"></script>
+<script src="js/data-sync/key-sync.js"></script>
+<script src="js/data-sync/config-sync.js"></script>
+<script src="js/audio/reminders.js"></script>
+<script src="js/voice/tusk-speak.js?v=rw-v118-mobile-audio-fresh"></script>
+<script src="js/voice/voice-input.js"></script>
+<script src="js/booking/affiliate-links.js"></script>
+<script src="js/booking/actions.js"></script>
+<script src="js/booking/form.js"></script>
+<script src="js/booking/local-rides.js"></script>
+<script src="js/booking/pnr-parser.js"></script>
+<script src="js/social/coordkit.js"></script>
+<script src="js/social/upi-settle.js"></script>
+<script src="js/social/tribe-beacon.js"></script>
+<script src="js/social/group-state.js"></script>
+<script src="js/social/group-compromise.js"></script>
+<script src="js/social/group-chat.js"></script>
+<script src="js/social/group-chat-social.js"></script>
+<script src="js/social/expense-split.js"></script>
+<script src="js/social/train-picker.js"></script>
+<script src="js/social/trip-scheduling-poll.js"></script>
+<script src="js/social/trip-board.js"></script>
+<script src="js/social/compat.js"></script>
+<script src="js/copilot/core.js"></script>
+<script src="js/copilot/rich-reply.js"></script>
+<script src="js/copilot/tusk-persona.js"></script>
+<script src="js/copilot/tusk-knowledge.js"></script>
+<script src="js/copilot/answer-cards.js"></script>
+<script src="js/copilot/agent.js"></script>
+<script src="js/copilot/agent-evals.js"></script>
+<script src="js/itinerary/ground-truth.js"></script>
+<script src="js/itinerary/ninja-hacks.js"></script>
+<script src="js/itinerary/share.js"></script>
+<script src="js/itinerary/journey-certificate.js"></script>
+<script src="js/itinerary/atlas-certificate.js"></script>
+<script src="js/itinerary/journey-movie.js"></script>
+<script src="js/itinerary/certificate-verify.js"></script>
+<script src="js/itinerary/eco-certificate.js"></script>
+<script src="js/itinerary/journey-log.js"></script>
+<script src="js/itinerary/map-view.js"></script>
+<script src="js/itinerary/trip-vault.js"></script>
+<script src="js/itinerary/meters.js"></script>
+<script src="js/itinerary/place-disambiguation.js"></script>
+<script src="js/itinerary/shadow-budget.js"></script>
+<script src="js/itinerary/pdf-export.js"></script>
+<script src="js/itinerary/build.js"></script>
+<script src="js/ui/page-router.js"></script>
+<script src="js/ui/layout-modes.js"></script>
+<script src="js/ui/settings-modal.js"></script>
+<script src="js/ui/themes.js"></script>
+<script src="js/ui/adaptive-shell.js"></script>
+<script src="js/ui/site-search.js"></script>
+<script src="js/ui/onboarding.js"></script>
+<script src="js/ui/card-painter.js"></script>
+<script src="js/ui/status-tier.js"></script>
+<script src="js/ui/opening.js"></script>
+<script src="js/game/badges.js"></script>
+<script src="js/game/realms.js"></script>
+<script src="js/misc/partners.js"></script>
+<script src="js/misc/events.js"></script>
+<script src="js/misc/listings.js"></script>
+<script src="js/misc/experiences.js"></script>
+<script src="js/misc/green-trip.js"></script>
+<script src="js/misc/eco-safety.js"></script>
+<script src="js/misc/misc-features.js"></script>
+<script src="js/misc/misc-features-2.js"></script>
+<script src="js/misc/sound-of-place.js"></script>
+<script src="js/misc/signature-food.js"></script>
+<script src="js/misc/destination-vibe.js"></script>
+<script src="js/misc/trek-vault.js"></script>
+<script src="js/misc/athlete-mode.js"></script>
+<script src="js/misc/live-location.js"></script>
+<script src="js/misc/booking-platform-compare.js"></script>
+<script src="js/misc/local-ecosystem.js"></script>
 <script src="tusk-learned.js" onerror="void 0"></script>
 <script src="destination-photos.js" defer></script>
 <script src="tusk-data.js" defer></script>
-<script src="app.js" defer></script>
-<script src="roamwise-premium-itinerary.js" defer></script>
+<script src="js/boot/auth-init.js?v=rw-v121-hollywood-smooth-read" defer></script>
+<script src="app.js?v=rw-v121-hollywood-smooth-read" defer></script>
+<script src="js/boot/init.js?v=rw-v121-hollywood-smooth-read" defer></script>
+<script src="roamwise-premium-itinerary.js?v=rw-v118-mobile-audio-fresh" defer></script>
 <script src="itinerary-library/preset-loader.js" defer></script>
+  <script src="nearby-mesh.js" defer></script>
 </body>
 </html>

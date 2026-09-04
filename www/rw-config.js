@@ -66,7 +66,7 @@ window.rwApi = function(path){
   var boot = document.createElement('style');
   boot.id = 'rw-opening-boot-style';
   boot.textContent = '#intro,.intro{display:none!important;visibility:hidden!important;opacity:0!important}'+
-    'html:not(.rw-opening-skip):not(.rw-opening-mounted) body:before{content:"";position:fixed;inset:0;z-index:2147482999;background:radial-gradient(circle at 50% 18%,rgba(118,45,255,.42),transparent 38%),radial-gradient(circle at 66% 74%,rgba(255,49,164,.28),transparent 38%),linear-gradient(145deg,#130621,#260824 50%,#10051b);pointer-events:none}';
+    'html:not(.rw-opening-skip):not(.rw-opening-mounted) body:before{content:"";position:fixed;inset:0;z-index:2147482999;background:linear-gradient(180deg,transparent 0 67%,rgba(8,2,14,.76) 83%,#08020e 100%),#16051e url("assets/roamwise-opening-first.webp") center/cover no-repeat;pointer-events:none}';
   document.head.appendChild(boot);
 })();
 
@@ -75,11 +75,12 @@ window.rwApi = function(path){
    soon as its tiny JS arrives instead of waiting behind unrelated modules. */
 (function(){
   var f=(window.RW_CONFIG&&window.RW_CONFIG.features)||{};
+  var build='rw-v121-hollywood-smooth-read';
 
   function load(src, opening){
     if(document.querySelector('script[data-rw-v5="'+src+'"]')) return;
     var s=document.createElement('script');
-    s.src=src;
+    s.src=src+(src.indexOf('?')===-1?'?':'&')+'v='+build;
     s.dataset.rwV5=src;
     if(opening){
       s.async=false;
@@ -92,7 +93,9 @@ window.rwApi = function(path){
 
   /* Audio must register before the opener. Dynamic scripts marked async=false
      execute in insertion order, giving the intro one authoritative sound gate. */
+  if(f.audioTheme) load('js/audio/focus.js', true);
   if(f.audioTheme) load('platform-v5/audio-only.js', true);
+  if(f.audioTheme) load('js/audio/cues.js', true);
   if(f.atlasIntroV5) load('platform-v5/atlas-shinobi.js', true);
   if(f.performanceV5) load('platform-v5/performance.js', false);
   if(f.privateLearningConsent) load('platform-v5/learning-consent.js', false);
