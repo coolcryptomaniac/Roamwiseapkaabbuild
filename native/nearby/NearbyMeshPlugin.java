@@ -69,7 +69,7 @@ public class NearbyMeshPlugin extends Plugin {
     @com.getcapacitor.annotation.PermissionCallback
     private void permissionCallback(PluginCall call) {
         JSObject result = permissionResult();
-        if (result.getBool("granted", false)) call.resolve(result);
+        if (Boolean.TRUE.equals(result.getBool("granted"))) call.resolve(result);
         else call.reject("Nearby permission was not granted; mesh remains off.");
     }
 
