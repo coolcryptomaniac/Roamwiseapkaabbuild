@@ -83,7 +83,8 @@ environment. Everything up to that point is done for you.
 Android builds include an opt-in `NearbyMesh` Capacitor plugin backed by Google
 Nearby Connections and the `P2P_CLUSTER` topology. It connects multiple nearby
 devices without internet, but it is not a guaranteed long-distance or satellite
-SOS system and it does not relay messages across unconnected hops.
+SOS system. Its optional application relay can forward selected lightweight
+packets across up to three verified-device hops.
 
 The feature never starts in the background and never requests permissions at
 launch. The trekking UI must explain the feature, then call:
@@ -111,7 +112,8 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
 3. Compare the verification digits displayed on both phones in person. Accept
    only when they match. Reject unexpected requests.
 4. Use:
-   - **Chat** for internet-free nearby messages and recorded voice notes.
+   - **Chat** for internet-free nearby messages, radio checks, and recorded
+     push-to-talk voice notes.
    - **Team** for roll calls, regroup/hold-position instructions, and local
      lost-trekker alerts.
    - **SOS** to alert connected nearby phones, attach current GPS when
@@ -119,22 +121,29 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
    - **Share** for a photo, short video, song, voice note, PDF, or text file up
      to 8 MB.
    - **Test network** to confirm a verified peer can receive and reply.
-5. Tusk understands “open Trail Mesh”, “mesh status”, “find lost trekker”, and
+   - **Fun** for lightweight photo challenges, trail quizzes, campfire-story
+     rounds, and team cheers.
+5. For a stretched group, each participant may explicitly enable **Multi-hop
+   relay**. Text, team, lost-trekker, SOS, and fun packets can travel up to three
+   verified-device hops. Duplicate IDs and a ten-minute cache prevent loops.
+   Files and voice notes remain direct-only to protect emergency capacity.
+6. Tusk understands “open Trail Mesh”, “mesh status”, “find lost trekker”, and
    “nearby SOS”. It opens the relevant screen; the user must still confirm any
    safety-sensitive broadcast.
-6. Tap **Stop** when the trip ends.
+7. Tap **Stop** when the trip ends.
 
 ## Safety and product limits
 
 - Trail Mesh uses local Bluetooth and Wi-Fi radios. Range changes with terrain,
   bodies, weather, and phone hardware. It is not satellite communication.
-- This release connects nearby peers but does not relay messages through
-  intermediate phones. “Find lost trekker” works only when both phones are
-  running Trail Mesh and come within radio range.
+- Opt-in relay carries only lightweight packets, has a maximum three-hop TTL,
+  and reports forwarding rather than guaranteed end-to-end delivery. “Find lost
+  trekker” works only when their running phone reaches a connected or relaying
+  phone in the active group.
 - SOS delivery is not guaranteed. Users should contact local emergency services
   by phone/SMS or another official channel whenever available.
-- Voice is intentionally push-to-talk recording rather than an unvalidated
-  full-duplex call. Media transfers are foreground, local, and best for short
-  clips; they are not streaming.
+- Voice is intentionally a resilient push-to-talk radio room rather than an
+  unvalidated full-duplex conference. Media transfers are foreground, direct,
+  local, and best for short clips; they are not streamed or relayed.
 - A display name is advertised locally only while Trail Mesh is running. No
   connection is accepted silently and no permission is requested at launch.
