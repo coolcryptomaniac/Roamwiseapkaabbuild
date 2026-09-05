@@ -9,7 +9,7 @@
 function openMovie(){
   if(!window._rwCard || !window._rwCine){ showToast('Forge your Journey Card first \u2014 then the movie'); return; }
   if((_rwCine.pts||[]).length<2){ showToast('Log at least 2 located places for a movie'); return; }
-  try{ track('video_opens'); }catch(e){}
+  try{ track('video_opens'); }catch(e){ /* analytics best-effort, ignore */ }
   if(isPro || lsGet('rw_movie_ok')) return cineRender();
   if(perksUnlocked().indexOf('documented')>-1 && !lsGet('rw_movie_perk_used')){
     lsSet('rw_movie_perk_used','1');
@@ -59,7 +59,7 @@ function cineRender(opts){
   opts=opts||{};
   var ST=CARD_STYLES[(_rwCine&&_rwCine.style)||'neon']||CARD_STYLES.neon;
   showToast('\ud83c\udfac Rolling\u2026 rendering your journey film');
-  try{ track('video_made'); }catch(e){}
+  try{ track('video_made'); }catch(e){ /* analytics best-effort, ignore */ }
   var C=_rwCine, S=2;
   var VW=1080, VH=1920, cv=document.createElement('canvas'); cv.width=VW; cv.height=VH;
   var x=cv.getContext('2d');
@@ -79,7 +79,7 @@ function cineRender(opts){
 
   /* audio */
   var AC=window.AudioContext||window.webkitAudioContext, ctx=null, dest=null;
-  if(!opts.mute){ try{ ctx=new AC(); try{ctx.resume();}catch(e2){} dest=ctx.createMediaStreamDestination(); cineMusic(ctx,dest,DUR);}catch(e){} }
+  if(!opts.mute){ try{ ctx=new AC(); try{ctx.resume();}catch(e2){ /* best-effort, ignore */ } dest=ctx.createMediaStreamDestination(); cineMusic(ctx,dest,DUR);}catch(e){ /* best-effort, ignore */ } }
   var stream=cv.captureStream(30);
   if(dest && dest.stream.getAudioTracks().length) stream.addTrack(dest.stream.getAudioTracks()[0]);
   var mime=['video/webm;codecs=vp8,opus','video/webm;codecs=vp9,opus','video/webm'].find(function(m){return window.MediaRecorder && MediaRecorder.isTypeSupported(m);});
@@ -87,7 +87,7 @@ function cineRender(opts){
   var rec=new MediaRecorder(stream,{mimeType:mime, videoBitsPerSecond:6e6}), chunks=[];
   rec.ondataavailable=function(e){ if(e.data.size) chunks.push(e.data); };
   rec.onstop=function(){
-    if(ctx) try{ctx.close();}catch(e){}
+    if(ctx) try{ctx.close();}catch(e){ /* best-effort, ignore */ }
     var blob=new Blob(chunks,{type:'video/webm'});
     if(blob.size<2000 && !opts.mute){ showToast('Retrying without music\u2026'); return cineRender({mute:true}); }
     if(blob.size<2000){ showToast('\u26a0 Recording failed \u2014 try Chrome'); return; }
@@ -190,23 +190,23 @@ function cineRender(opts){
       /* camera frames the current hop, tightening as the plane flies */
       var midX=(A.x+B.x)/2, midY=(A.y+B.y)/2;
       var hopSpan=Math.max(30, (Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y)))*2.2);
-      var v=view(midX,midY, hopSpan);
-      drawTrail(v,k,e);
-      drawPins(v,k + (e>0.98?1:0));
-      plane(v,A,B,e);
+      var vHop=view(midX,midY, hopSpan);
+      drawTrail(vHop,k,e);
+      drawPins(vHop,k + (e>0.98?1:0));
+      plane(vHop,A,B,e);
       var toName=(names[k+1]||'Next stop').slice(0,18), fromName=(names[k]||'').slice(0,18);
       caption('CHAPTER '+(k+1)+' \u2192 '+(k+2), toName, k===0? 'the journey begins \u00b7 from '+fromName : 'flying in from '+fromName, 1);
     } else {
       /* FINAL SEGMENT — OUTRO: zoom back out over the full trail, thanks note */
       var ot=(t-INTRO-hops*SEG)/OUTRO, e3=ease(Math.min(1,ot));
       var spanAll2=Math.max(60, Math.max(maxX-minX,maxY-minY)*1.5);
-      var v=view((minX+maxX)/2,(minY+maxY)/2, spanAll2*(0.9+0.35*e3));
-      drawTrail(v,legs.length-1,null); drawPins(v,legs.length-1);
+      var vOutro=view((minX+maxX)/2,(minY+maxY)/2, spanAll2*(0.9+0.35*e3));
+      drawTrail(vOutro,legs.length-1,null); drawPins(vOutro,legs.length-1);
       caption('THANK YOU FOR TRAVELING', (C.name||'').toUpperCase(), 'make your own film \u00b7 roamwise.co.in', Math.min(1,ot*1.4));
     }
 
     if(t<DUR) requestAnimationFrame(frame); else rec.stop();
-   }catch(err){ try{rec.stop();}catch(e2){} showToast('Film wrapped early \u2014 saved what rendered'); }
+   }catch(err){ try{rec.stop();}catch(e2){ /* best-effort, ignore */ } showToast('Film wrapped early \u2014 saved what rendered'); }
   }
   requestAnimationFrame(frame);
 }

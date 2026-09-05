@@ -34,7 +34,7 @@ function chatReact(id, emoji){
     ? firebase.firestore.FieldValue.arrayRemove(user.uid)
     : firebase.firestore.FieldValue.arrayUnion(user.uid);
   db.collection('tripchats').doc(_chatRoom).collection('msgs').doc(id).update(upd).catch(function(){});
-  if(!have){ try{ rwHaptic&&rwHaptic(); }catch(e){} rwPopHeart(emoji); }
+  if(!have){ try{ rwHaptic&&rwHaptic(); }catch(e){ /* haptic feedback is a nice-to-have, ignore */ } rwPopHeart(emoji); }
 }
 /* the little floating emoji burst — pure CSS, no library */
 function rwPopHeart(e){
@@ -57,7 +57,7 @@ function chatReactsHTML(id, m){
 }
 /* long-press / double-tap opens the reaction picker */
 function chatReactPicker(id, ev){
-  try{ ev && ev.preventDefault(); }catch(e){}
+  try{ ev && ev.preventDefault(); }catch(e){ /* best-effort, ignore */ }
   var old=el('rxPick'); if(old) old.remove();
   var d=document.createElement('div');
   d.id='rxPick'; d.className='rx-pick';
@@ -128,18 +128,18 @@ function rwPresenceStart(){
   var col=db.collection('tripchats').doc(_chatRoom).collection('presence');
   var ref=col.doc(user.uid);
   function beat(){
-    try{ ref.set({ name:(user.displayName||user.email||'Traveller').split('@')[0], at:Date.now() },{merge:true}); }catch(e){}
+    try{ ref.set({ name:(user.displayName||user.email||'Traveller').split('@')[0], at:Date.now() },{merge:true}); }catch(e){ /* best-effort, ignore */ }
   }
   beat();
   if(_presTimer) clearInterval(_presTimer);
   _presTimer=setInterval(function(){ if(!document.hidden) beat(); }, 45000);
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) beat(); });
-  if(_presUnsub){ try{ _presUnsub(); }catch(e){} }
+  if(_presUnsub){ try{ _presUnsub(); }catch(e){ /* best-effort, ignore */ } }
   _presUnsub = col.onSnapshot(function(qs){
     _presence={};
     qs.forEach(function(d){ _presence[d.id]=d.data()||{}; });
-    try{ var vb=el('tcVibe'); if(vb) vb.innerHTML=chatVibeHTML(); }catch(e){}
-    try{ if(el('memList')) rwMembersRender(); }catch(e){}
+    try{ var vb=el('tcVibe'); if(vb) vb.innerHTML=chatVibeHTML(); }catch(e){ /* best-effort, ignore */ }
+    try{ if(el('memList')) rwMembersRender(); }catch(e){ /* best-effort, ignore */ }
   }, function(){});
 }
 function rwIsOnline(uid){
@@ -277,7 +277,7 @@ function chatVibeHTML(){
     var mem=rwMembers();
     n=mem.length;
     mem.forEach(function(u){ if(rwIsOnline(u)){ live++; names.push(rwMemberName(u)); } });
-  }catch(e){}
+  }catch(e){ /* best-effort, ignore */ }
   if(!n) n=1;
   var vibe = st>=7 ? 'locked in \ud83d\udd25' : st>=3 ? 'warming up \u2728' : n>2 ? 'the squad is here \ud83d\udc65' : 'just getting started \ud83c\udf31';
   return '<div class="tc-vibe">'
@@ -324,19 +324,19 @@ function chatBubble(id, m, mine){
       +'</div></div>';
   }
   if(kind==='expense'){
-    var p=m.payload||{};
+    var pExp=m.payload||{};
     return '<div style="margin:6px 0"><div style="background:var(--bg2,#12121C);border-left:3px solid #4ADE80;border-radius:9px;padding:8px 12px">'
       +'<div style="font-size:9.5px;color:#4ADE80;font-weight:800;text-transform:uppercase;letter-spacing:.08em">\ud83d\udcb0 Expense</div>'
-      +'<div style="font-size:12.5px;margin-top:2px"><b>'+esc2(p.payerName||m.name||'Someone')+'</b> paid <b style="color:var(--gold,#E8BA6C)">\u20b9'+((p.amount||0).toLocaleString('en-IN'))+'</b> for '+esc2(p.what||'')+'</div></div></div>';
+      +'<div style="font-size:12.5px;margin-top:2px"><b>'+esc2(pExp.payerName||m.name||'Someone')+'</b> paid <b style="color:var(--gold,#E8BA6C)">\u20b9'+((pExp.amount||0).toLocaleString('en-IN'))+'</b> for '+esc2(pExp.what||'')+'</div></div></div>';
   }
   if(kind==='settle'){
     return '<div style="margin:5px 0;text-align:center"><span style="font-size:11px;color:#4ADE80;background:rgba(74,222,128,.1);padding:3px 10px;border-radius:999px">\u2705 '+esc2(m.text||'settled up')+'</span></div>';
   }
   if(kind==='decision'){
-    var p=m.payload||{};
+    var pDec=m.payload||{};
     return '<div style="margin:6px 0"><div style="background:linear-gradient(135deg,rgba(74,222,128,.12),transparent);border:1px solid rgba(74,222,128,.3);border-radius:11px;padding:9px 12px">'
       +'<div style="font-size:9.5px;color:#4ADE80;font-weight:800;text-transform:uppercase;letter-spacing:.08em">\u2705 Decided \u00b7 pinned up top</div>'
-      +'<div style="font-size:12.5px;margin-top:2px">'+esc2(p.q||'')+' \u2192 <b>'+esc2(p.choice||'')+'</b></div></div></div>';
+      +'<div style="font-size:12.5px;margin-top:2px">'+esc2(pDec.q||'')+' \u2192 <b>'+esc2(pDec.choice||'')+'</b></div></div></div>';
   }
   if(kind==='vote'){ return ''; }
   if(kind==='whenvote'){ return ''; }
@@ -356,22 +356,22 @@ function chatBubble(id, m, mine){
       + chatWhenBody(m) + '</div>';
   }
   if(kind==='board'){
-    var p=m.payload||{}, mineB=(m.uid===((user||{}).uid));
+    var pBoard=m.payload||{}, mineB=(m.uid===((user||{}).uid));
     /* private items are only shown to their owner, even in the log */
-    if(p.share===false && !mineB) return '';
-    var ic={emergency:'\ud83c\udd98',ticket:'\ud83c\udfab',doc:'\ud83d\udcc4',note:'\ud83d\udccc'}[p.type]||'\ud83d\udccc';
-    return '<div style="margin:5px 0;text-align:center"><span style="font-size:11px;color:var(--t2);background:rgba(255,255,255,.05);padding:3px 10px;border-radius:999px">'+ic+' '+esc2((m.name||'Someone').split(' ')[0])+' added '+(p.share===false?'a private ':'')+'board item \u00b7 tap \ud83d\udccb Board</span></div>';
+    if(pBoard.share===false && !mineB) return '';
+    var ic={emergency:'\ud83c\udd98',ticket:'\ud83c\udfab',doc:'\ud83d\udcc4',note:'\ud83d\udccc'}[pBoard.type]||'\ud83d\udccc';
+    return '<div style="margin:5px 0;text-align:center"><span style="font-size:11px;color:var(--t2);background:rgba(255,255,255,.05);padding:3px 10px;border-radius:999px">'+ic+' '+esc2((m.name||'Someone').split(' ')[0])+' added '+(pBoard.share===false?'a private ':'')+'board item \u00b7 tap \ud83d\udccb Board</span></div>';
   }
   if(kind==='meet'){
-    var p=m.payload||{};
-    var place=p.place||m.text||'', when=p.when||'', city=p.city||place;
-    var mapQ=encodeURIComponent(place+(p.city?', '+p.city:''));
-    var mapUrl=p.map||('https://www.google.com/maps/search/?api=1&query='+mapQ);
+    var pMeet=m.payload||{};
+    var place=pMeet.place||m.text||'', when=pMeet.when||'', city=pMeet.city||place;
+    var mapQ=encodeURIComponent(place+(pMeet.city?', '+pMeet.city:''));
+    var mapUrl=pMeet.map||('https://www.google.com/maps/search/?api=1&query='+mapQ);
     var slug=(city||place).toLowerCase().replace(/[^a-z ]/g,'').trim().replace(/\s+/g,'-');
     var bms='https://in.bookmyshow.com/explore/events-'+encodeURIComponent(slug);
     /* Zomato has no stable city-slug URL (that 404s in the app WebView). Its
        search endpoint is the reliable one across web + WebView. */
-    var zomato='https://www.zomato.com/search?q='+encodeURIComponent(place+(p.city?' '+p.city:''));
+    var zomato='https://www.zomato.com/search?q='+encodeURIComponent(place+(pMeet.city?' '+pMeet.city:''));
     return '<div style="margin:7px 0"><div style="background:var(--bg2,#12121C);border-left:3px solid #60A5FA;border-radius:9px;padding:10px 12px">'
       +'<div style="font-size:9.5px;color:#60A5FA;font-weight:800;text-transform:uppercase;letter-spacing:.08em">\ud83d\udccd Meeting point \u00b7 '+esc2(m.name||'')+'</div>'
       +'<div style="font-size:13px;font-weight:700;margin:3px 0 1px">'+esc2(place)+'</div>'
@@ -448,10 +448,10 @@ function rwReportSend(ctx){
 /* local block: hides them for you immediately, before any moderation happens */
 function rwBlock(uid){
   if(!uid) return;
-  var b=[]; try{ b=JSON.parse(lsGet('rw_blocked')||'[]'); }catch(e){}
+  var b=[]; try{ b=JSON.parse(lsGet('rw_blocked')||'[]'); }catch(e){ /* parse best-effort, ignore malformed/missing data */ }
   if(b.indexOf(uid)===-1){ b.push(uid); lsSet('rw_blocked', JSON.stringify(b)); }
   showToast('Blocked \u2014 their messages are hidden for you');
-  try{ if(_chatRoom) tripChatOpen(_chatRoom); }catch(e){}
+  try{ if(_chatRoom) tripChatOpen(_chatRoom); }catch(e){ /* best-effort, ignore */ }
 }
 function rwIsBlocked(uid){
   try{ return (JSON.parse(lsGet('rw_blocked')||'[]')).indexOf(uid)>-1; }catch(e){ return false; }

@@ -11,11 +11,11 @@
 // load order relative to app.js does not matter (see ARCHITECTURE.md).
 function extractJSON(txt){
   if(!txt) return null;
-  try{ return JSON.parse(txt); }catch(e){}
+  try{ return JSON.parse(txt); }catch(e){ /* parse best-effort, ignore malformed/missing data */ }
   var a=txt.indexOf('{'), b=txt.lastIndexOf('}');
-  if(a>-1 && b>a){ try{ return JSON.parse(txt.slice(a,b+1)); }catch(e){} }
+  if(a>-1 && b>a){ try{ return JSON.parse(txt.slice(a,b+1)); }catch(e){ /* parse best-effort, ignore malformed/missing data */ } }
   a=txt.indexOf('['); b=txt.lastIndexOf(']');
-  if(a>-1 && b>a){ try{ var arr=JSON.parse(txt.slice(a,b+1)); return {days:arr}; }catch(e){} }
+  if(a>-1 && b>a){ try{ var arr=JSON.parse(txt.slice(a,b+1)); return {days:arr}; }catch(e){ /* parse best-effort, ignore malformed/missing data */ } }
   return null;
 }
 
@@ -55,7 +55,7 @@ function aiRequest(prov, key, model, prompt, maxTok, jsonMode){
         if(typeof em!=='string') em=JSON.stringify(em).slice(0,120);
         var e=new Error(em); e.httpStatus=res.status; throw e;
       }
-      var txt='';
+      var txt;
       if(prov==='anthropic') txt=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
       else if(prov==='gemini') txt=((((data.candidates||[])[0]||{}).content||{}).parts||[]).map(function(p){return p.text||'';}).join('');
       else txt=(((data.choices||[])[0]||{}).message||{}).content||'';
