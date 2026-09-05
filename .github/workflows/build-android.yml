@@ -96,6 +96,10 @@ jobs:
             source-roamwise/ www/
 
           node scripts/prepare-android-web.mjs
+          node --check www/nearby-mesh.js
+          grep -q 'Multi-hop relay (experimental)' www/nearby-mesh.js
+          grep -q 'data-rwm-panel="fun"' www/nearby-mesh.js
+          grep -q 'nearby-mesh.js' www/index.html
 
           SOURCE_SHA=$(git -C source-roamwise rev-parse HEAD)
           printf '{\n  "sourceRepo": "%s",\n  "sourceBranch": "%s",\n  "sourceCommit": "%s"\n}\n' \
