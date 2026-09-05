@@ -78,7 +78,7 @@ The `www/` files here are ready and GPS-aware. The one thing that cannot happen
 in this chat is the final Gradle/native compile — that needs a real Android build
 environment. Everything up to that point is done for you.
 
-# Nearby trekking mesh
+# Trail Mesh: offline trekking coordination
 
 Android builds include an opt-in `NearbyMesh` Capacitor plugin backed by Google
 Nearby Connections and the `P2P_CLUSTER` topology. It connects multiple nearby
@@ -95,7 +95,46 @@ await RWNearbyMesh.start('Trail name');
 
 Listen for `verificationRequired`, compare the displayed verification code on
 both devices, and call `accept(endpointId)` only after the trekkers confirm it.
-Messages are limited to 16 KiB. Call `stop()` when the trekking session ends.
+Each radio message is limited to 16 KiB. The Trail Mesh UI splits selected
+files into smaller messages and caps a transfer at 8 MB. Keep both phones
+nearby and the app open until a transfer finishes. Call `stop()` when the
+trekking session ends.
 
 Useful events are `peerFound`, `peerLost`, `verificationRequired`,
 `connectionChanged`, `messageReceived`, `meshState`, and `meshError`.
+
+## User tutorial
+
+1. Open **Trail Mesh** from the Android drawer or floating Trail Mesh button.
+2. On every participating phone, enter a recognizable trail name and tap
+   **Allow & start**. Approve Android's Nearby Devices and location prompts.
+3. Compare the verification digits displayed on both phones in person. Accept
+   only when they match. Reject unexpected requests.
+4. Use:
+   - **Chat** for internet-free nearby messages and recorded voice notes.
+   - **Team** for roll calls, regroup/hold-position instructions, and local
+     lost-trekker alerts.
+   - **SOS** to alert connected nearby phones, attach current GPS when
+     available, sound a local alarm, or open the existing RoamWise SOS screen.
+   - **Share** for a photo, short video, song, voice note, PDF, or text file up
+     to 8 MB.
+   - **Test network** to confirm a verified peer can receive and reply.
+5. Tusk understands “open Trail Mesh”, “mesh status”, “find lost trekker”, and
+   “nearby SOS”. It opens the relevant screen; the user must still confirm any
+   safety-sensitive broadcast.
+6. Tap **Stop** when the trip ends.
+
+## Safety and product limits
+
+- Trail Mesh uses local Bluetooth and Wi-Fi radios. Range changes with terrain,
+  bodies, weather, and phone hardware. It is not satellite communication.
+- This release connects nearby peers but does not relay messages through
+  intermediate phones. “Find lost trekker” works only when both phones are
+  running Trail Mesh and come within radio range.
+- SOS delivery is not guaranteed. Users should contact local emergency services
+  by phone/SMS or another official channel whenever available.
+- Voice is intentionally push-to-talk recording rather than an unvalidated
+  full-duplex call. Media transfers are foreground, local, and best for short
+  clips; they are not streaming.
+- A display name is advertised locally only while Trail Mesh is running. No
+  connection is accepted silently and no permission is requested at launch.
