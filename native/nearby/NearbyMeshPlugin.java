@@ -2,6 +2,7 @@ package com.gyanverse.roamwise.nearby;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -27,6 +28,8 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
+import com.google.android.gms.common.api.ApiException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +63,12 @@ public class NearbyMeshPlugin extends Plugin {
 
     @PluginMethod
     public void requestMeshPermissions(PluginCall call) {
+        // Android remembers grants. Resolve immediately after the first approval so
+        // later Trail Mesh sessions never manufacture another permission prompt.
+        if (hasRequiredPermission()) {
+            call.resolve(permissionResult());
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissionForAliases(new String[] { "bluetoothNearby", "nearbyWifi" }, call, "permissionCallback");
         } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
@@ -103,7 +112,9 @@ public class NearbyMeshPlugin extends Plugin {
             })
             .addOnFailureListener(error -> {
                 client().stopAdvertising();
-                call.reject("Could not start Nearby mesh: " + error.getMessage(), null, error);
+                int code = error instanceof ApiException ? ((ApiException) error).getStatusCode() : -1;
+                String reason = code >= 0 ? ConnectionsStatusCodes.getStatusCodeString(code) : error.getClass().getSimpleName();
+                call.reject("Could not start Nearby mesh [" + code + " " + reason + "]: " + error.getMessage(), null, error);
             });
     }
 
@@ -241,6 +252,8 @@ public class NearbyMeshPlugin extends Plugin {
         result.put("legacyLocation", getPermissionState("legacyLocation").toString());
         result.put("bluetoothNearby", getPermissionState("bluetoothNearby").toString());
         result.put("nearbyWifi", getPermissionState("nearbyWifi").toString());
+        result.put("accessWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
+        result.put("changeWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
         return result;
     }
 
