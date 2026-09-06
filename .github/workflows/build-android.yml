@@ -103,7 +103,7 @@ jobs:
           grep -q 'e.displayName' www/nearby-mesh.js
           grep -q 'Offline readiness test' www/nearby-mesh.js
           grep -q 'data-rwm-panel="health"' www/nearby-mesh.js
-          grep -q 'Local process console' www/nearby-mesh.js
+          grep -q 'Process console' www/nearby-mesh.js
           grep -q 'safe-area-inset-top' www/nearby-mesh.js
           grep -q 'nearby-mesh.js' www/index.html
 
