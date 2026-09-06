@@ -39,7 +39,8 @@ import java.util.Set;
 @CapacitorPlugin(
     name = "NearbyMesh",
     permissions = {
-        @Permission(alias = "legacyLocation", strings = { Manifest.permission.ACCESS_FINE_LOCATION }),
+        @Permission(alias = "coarseLocation", strings = { Manifest.permission.ACCESS_COARSE_LOCATION }),
+        @Permission(alias = "fineLocation", strings = { Manifest.permission.ACCESS_FINE_LOCATION }),
         @Permission(alias = "bluetoothNearby", strings = {
             Manifest.permission.BLUETOOTH_ADVERTISE,
             Manifest.permission.BLUETOOTH_CONNECT,
@@ -70,13 +71,15 @@ public class NearbyMeshPlugin extends Plugin {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissionForAliases(new String[] { "bluetoothNearby", "nearbyWifi" }, call, "permissionCallback");
-        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
-            requestPermissionForAliases(new String[] { "bluetoothNearby", "legacyLocation" }, call, "permissionCallback");
+            requestPermissionForAliases(new String[] { "bluetoothNearby", "nearbyWifi", "coarseLocation" }, call, "permissionCallback");
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-            requestPermissionForAlias("bluetoothNearby", call, "permissionCallback");
+            requestPermissionForAliases(new String[] { "bluetoothNearby", "fineLocation" }, call, "permissionCallback");
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+            requestPermissionForAliases(new String[] { "bluetoothNearby", "fineLocation" }, call, "permissionCallback");
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requestPermissionForAlias("fineLocation", call, "permissionCallback");
         } else {
-            requestPermissionForAlias("legacyLocation", call, "permissionCallback");
+            requestPermissionForAlias("coarseLocation", call, "permissionCallback");
         }
     }
 
@@ -233,25 +236,38 @@ public class NearbyMeshPlugin extends Plugin {
     private boolean hasRequiredPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
-                && getPermissionState("nearbyWifi") == PermissionState.GRANTED;
+                && getPermissionState("nearbyWifi") == PermissionState.GRANTED
+                && hasCoarseLocation();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
+            return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
+                && hasFineLocation();
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
             return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
-                && getPermissionState("legacyLocation") == PermissionState.GRANTED;
+                && hasFineLocation();
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-            return getPermissionState("bluetoothNearby") == PermissionState.GRANTED;
-        }
-        return getPermissionState("legacyLocation") == PermissionState.GRANTED;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? hasFineLocation() : hasCoarseLocation();
+    }
+
+    private boolean hasCoarseLocation() {
+        return getContext().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasFineLocation() {
+        return getContext().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private JSObject permissionResult() {
         JSObject result = new JSObject();
         result.put("granted", hasRequiredPermission());
         result.put("sdkInt", Build.VERSION.SDK_INT);
-        result.put("legacyLocation", getPermissionState("legacyLocation").toString());
+        result.put("coarseLocation", getPermissionState("coarseLocation").toString());
+        result.put("fineLocation", getPermissionState("fineLocation").toString());
         result.put("bluetoothNearby", getPermissionState("bluetoothNearby").toString());
         result.put("nearbyWifi", getPermissionState("nearbyWifi").toString());
+        result.put("coarseLocationGranted", hasCoarseLocation());
+        result.put("fineLocationGranted", hasFineLocation());
         result.put("accessWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
         result.put("changeWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
         return result;
