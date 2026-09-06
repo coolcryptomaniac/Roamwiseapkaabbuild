@@ -110,9 +110,10 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
 
 1. Open **Trail Mesh** from the Android drawer or floating Trail Mesh button.
 2. On every participating phone, enter a recognizable trail name and tap
-   **Allow & start**. Approve Android's Nearby Devices prompt. Android 12 and
-   older may also request the legacy location permission for Nearby discovery;
-   Android 13+ does not request location for this feature.
+   **Allow & start**. Approve Android's Nearby Devices prompt. Android 12
+   (API 31) and older may also request the legacy location permission for
+   Nearby discovery; Android 12L/API 32+ does not request location for this
+   feature.
 3. When a request appears, open **Nearby radar** and compare the verification
    digits displayed on both phones in person. Accept only when they match;
    reject unexpected requests. **Share digits manually** can copy/share the

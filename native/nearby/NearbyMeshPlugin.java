@@ -266,8 +266,13 @@ public class NearbyMeshPlugin extends Plugin {
         result.put("nearbyWifi", getPermissionState("nearbyWifi").toString());
         result.put("coarseLocationGranted", hasCoarseLocation());
         result.put("fineLocationGranted", hasFineLocation());
-        result.put("accessWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
-        result.put("changeWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
+        // These are normal legacy permissions and are intentionally capped at
+        // Android 12 in the manifest. Report them as satisfied when they are
+        // not applicable so the health console does not show a false failure on
+        // Android 13+.
+        boolean legacyWifiNeeded = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S;
+        result.put("accessWifiStateDeclared", !legacyWifiNeeded || getContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
+        result.put("changeWifiStateDeclared", !legacyWifiNeeded || getContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
         return result;
     }
 
