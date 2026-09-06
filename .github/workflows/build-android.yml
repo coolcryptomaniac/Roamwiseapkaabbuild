@@ -104,6 +104,9 @@ jobs:
           grep -q 'Offline readiness test' www/nearby-mesh.js
           grep -q "dataset.rwmPanel='health'" www/nearby-mesh.js
           grep -q 'Process console' www/nearby-mesh.js
+          grep -q 'rwmPermissionCatalog' www/nearby-mesh.js
+          grep -q 'Talk to a trail character' www/nearby-mesh.js
+          grep -q 'talkToCharacter' www/nearby-mesh.js
           grep -q 'safe-area-inset-top' www/nearby-mesh.js
           grep -q 'nearby-mesh.js' www/index.html
 
