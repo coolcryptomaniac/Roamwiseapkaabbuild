@@ -1,7 +1,10 @@
 package com.gyanverse.roamwise.nearby;
 
 import android.Manifest;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import androidx.annotation.NonNull;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -59,7 +62,9 @@ public class NearbyMeshPlugin extends Plugin {
     public void requestMeshPermissions(PluginCall call) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissionForAliases(new String[] { "bluetoothNearby", "nearbyWifi" }, call, "permissionCallback");
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+            requestPermissionForAliases(new String[] { "bluetoothNearby", "legacyLocation" }, call, "permissionCallback");
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
             requestPermissionForAlias("bluetoothNearby", call, "permissionCallback");
         } else {
             requestPermissionForAlias("legacyLocation", call, "permissionCallback");
@@ -149,6 +154,15 @@ public class NearbyMeshPlugin extends Plugin {
     public void getStatus(PluginCall call) { call.resolve(status()); }
 
     @PluginMethod
+    public void openAppSettings(PluginCall call) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", getContext().getPackageName(), null));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+        call.resolve();
+    }
+
+    @PluginMethod
     public void stop(PluginCall call) {
         stopMesh();
         call.resolve(status());
@@ -210,7 +224,11 @@ public class NearbyMeshPlugin extends Plugin {
             return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
                 && getPermissionState("nearbyWifi") == PermissionState.GRANTED;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+            return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
+                && getPermissionState("legacyLocation") == PermissionState.GRANTED;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
             return getPermissionState("bluetoothNearby") == PermissionState.GRANTED;
         }
         return getPermissionState("legacyLocation") == PermissionState.GRANTED;
@@ -219,6 +237,10 @@ public class NearbyMeshPlugin extends Plugin {
     private JSObject permissionResult() {
         JSObject result = new JSObject();
         result.put("granted", hasRequiredPermission());
+        result.put("sdkInt", Build.VERSION.SDK_INT);
+        result.put("legacyLocation", getPermissionState("legacyLocation").toString());
+        result.put("bluetoothNearby", getPermissionState("bluetoothNearby").toString());
+        result.put("nearbyWifi", getPermissionState("nearbyWifi").toString());
         return result;
     }
 
