@@ -102,6 +102,8 @@ jobs:
           grep -q 'Boolean(e.connected)' www/nearby-mesh.js
           grep -q 'e.displayName' www/nearby-mesh.js
           grep -q 'Offline readiness test' www/nearby-mesh.js
+          grep -q "dataset.rwmPanel='health'" www/nearby-mesh.js
+          grep -q 'Process console' www/nearby-mesh.js
           grep -q 'safe-area-inset-top' www/nearby-mesh.js
           grep -q 'nearby-mesh.js' www/index.html
 
@@ -225,7 +227,16 @@ jobs:
         run: npx cap sync android
 
       - name: Configure opt-in Nearby trekking mesh
-        run: node scripts/configure-nearby-mesh.mjs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/configure-nearby-mesh.mjs
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.ACCESS_WIFI_STATE' "$MANIFEST"
+          grep -q 'android.permission.CHANGE_WIFI_STATE' "$MANIFEST"
+          grep -q 'android.permission.ACCESS_COARSE_LOCATION' "$MANIFEST"
+          grep -q 'android.permission.ACCESS_FINE_LOCATION' "$MANIFEST"
+          grep -q 'android.permission.NEARBY_WIFI_DEVICES' "$MANIFEST"
 
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
