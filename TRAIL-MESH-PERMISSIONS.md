@@ -17,6 +17,8 @@ Trail Mesh uses Android's just-in-time permission pattern. Every runtime-sensiti
 
 Contacts, phone, SMS, background location, accessibility, package visibility, and storage-wide read permissions are intentionally not requested by Trail Mesh. They are not needed for its current functionality.
 
+`ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` stay declared because Android requires a manifest declaration for the separate, user-selected precise-location SOS flow. The native Nearby start path does not request location on Android 13+; a location prompt is shown only when the SOS checkbox is selected.
+
 ## Pairing and media notes
 
 When a nearby request arrives, the verification digits stay visible in the Nearby radar card until the request completes or expires. Compare the digits face to face, then accept. The **Share digits manually** action can copy the digits to the Android share sheet or clipboard for coordination; it never accepts a connection or bypasses verification.

@@ -89,9 +89,10 @@ discovery:
 It also identifies Google Nearby diagnostics, links the full privacy policy,
 explains that delivery is not guaranteed, and requires **Allow & start** before
 the Android permission request. On Android 13+, Nearby does not request
-location; precise location is requested only after the user ticks **Attach
-precise location** in the SOS flow. A microphone prompt appears only after the
-user confirms the radio-note disclosure.
+location. The location declarations remain in the manifest for the separate
+SOS capability, but precise location is requested only after the user ticks
+**Attach precise location** in the SOS flow. A microphone prompt appears only
+after the user confirms the radio-note disclosure.
 
 ## D. Before sending for review
 
