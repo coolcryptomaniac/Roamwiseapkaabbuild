@@ -15,8 +15,7 @@ if (!build.includes(dependency)) {
 
 let manifest = readFileSync(manifestFile, 'utf8');
 const marker = '    <!-- RoamWise Nearby trekking mesh: requested only after explicit user action. -->';
-if (!manifest.includes(marker)) {
-  const permissions = `${marker}
+const permissions = `${marker}
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" android:maxSdkVersion="31" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" android:maxSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -26,12 +25,15 @@ if (!manifest.includes(marker)) {
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" android:minSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" android:minSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:minSdkVersion="31" android:usesPermissionFlags="neverForLocation" />
-    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" android:minSdkVersion="32" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" android:minSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" android:minSdkVersion="37" />
 `;
+if (!manifest.includes(marker)) {
   manifest = manifest.replace(/\n\s*<application/, `\n${permissions}\n    <application`);
-  writeFileSync(manifestFile, manifest);
+} else {
+  manifest = manifest.replace(/    <!-- RoamWise Nearby trekking mesh:[\s\S]*?\n\s*<application/, `${permissions}\n    <application`);
 }
+writeFileSync(manifestFile, manifest);
 
 writeFileSync(mainActivityFile, `package com.gyanverse.roamwise;
 
