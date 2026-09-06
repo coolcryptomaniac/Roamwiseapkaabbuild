@@ -97,7 +97,9 @@ await RWNearbyMesh.start('Trail name');
 Listen for `verificationRequired`, compare the displayed verification code on
 both devices, and call `accept(endpointId)` only after the trekkers confirm it.
 Each radio message is limited to 16 KiB. The Trail Mesh UI splits selected
-files into smaller messages and caps a transfer at 8 MB. Keep both phones
+files into smaller messages, warns above 8 MB, and caps the current WebView
+bridge at 64 MB. Multi-GB transfers require a future native FILE-payload
+stream; do not advertise 2–10 GB support from this release. Keep both phones
 nearby and the app open until a transfer finishes. Call `stop()` when the
 trekking session ends.
 
@@ -108,21 +110,26 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
 
 1. Open **Trail Mesh** from the Android drawer or floating Trail Mesh button.
 2. On every participating phone, enter a recognizable trail name and tap
-   **Allow & start**. Approve Android's Nearby Devices and location prompts.
-3. Compare the verification digits displayed on both phones in person. Accept
-   only when they match. Reject unexpected requests.
+   **Allow & start**. Approve Android's Nearby Devices prompt. Android 12 and
+   older may also request the legacy location permission for Nearby discovery;
+   Android 13+ does not request location for this feature.
+3. When a request appears, open **Nearby radar** and compare the verification
+   digits displayed on both phones in person. Accept only when they match;
+   reject unexpected requests. **Share digits manually** can copy/share the
+   digits for coordination but cannot bypass verification.
 4. Use:
    - **Chat** for internet-free nearby messages, radio checks, and recorded
      push-to-talk voice notes.
    - **Team** for roll calls, regroup/hold-position instructions, and local
      lost-trekker alerts.
-   - **SOS** to alert connected nearby phones, attach current GPS when
-     available, sound a local alarm, or open the existing RoamWise SOS screen.
+   - **SOS** to alert connected nearby phones, optionally tick **Attach precise
+     location**, sound a local alarm, or open the existing RoamWise SOS screen.
    - **Share** for a photo, short video, song, voice note, PDF, or text file up
-     to 8 MB.
+     to 64 MB. Files above 8 MB show a battery/radio warning.
    - **Test network** to confirm a verified peer can receive and reply.
    - **Fun** for lightweight photo challenges, trail quizzes, campfire-story
-     rounds, and team cheers.
+     rounds, team cheers, and offline travel-character conversations with
+     optional device text-to-speech.
 5. For a stretched group, each participant may explicitly enable **Multi-hop
    relay**. Text, team, lost-trekker, SOS, and fun packets can travel up to three
    verified-device hops. Duplicate IDs and a ten-minute cache prevent loops.
@@ -144,6 +151,8 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
   by phone/SMS or another official channel whenever available.
 - Voice is intentionally a resilient push-to-talk radio room rather than an
   unvalidated full-duplex conference. Media transfers are foreground, direct,
-  local, and best for short clips; they are not streamed or relayed.
+  local, and best for short clips; they are not streamed or relayed. A future
+  call implementation needs native audio streaming/WebRTC, battery controls,
+  and a separate permission/privacy review.
 - A display name is advertised locally only while Trail Mesh is running. No
   connection is accepted silently and no permission is requested at launch.

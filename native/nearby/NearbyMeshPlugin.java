@@ -71,9 +71,9 @@ public class NearbyMeshPlugin extends Plugin {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissionForAliases(new String[] { "bluetoothNearby", "nearbyWifi", "coarseLocation" }, call, "permissionCallback");
+            requestPermissionForAliases(new String[] { "bluetoothNearby", "nearbyWifi" }, call, "permissionCallback");
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-            requestPermissionForAliases(new String[] { "bluetoothNearby", "fineLocation" }, call, "permissionCallback");
+            requestPermissionForAliases(new String[] { "bluetoothNearby" }, call, "permissionCallback");
         } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
             requestPermissionForAliases(new String[] { "bluetoothNearby", "fineLocation" }, call, "permissionCallback");
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -236,12 +236,10 @@ public class NearbyMeshPlugin extends Plugin {
     private boolean hasRequiredPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
-                && getPermissionState("nearbyWifi") == PermissionState.GRANTED
-                && hasCoarseLocation();
+                && getPermissionState("nearbyWifi") == PermissionState.GRANTED;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-            return getPermissionState("bluetoothNearby") == PermissionState.GRANTED
-                && hasFineLocation();
+            return getPermissionState("bluetoothNearby") == PermissionState.GRANTED;
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
             return getPermissionState("bluetoothNearby") == PermissionState.GRANTED

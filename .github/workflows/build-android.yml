@@ -107,6 +107,11 @@ jobs:
           grep -q 'rwmPermissionCatalog' www/nearby-mesh.js
           grep -q 'Talk to a trail character' www/nearby-mesh.js
           grep -q 'talkToCharacter' www/nearby-mesh.js
+          grep -q 'rwmClearChat' www/nearby-mesh.js
+          grep -q 'Nearby radar' www/nearby-mesh.js
+          grep -q 'Share digits manually' www/nearby-mesh.js
+          grep -q 'MAX_BRIDGE_FILE_BYTES' www/nearby-mesh.js
+          grep -q 'speakLastCharacter' www/nearby-mesh.js
           grep -q 'safe-area-inset-top' www/nearby-mesh.js
           grep -q 'nearby-mesh.js' www/index.html
 
