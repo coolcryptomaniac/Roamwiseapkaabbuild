@@ -97,7 +97,7 @@ jobs:
 
           node scripts/prepare-android-web.mjs
           node --check www/nearby-mesh.js
-          grep -q 'Multi-hop relay (experimental)' www/nearby-mesh.js
+          grep -q 'Multi-hop relay' www/nearby-mesh.js
           grep -q 'data-rwm-panel="fun"' www/nearby-mesh.js
           grep -q 'Boolean(e.connected)' www/nearby-mesh.js
           grep -q 'e.displayName' www/nearby-mesh.js
