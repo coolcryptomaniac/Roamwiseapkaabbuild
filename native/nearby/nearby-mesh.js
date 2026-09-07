@@ -163,6 +163,7 @@
   async function stop() { state.sessionRequested=false;try { if(state.recorder&&state.recorder.state==='recording')state.recorder.stop();if(state.demo){stopDemo(true);trace('ok','Stop','Demo stopped');return;}await requirePlugin().stop();if(state.ecoTimer)clearTimeout(state.ecoTimer);state.ecoTimer=null;state.running=false;state.peers={};render();trace('ok','Stop','Nearby radios stopped');toast('Trail Mesh stopped'); } catch (e) { trace('error','Stop',e.message||'Could not stop');toast(e.message || 'Could not stop Trail Mesh'); } }
   async function sendChat(text, source) { text = String(text || '').trim(); if (!text) throw new Error('Type a message first'); await sendPacket('chat', { text: text, source: source || 'mesh', from: safeName() }); state.messages.push({ mine: true, from: 'You', text: text, time: now() }); render(); }
   function sendTyping(active){if(!state.running||!peerCount()||state.demo)return;var payload={from:safeName(),active:Boolean(active)};if(active&&Date.now()-(state.typingLast||0)<1200)return;state.typingLast=Date.now();sendPacket('typing',payload).catch(function(e){trace('warn','Typing indicator',e.message||'Could not send typing state');});}
+  function waitForPeer(timeout){if(peerCount()>0)return Promise.resolve(true);return new Promise(function(resolve){var started=Date.now(),timer=setInterval(function(){if(peerCount()>0||Date.now()-started>=timeout){clearInterval(timer);resolve(peerCount()>0);}},250);});}
   function mirrorToTripChat(message) { var box = document.querySelector('#groupChatMessages,.group-chat-messages,#tripChatMessages'); if (!box) return; var row = document.createElement('div'); row.className = 'chat-message mesh-message'; row.innerHTML = '<b>📡 '+esc(message.from || 'Nearby trekker')+'</b><div>'+esc(message.text)+'</div><small>Offline Trail Mesh · '+esc(now())+'</small>'; box.appendChild(row); }
 
   async function networkTest() { return runPeerTest(); }
@@ -193,7 +194,8 @@
       trace('info','File share','Large-file transfer cancelled');
       return;
     }
-    if (!state.running || !peerCount()) throw new Error('Start Trail Mesh and connect a verified device first');
+    if (!state.running && state.sessionRequested && !state.demo) { try { var status=await requirePlugin().getStatus(); if(status&&status.running)state.running=true; else { await requirePlugin().start({displayName:safeName()}); state.running=true; trace('ok','File share','Resumed Trail Mesh after the system picker'); } } catch(e) { throw new Error('Trail Mesh paused while the picker was open. Return to the app, keep both phones nearby, and retry ('+(e.message||'radio unavailable')+')'); } }
+    if (!state.running || (!peerCount() && !(await waitForPeer(7000)))) throw new Error('Start Trail Mesh and connect a verified device first; the connection is kept queued while a peer returns');
     var transferId=id(), total=Math.ceil(file.size/CHUNK_BYTES);
     updateTransfer(transferId,'Preparing '+file.name+' · '+formatBytes(file.size),0);
     if (state.demo) {
