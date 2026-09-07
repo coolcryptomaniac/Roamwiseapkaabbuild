@@ -87,11 +87,11 @@ SOS system. Its optional application relay can forward selected lightweight
 packets across up to three verified-device hops.
 
 The feature never starts in the background and never requests permissions at
-launch. The trekking UI must explain the feature, then call:
+launch. The trekking UI explains the feature and the **Allow & start** action
+requests the API-specific grants immediately before starting:
 
 ```js
-await RWNearbyMesh.requestPermissions();
-await RWNearbyMesh.start('Trail name');
+await RWNearbyMesh.start();
 ```
 
 Listen for `verificationRequired`, compare the displayed verification code on
@@ -139,6 +139,12 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
    “nearby SOS”. It opens the relevant screen; the user must still confirm any
    safety-sensitive broadcast.
 7. Tap **Stop** when the trip ends.
+
+8. **Live call readiness:** Chat includes a readiness check. In this release
+   Google Nearby is exposed to the WebView as a small BYTES channel, so the
+   check must clearly report that duplex calls are not enabled. Do not market a
+   call until a native stream transport, interruption handling, five-minute
+   warning and thirty-minute hard cap have passed the field test.
 
 ## Safety and product limits
 

@@ -10,6 +10,7 @@ Trail Mesh uses Android's just-in-time permission pattern. Every runtime-sensiti
 | Nearby compatibility location | `ACCESS_COARSE_LOCATION` (Android ≤28) or `ACCESS_FINE_LOCATION` (Android 29–31), per Google Nearby’s legacy requirements | Connect → **Allow & start** on legacy devices | Nearby discovery cannot start on those legacy versions; Android 13+ does not request location for Nearby |
 | Precise location | `ACCESS_FINE_LOCATION` | SOS only when the user chooses location-assisted SOS, or a separate navigation feature | SOS remains available without coordinates; user can describe location |
 | Microphone | `RECORD_AUDIO` | Chat → **Record radio note** | Text chat remains available |
+| WebView audio routing | `MODIFY_AUDIO_SETTINGS` (normal capability) | Declared for the WebView audio bridge; no runtime prompt | Recording/playback stays unavailable until the user grants microphone/audio access |
 | Camera | `CAMERA` | Only a future in-app camera capture action | System file/photo picker remains available |
 | Notifications | `POST_NOTIFICATIONS` | Only when an opt-in notification feature is enabled | In-app status and foreground UI remain available |
 | Files and media | Android system picker / selected URI | Share → **Choose file** | File sharing is unavailable; no broad storage permission is needed |
@@ -24,6 +25,18 @@ Contacts, phone, SMS, background location, accessibility, package visibility, an
 When a nearby request arrives, the verification digits stay visible in the Nearby radar card until the request completes or expires. Compare the digits face to face, then accept. The **Share digits manually** action can copy the digits to the Android share sheet or clipboard for coordination; it never accepts a connection or bypasses verification.
 
 The current bridge sends small BYTES chunks and assembles received files in WebView memory. It warns before any file over 8 MB and caps a safe transfer at 64 MB. Do not describe this release as supporting 2–10 GB transfers; that requires a native Google Nearby `Payload.fromFile` stream with resumable storage and a separate battery/data policy.
+
+Voice notes use `RECORD_AUDIO` only while recording. Capacitor's WebView audio
+bridge also needs the normal `MODIFY_AUDIO_SETTINGS` manifest capability; this
+does not create a runtime prompt. Character playback prefers the installed
+native Text-to-Speech engine and falls back to browser speech when available.
+If neither exists, the health console reports the failure instead of leaving a
+button spinning.
+
+The current Nearby bridge intentionally has no duplex call transport. Its
+`sendMessage` method is a small BYTES channel, not an audio stream. The UI's
+Live call readiness check is therefore explanatory, not a fake call. A future
+native stream implementation must be field-tested before enabling calling.
 
 ## Important Android limitation
 

@@ -112,6 +112,9 @@ jobs:
           grep -q 'Share digits manually' www/nearby-mesh.js
           grep -q 'MAX_BRIDGE_FILE_BYTES' www/nearby-mesh.js
           grep -q 'speakLastCharacter' www/nearby-mesh.js
+          grep -q 'speakCharacterReply' www/nearby-mesh.js
+          grep -q 'rwmCallCheck' www/nearby-mesh.js
+          grep -q 'flushOutbox' www/nearby-mesh.js
           grep -q 'safe-area-inset-top' www/nearby-mesh.js
           grep -q 'nearby-mesh.js' www/index.html
 
@@ -245,6 +248,7 @@ jobs:
           grep -q 'android.permission.ACCESS_COARSE_LOCATION' "$MANIFEST"
           grep -q 'android.permission.ACCESS_FINE_LOCATION' "$MANIFEST"
           grep -q 'android.permission.NEARBY_WIFI_DEVICES' "$MANIFEST"
+          grep -q 'android.permission.MODIFY_AUDIO_SETTINGS' "$MANIFEST"
 
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true

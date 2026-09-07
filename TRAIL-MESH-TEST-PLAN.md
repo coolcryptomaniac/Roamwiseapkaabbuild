@@ -31,6 +31,11 @@ below require physical Android radios and must pass before production release.
    that incomplete files cannot be opened as complete.
 5. Record voice with permission denied, silence, incoming phone interruption,
    Bluetooth headset, 60-second auto-stop, and peer loss during transfer.
+6. On Android, verify the WebView microphone prompt appears only after tapping
+   Record radio note, that a non-empty WebM/M4A/OGG clip is sent, and that the
+   received audio control plays after the screen is unlocked. Test the native
+   Trail character Read last reply action and confirm it falls back to browser
+   speech with an explicit error when no TTS engine exists.
 
 ## Relay topology
 
@@ -58,6 +63,26 @@ below require physical Android radios and must pass before production release.
 7. Battery soak: 2-hour and 8-hour discovery/relay sessions; record drain and
    thermal behavior. Test Android battery optimization killing the app.
 8. Congestion: simultaneous SOS, team command, chat, and direct media transfer.
+
+## Radio diagnostics and group scale
+
+- Verify the radar labels discovered versus verified endpoints and keeps the
+  pairing digits visible until accept/reject or expiry.
+- Confirm the UI does not invent RSSI, transmit power or a guaranteed metre
+  range. Google Nearby does not expose a calibrated signal/range value through
+  this bridge; record measured results separately for each phone and terrain.
+- Test 30–100-person exercises as multiple small clusters with a leader, rear
+  marker and spaced relay volunteers. Treat P2P_CLUSTER as best effort, not a
+  promise that every phone is connected in one hop.
+- Disconnect a peer for 1, 5 and 24 hours, reconnect, and verify queued chat,
+  team and fun packets send once, while SOS is never silently queued.
+
+## Calling readiness
+
+- Run Live call readiness. It must report that the current BYTES-only bridge
+  cannot carry a duplex audio stream; never show a false connected call. A
+  future native stream release must add microphone disclosure, a five-minute
+  warning, a thirty-minute hard cap, interruption handling and battery tests.
 
 ## Entertainment and misuse
 

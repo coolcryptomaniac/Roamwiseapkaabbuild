@@ -224,8 +224,9 @@ public class NearbyMeshPlugin extends Plugin {
 
     private final PayloadCallback payloadCallback = new PayloadCallback() {
         @Override public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
+            if (payload.getType() != Payload.Type.BYTES) return;
             byte[] bytes = payload.asBytes();
-            if (payload.getType() != Payload.Type.BYTES || bytes == null || bytes.length > MAX_MESSAGE_BYTES) return;
+            if (bytes == null || bytes.length > MAX_MESSAGE_BYTES) return;
             JSObject event = new JSObject(); event.put("endpointId", endpointId);
             event.put("message", new String(bytes, StandardCharsets.UTF_8));
             notifyListeners("messageReceived", event, true);
@@ -266,13 +267,12 @@ public class NearbyMeshPlugin extends Plugin {
         result.put("nearbyWifi", getPermissionState("nearbyWifi").toString());
         result.put("coarseLocationGranted", hasCoarseLocation());
         result.put("fineLocationGranted", hasFineLocation());
-        // These are normal legacy permissions and are intentionally capped at
-        // Android 12 in the manifest. Report them as satisfied when they are
-        // not applicable so the health console does not show a false failure on
-        // Android 13+.
-        boolean legacyWifiNeeded = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S;
-        result.put("accessWifiStateDeclared", !legacyWifiNeeded || getContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
-        result.put("changeWifiStateDeclared", !legacyWifiNeeded || getContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
+        // ACCESS_WIFI_STATE and CHANGE_WIFI_STATE are normal (non-runtime)
+        // capabilities. Report the actual manifest/runtime result on every API
+        // level so the health console can distinguish a stale build from a
+        // permission prompt that the user can act on.
+        result.put("accessWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
+        result.put("changeWifiStateDeclared", getContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED);
         return result;
     }
 

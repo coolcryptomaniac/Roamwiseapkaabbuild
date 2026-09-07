@@ -28,6 +28,8 @@ const permissions = `${marker}
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Requested by the WebView only when the user records a radio note. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Capacitor's WebView audio bridge requests this alongside RECORD_AUDIO. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" android:minSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" android:minSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:minSdkVersion="31" android:usesPermissionFlags="neverForLocation" />
