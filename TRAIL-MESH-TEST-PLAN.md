@@ -24,8 +24,9 @@ below require physical Android radios and must pass before production release.
 
 1. Exchange Unicode, Hindi, emoji, empty, 4,000-character, and rapid messages.
 2. Run network tests under good, weak, disconnected, and reconnecting links.
-3. Send every supported media type at 0 B, one chunk, many chunks, and 8 MB;
-   reject 8 MB + 1 B. Interrupt sender and receiver halfway through.
+3. Send every supported media type at 0 B, one chunk, many chunks, 8 MB, and
+   64 MB; show the warning above 8 MB and reject 64 MB + 1 B. Interrupt sender
+   and receiver halfway through.
 4. Verify received file hash, MIME type, filename escaping, memory recovery, and
    that incomplete files cannot be opened as complete.
 5. Record voice with permission denied, silence, incoming phone interruption,
@@ -51,9 +52,12 @@ below require physical Android radios and must pass before production release.
 4. Local alarm with silent mode, media volume zero, Do Not Disturb, vibration
    unavailable, screen locked, and low battery.
 5. Full blackout: airplane mode, no SIM, no internet, cached web app only.
-6. Battery soak: 2-hour and 8-hour discovery/relay sessions; record drain and
+6. Pairing recovery: close the overlay while a request arrives, reopen it, and
+   confirm the radar card still shows the digits; test manual copy/share and
+   verify it never accepts a connection by itself.
+7. Battery soak: 2-hour and 8-hour discovery/relay sessions; record drain and
    thermal behavior. Test Android battery optimization killing the app.
-7. Congestion: simultaneous SOS, team command, chat, and direct media transfer.
+8. Congestion: simultaneous SOS, team command, chat, and direct media transfer.
 
 ## Entertainment and misuse
 

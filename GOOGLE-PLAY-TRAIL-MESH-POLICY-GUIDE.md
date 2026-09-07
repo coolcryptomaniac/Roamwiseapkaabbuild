@@ -88,7 +88,11 @@ discovery:
 
 It also identifies Google Nearby diagnostics, links the full privacy policy,
 explains that delivery is not guaranteed, and requires **Allow & start** before
-the Android permission request.
+the Android permission request. On Android 13+, Nearby does not request
+location. The location declarations remain in the manifest for the separate
+SOS capability, but precise location is requested only after the user ticks
+**Attach precise location** in the SOS flow. A microphone prompt appears only
+after the user confirms the radio-note disclosure.
 
 ## D. Before sending for review
 
@@ -96,8 +100,9 @@ the Android permission request.
   Trail Mesh text at the canonical URL.
 - Install the exact signed APK/AAB candidate and capture screenshots showing the
   disclosure before the permission dialog and the Privacy Policy link.
-- Confirm microphone permission appears only when recording, location only when
-  attaching SOS location, and the system picker only after Share is selected.
+- Confirm microphone permission appears only when recording, legacy Nearby
+  location only on Android 12 and older, precise location only when attaching
+  SOS location, and the system picker only after Share is selected.
 - Recheck **Publishing overview → Changes ready to send for review**.
 - Submit the policy changes and Android release together so declared behavior,
   in-app disclosure and the reviewed binary remain aligned.

@@ -16,15 +16,18 @@ if (!build.includes(dependency)) {
 let manifest = readFileSync(manifestFile, 'utf8');
 const marker = '    <!-- RoamWise Nearby trekking mesh: requested only after explicit user action. -->';
 const permissions = `${marker}
-    <!-- Play services Nearby 19.x can enforce these normal permissions on newer Android builds too. -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- Google Nearby's normal Wi‑Fi permissions are legacy-only (Android <= 12). -->
+    <uses-permission android:maxSdkVersion="31" android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:maxSdkVersion="31" android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
-    <!-- Required by affected Google Play services Nearby builds even on Android 15;
-         also supports RoamWise's separately initiated location-assisted SOS. -->
+    <!-- Nearby location compatibility is needed only on legacy Android releases. -->
+    <!-- Fine/coarse location remain declared for the separate, user-selected
+         precise-location SOS flow. Nearby does not request them on Android 13+. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Requested by the WebView only when the user records a radio note. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" android:minSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" android:minSdkVersion="31" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:minSdkVersion="31" android:usesPermissionFlags="neverForLocation" />
