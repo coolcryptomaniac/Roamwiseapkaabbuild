@@ -16,9 +16,9 @@ if (!build.includes(dependency)) {
 let manifest = readFileSync(manifestFile, 'utf8');
 const marker = '    <!-- RoamWise Nearby trekking mesh: requested only after explicit user action. -->';
 const permissions = `${marker}
-    <!-- Google Nearby's normal Wi‑Fi permissions are legacy-only (Android <= 12). -->
-    <uses-permission android:maxSdkVersion="31" android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:maxSdkVersion="31" android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- Google Nearby checks these normal Wi‑Fi capabilities on current devices. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
     <!-- Nearby location compatibility is needed only on legacy Android releases. -->
