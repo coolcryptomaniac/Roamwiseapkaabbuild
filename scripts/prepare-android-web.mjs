@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const SITE_ORIGIN = 'https://www.roamwise.co.in';
 const edits = [
@@ -32,6 +33,38 @@ for (const { file, pattern, replacement, label } of edits) {
   writeFileSync(file, output);
   console.log(`Routed ${label} to the web origin from ${file}`);
 }
+
+// Capacitor's local asset server treats directory URLs such as /guides/ as
+// app-shell routes and falls back to index.html. That made the Android-only
+// "Browse 36 Destination Guides" action reopen an unstyled copy of the
+// planner. Content pages live on the public web origin (where their canonical
+// styles, media and fresh SEO updates are deployed), so route every content
+// link there while leaving app routes such as / and /pricing untouched.
+function htmlFiles(directory) {
+  return readdirSync(directory).flatMap((name) => {
+    const path = join(directory, name);
+    return statSync(path).isDirectory()
+      ? htmlFiles(path)
+      : path.endsWith('.html') ? [path] : [];
+  });
+}
+
+let routedContentLinks = 0;
+for (const file of htmlFiles('www')) {
+  const source = readFileSync(file, 'utf8');
+  const output = source.replace(
+    /href=(['"])\/(guides|blog|trips)(\/[^'"#?]*)?([?#][^'"]*)?\1/gi,
+    (_match, quote, section, path = '/', suffix = '') => {
+      routedContentLinks += 1;
+      return `href=${quote}${SITE_ORIGIN}/${section}${path}${suffix}${quote}`;
+    }
+  );
+  if (output !== source) writeFileSync(file, output);
+}
+if (!routedContentLinks) {
+  throw new Error('Could not route Android content links; no guide/blog/trip links were found');
+}
+console.log(`Routed ${routedContentLinks} guide/blog/trip links to ${SITE_ORIGIN}`);
 
 copyFileSync('native/nearby/nearby-mesh.js', 'www/nearby-mesh.js');
 const indexFile = 'www/index.html';
