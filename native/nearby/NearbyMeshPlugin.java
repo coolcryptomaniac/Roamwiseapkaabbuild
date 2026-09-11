@@ -168,6 +168,23 @@ public class NearbyMeshPlugin extends Plugin {
     public void getStatus(PluginCall call) { call.resolve(status()); }
 
     @PluginMethod
+    public void disconnect(PluginCall call) {
+        String endpointId = call.getString("endpointId");
+        if (!validEndpoint(endpointId)) {
+            call.reject("Invalid endpoint.");
+            return;
+        }
+        pending.remove(endpointId);
+        connected.remove(endpointId);
+        client().disconnectFromEndpoint(endpointId);
+        JSObject event = new JSObject();
+        event.put("endpointId", endpointId);
+        event.put("connected", false);
+        notifyListeners("connectionChanged", event, true);
+        call.resolve(status());
+    }
+
+    @PluginMethod
     public void openAppSettings(PluginCall call) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.fromParts("package", getContext().getPackageName(), null));

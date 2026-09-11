@@ -5,7 +5,8 @@
   "scripts": {
     "sync": "npx cap sync",
     "open:android": "npx cap open android",
-    "open:ios": "npx cap open ios"
+    "open:ios": "npx cap open ios",
+    "test:trail-mesh": "node scripts/test-trail-mesh-access.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
