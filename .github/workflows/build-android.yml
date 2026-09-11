@@ -101,7 +101,7 @@ jobs:
           grep -q 'Multi-hop relay' www/nearby-mesh.js
           grep -q 'Trail Mesh Operator' www/nearby-mesh.js
           grep -q 'trailMeshTrialSelected' www/nearby-mesh.js
-          grep -q 'data-rwm-panel="ops"' www/nearby-mesh.js
+          grep -q "dataset.rwmPanel='ops'" www/nearby-mesh.js
           grep -q 'data-rwm-panel="fun"' www/nearby-mesh.js
           grep -q 'Boolean(e.connected)' www/nearby-mesh.js
           grep -q 'e.displayName' www/nearby-mesh.js
