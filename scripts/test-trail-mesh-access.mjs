@@ -49,5 +49,12 @@ assert.match(source, /No swipe matching/);
 assert.match(source, /function requireOperator/);
 assert.match(nativePlugin, /public void disconnect\(PluginCall call\)/);
 assert.match(nativePlugin, /disconnectFromEndpoint/);
+assert.match(nativePlugin, /trustedSession/);
+assert.match(nativePlugin, /scheduleReconnect/);
+assert.match(nativePlugin, /autoReconnectScope/);
+assert.match(nativePlugin, /manuallyDisconnected/);
+assert.match(source, /automatic rejoin is active/);
+assert.match(source, /audioBitsPerSecond:32000/);
+assert.doesNotMatch(source, /id="rwmEco" type="checkbox" checked/);
 
 console.log('Trail Mesh access, trust boundary and packaged-source checks passed.');
