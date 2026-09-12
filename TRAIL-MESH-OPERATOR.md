@@ -83,3 +83,23 @@ departure. The selected-trial build itself caps the visible operator roster at
 Do not sell a guaranteed range, 30–100 phone single-hop topology, continuous
 calling, multi-gigabyte transfer or rescue-delivery SLA until native transport
 and physical field tests prove those claims.
+
+
+## Connection continuity contract
+
+- The first connection always requires both phones to compare and accept the
+  Nearby verification digits.
+- A successfully verified endpoint is remembered in native memory only while
+  that Trail Mesh radio session is running. If terrain briefly breaks the link,
+  both phones retry with bounded backoff and automatically accept only that same
+  current-session endpoint when it returns.
+- Tapping **Disconnect**, tapping **Stop**, or the app process ending clears that
+  trust. A later session requires digit verification again.
+- The two-hour battery timer is optional and off by default. Android can still
+  suspend or kill an app, radios can be switched off, and mountain terrain can
+  exceed local radio range; therefore RoamWise does not promise uninterrupted
+  coverage or guaranteed delivery.
+- Safety text queued while no verified peer is connected flushes after rejoin.
+  Voice uses short 48 kHz mono Opus-preferred radio notes with echo cancellation,
+  noise suppression and automatic gain control. Full-duplex calls remain
+  disabled until a separately tested native STREAM transport exists.
