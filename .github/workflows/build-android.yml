@@ -97,7 +97,11 @@ jobs:
 
           node scripts/prepare-android-web.mjs
           node --check www/nearby-mesh.js
+          node scripts/test-trail-mesh-access.mjs
           grep -q 'Multi-hop relay' www/nearby-mesh.js
+          grep -q 'Trail Mesh Operator' www/nearby-mesh.js
+          grep -q 'trailMeshTrialSelected' www/nearby-mesh.js
+          grep -q "dataset.rwmPanel='ops'" www/nearby-mesh.js
           grep -q 'data-rwm-panel="fun"' www/nearby-mesh.js
           grep -q 'Boolean(e.connected)' www/nearby-mesh.js
           grep -q 'e.displayName' www/nearby-mesh.js
@@ -254,6 +258,8 @@ jobs:
           grep -q 'android.permission.ACCESS_FINE_LOCATION' "$MANIFEST"
           grep -q 'android.permission.NEARBY_WIFI_DEVICES' "$MANIFEST"
           grep -q 'android.permission.MODIFY_AUDIO_SETTINGS' "$MANIFEST"
+          grep -q 'public void disconnect' android/app/src/main/java/com/gyanverse/roamwise/nearby/NearbyMeshPlugin.java
+          grep -q 'disconnectFromEndpoint' android/app/src/main/java/com/gyanverse/roamwise/nearby/NearbyMeshPlugin.java
 
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
