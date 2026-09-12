@@ -138,3 +138,24 @@ below require physical Android radios and must pass before production release.
 - APK/AAB CI is green and two complete field passes succeed on all four devices.
 - Play Data safety and the public privacy policy describe Nearby Devices,
   microphone, optional location, user-initiated sharing, and retention behavior.
+
+
+## Same-session reconnection drill
+
+Run this on every release candidate with two real Android phones:
+
+1. Start Trail Mesh on both phones, compare the digits and accept.
+2. Send a radio check, then move one phone out of range without tapping
+   Disconnect. Confirm both UIs show **automatic rejoin active**.
+3. While separated, queue a safety text. Return the phone to range and verify it
+   reconnects without a second prompt in the same running session, then verify
+   the queued text arrives once.
+4. Tap **Disconnect** on one phone. Keep both phones in range for two minutes and
+   confirm it does not reconnect.
+5. Stop and restart Trail Mesh. Confirm the same phone requires a fresh digit
+   comparison; no trust may survive Stop or app-process death.
+6. Repeat with Bluetooth toggled off/on, Wi-Fi toggled off/on, 1/5/15-minute
+   separation, screen lock, battery saver, and the supported Android API range.
+7. Record reconnect latency, failed attempts and battery change. A UI or unit
+   test is not evidence of field radio quality; complete ridge/forest/camp
+   trials before any operator claim.
