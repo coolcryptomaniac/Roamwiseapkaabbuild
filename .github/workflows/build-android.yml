@@ -169,7 +169,10 @@ jobs:
           grep -q 'https://www.roamwise.co.in/assets/audio/' www/js/audio/cues.js
           grep -q 'https://www.roamwise.co.in/assets/audio/' www/platform-v5/audio-only.js
           grep -q 'https://www.roamwise.co.in/itinerary-library/' www/itinerary-library/preset-loader.js
-          grep -q 'href="https://www.roamwise.co.in/guides/">Browse 36 Destination Guides' www/home.html
+          # The editorial label and guide count can change independently of the
+          # Android routing contract. Assert the canonical destination instead
+          # of coupling the build to one obsolete CTA caption.
+          grep -Eq 'href="https://www\.roamwise\.co\.in/guides/?"' www/home.html
           if rg -n "href=['\"]/(guides|blog|trips)(/|['\"])" www --glob '*.html'; then
             echo "::error::A content link still points at Capacitor's local route fallback."
             exit 1
