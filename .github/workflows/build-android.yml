@@ -203,7 +203,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          # ubuntu-latest already provides the SDK packages used by Gradle. The
+          # legacy aggregate package named "tools" was retired upstream, so do
+          # not ask sdkmanager to install it during setup.
+          packages: ''
 
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
