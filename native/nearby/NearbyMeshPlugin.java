@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import com.getcapacitor.JSArray;
@@ -33,7 +35,9 @@ import com.google.android.gms.common.api.ApiException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @CapacitorPlugin(
@@ -52,10 +56,20 @@ import java.util.Set;
 public class NearbyMeshPlugin extends Plugin {
     private static final Strategy STRATEGY = Strategy.P2P_CLUSTER;
     private static final int MAX_MESSAGE_BYTES = 16 * 1024;
+    private static final long[] RECONNECT_DELAYS_MS = { 1000L, 3000L, 7000L, 15000L, 30000L };
     private final Set<String> connected = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> pending = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> requesting = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> discovered = Collections.synchronizedSet(new HashSet<>());
+    // Session-only trust: an endpoint enters this set only after the user
+    // compares digits and accepts it. It is never persisted across stop/app exit.
+    private final Set<String> trustedSession = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> manuallyDisconnected = Collections.synchronizedSet(new HashSet<>());
+    private final Map<String, Integer> reconnectAttempts = Collections.synchronizedMap(new HashMap<>());
+    private final Handler reconnectHandler = new Handler(Looper.getMainLooper());
     private ConnectionsClient client;
     private boolean running;
+    private String localDisplayName = "RoamWise trekker";
 
     private ConnectionsClient client() {
         if (client == null) client = Nearby.getConnectionsClient(getContext());
@@ -101,6 +115,8 @@ public class NearbyMeshPlugin extends Plugin {
             return;
         }
         String displayName = safeName(call.getString("displayName", "RoamWise trekker"));
+        localDisplayName = displayName;
+        manuallyDisconnected.clear();
         AdvertisingOptions advertising = new AdvertisingOptions.Builder().setStrategy(STRATEGY).build();
         DiscoveryOptions discovery = new DiscoveryOptions.Builder().setStrategy(STRATEGY).build();
         client().startAdvertising(displayName, getContext().getPackageName(), lifecycle, advertising)
@@ -168,6 +184,27 @@ public class NearbyMeshPlugin extends Plugin {
     public void getStatus(PluginCall call) { call.resolve(status()); }
 
     @PluginMethod
+    public void disconnect(PluginCall call) {
+        String endpointId = call.getString("endpointId");
+        if (!validEndpoint(endpointId)) {
+            call.reject("Invalid endpoint.");
+            return;
+        }
+        manuallyDisconnected.add(endpointId);
+        trustedSession.remove(endpointId);
+        reconnectAttempts.remove(endpointId);
+        pending.remove(endpointId);
+        requesting.remove(endpointId);
+        connected.remove(endpointId);
+        client().disconnectFromEndpoint(endpointId);
+        JSObject event = new JSObject();
+        event.put("endpointId", endpointId);
+        event.put("connected", false);
+        notifyListeners("connectionChanged", event, true);
+        call.resolve(status());
+    }
+
+    @PluginMethod
     public void openAppSettings(PluginCall call) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.fromParts("package", getContext().getPackageName(), null));
@@ -182,43 +219,111 @@ public class NearbyMeshPlugin extends Plugin {
         call.resolve(status());
     }
 
+    private void requestEndpoint(String endpointId, boolean reconnecting) {
+        if (!validEndpoint(endpointId) || manuallyDisconnected.contains(endpointId)
+                || connected.contains(endpointId) || pending.contains(endpointId)
+                || !requesting.add(endpointId)) return;
+        if (reconnecting) notifyReconnect(endpointId, "requesting", 0L);
+        client().requestConnection(localDisplayName, endpointId, lifecycle)
+            .addOnFailureListener(error -> {
+                requesting.remove(endpointId);
+                notifyError("connectionRequestFailed", endpointId);
+                scheduleReconnect(endpointId);
+            });
+    }
+
+    private void scheduleReconnect(String endpointId) {
+        if (!running || !trustedSession.contains(endpointId) || manuallyDisconnected.contains(endpointId)) return;
+        int attempt = reconnectAttempts.containsKey(endpointId) ? reconnectAttempts.get(endpointId) : 0;
+        long delay = RECONNECT_DELAYS_MS[Math.min(attempt, RECONNECT_DELAYS_MS.length - 1)];
+        reconnectAttempts.put(endpointId, attempt + 1);
+        notifyReconnect(endpointId, discovered.contains(endpointId) ? "waiting" : "outOfRange", delay);
+        reconnectHandler.postDelayed(() -> {
+            if (!running || manuallyDisconnected.contains(endpointId) || connected.contains(endpointId)) return;
+            if (discovered.contains(endpointId)) requestEndpoint(endpointId, true);
+        }, delay);
+    }
+
+    private void notifyReconnect(String endpointId, String phase, long retryInMs) {
+        JSObject event = new JSObject();
+        event.put("endpointId", endpointId);
+        event.put("connected", false);
+        event.put("reconnecting", true);
+        event.put("phase", phase);
+        event.put("retryInMs", retryInMs);
+        notifyListeners("connectionChanged", event, true);
+    }
+
     private final EndpointDiscoveryCallback discoveryCallback = new EndpointDiscoveryCallback() {
         @Override public void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info) {
+            discovered.add(endpointId);
             JSObject event = new JSObject();
             event.put("endpointId", endpointId);
             event.put("displayName", info.getEndpointName());
+            event.put("reconnecting", trustedSession.contains(endpointId) && !manuallyDisconnected.contains(endpointId));
             notifyListeners("peerFound", event, true);
-            client().requestConnection(safeName(Build.MODEL), endpointId, lifecycle)
-                .addOnFailureListener(error -> notifyError("connectionRequestFailed", endpointId));
+            requestEndpoint(endpointId, trustedSession.contains(endpointId));
         }
         @Override public void onEndpointLost(@NonNull String endpointId) {
-            JSObject event = new JSObject(); event.put("endpointId", endpointId);
+            discovered.remove(endpointId);
+            JSObject event = new JSObject();
+            event.put("endpointId", endpointId);
+            event.put("reconnecting", trustedSession.contains(endpointId) && !manuallyDisconnected.contains(endpointId));
             notifyListeners("peerLost", event, true);
         }
     };
 
     private final ConnectionLifecycleCallback lifecycle = new ConnectionLifecycleCallback() {
         @Override public void onConnectionInitiated(@NonNull String endpointId, @NonNull ConnectionInfo info) {
+            requesting.remove(endpointId);
+            // A phone verified earlier in this still-running session may rejoin
+            // automatically. A stop, app exit or manual removal clears that trust.
+            if (trustedSession.contains(endpointId) && !manuallyDisconnected.contains(endpointId)) {
+                notifyReconnect(endpointId, "verifyingSessionPeer", 0L);
+                client().acceptConnection(endpointId, payloadCallback)
+                    .addOnFailureListener(error -> {
+                        notifyError("automaticReconnectAcceptanceFailed", endpointId);
+                        scheduleReconnect(endpointId);
+                    });
+                return;
+            }
             pending.add(endpointId);
             JSObject event = new JSObject();
             event.put("endpointId", endpointId);
             event.put("displayName", info.getEndpointName());
             event.put("verificationCode", info.getAuthenticationDigits());
             event.put("incoming", info.isIncomingConnection());
+            event.put("reconnecting", false);
             notifyListeners("verificationRequired", event, true);
         }
         @Override public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution result) {
+            requesting.remove(endpointId);
             pending.remove(endpointId);
             boolean ok = result.getStatus().isSuccess();
-            if (ok) connected.add(endpointId); else connected.remove(endpointId);
-            JSObject event = new JSObject(); event.put("endpointId", endpointId); event.put("connected", ok);
+            if (ok) {
+                connected.add(endpointId);
+                trustedSession.add(endpointId);
+                manuallyDisconnected.remove(endpointId);
+                reconnectAttempts.remove(endpointId);
+            } else {
+                connected.remove(endpointId);
+            }
+            JSObject event = new JSObject();
+            event.put("endpointId", endpointId);
+            event.put("connected", ok);
+            event.put("reconnecting", !ok && trustedSession.contains(endpointId));
             event.put("statusCode", result.getStatus().getStatusCode());
             notifyListeners("connectionChanged", event, true);
+            if (!ok) scheduleReconnect(endpointId);
         }
         @Override public void onDisconnected(@NonNull String endpointId) {
             connected.remove(endpointId);
-            JSObject event = new JSObject(); event.put("endpointId", endpointId); event.put("connected", false);
+            JSObject event = new JSObject();
+            event.put("endpointId", endpointId);
+            event.put("connected", false);
+            event.put("reconnecting", trustedSession.contains(endpointId) && !manuallyDisconnected.contains(endpointId));
             notifyListeners("connectionChanged", event, true);
+            scheduleReconnect(endpointId);
         }
     };
 
@@ -281,6 +386,8 @@ public class NearbyMeshPlugin extends Plugin {
         result.put("running", running);
         result.put("connectedCount", connected.size());
         result.put("pendingCount", pending.size());
+        result.put("reconnectingCount", Math.max(0, trustedSession.size() - connected.size()));
+        result.put("autoReconnectScope", "verified-current-session");
         result.put("topology", "P2P_CLUSTER");
         result.put("multiHopRelay", false);
         result.put("endpoints", new JSArray(new ArrayList<>(connected)));
@@ -291,7 +398,10 @@ public class NearbyMeshPlugin extends Plugin {
         if (client != null) {
             client.stopAdvertising(); client.stopDiscovery(); client.stopAllEndpoints();
         }
-        running = false; connected.clear(); pending.clear();
+        running = false;
+        reconnectHandler.removeCallbacksAndMessages(null);
+        connected.clear(); pending.clear(); requesting.clear(); discovered.clear();
+        trustedSession.clear(); manuallyDisconnected.clear(); reconnectAttempts.clear();
         notifyListeners("meshState", status(), true);
     }
 

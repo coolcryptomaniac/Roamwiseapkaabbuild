@@ -77,6 +77,45 @@ below require physical Android radios and must pass before production release.
 - Disconnect a peer for 1, 5 and 24 hours, reconnect, and verify queued chat,
   team and fun packets send once, while SOS is never silently queued.
 
+## Pro, selected trial and operator access
+
+1. With no account entitlement, confirm pairing, basic safety text, radio check,
+   lost-trekker alert, SOS, local alarm and personal check-in remain available.
+2. Confirm voice notes, selected-file transfer, relay and Trail Fun show a clear
+   paid-Pro gate without starting a permission request or radio action.
+3. With the ordinary account trial, confirm only selected practice tools unlock;
+   relay, media, exports and operator command stay locked.
+4. Grant `trailMeshTrialSelected` plus a future `trailMeshTrialUntil` from the
+   admin console. Confirm roll calls, checkpoints, roster and three local
+   incident records work, while a fourth incident, exports and relay stay locked.
+5. Change the selected-trial expiry to the past and verify access closes after an
+   entitlement refresh without deleting Safety Free data.
+6. Grant `trailMeshPlan: operator` with a future `trailMeshLicenseUntil`. Confirm
+   full field controls, CSV export and shift handover work. Test an expired paid
+   seat and a permanent seat with no expiry.
+7. Attempt to write every Trail Mesh entitlement field from a non-admin account;
+   Firestore rules must reject create and update. Confirm the admin write creates
+   an `adminAuditLog` record.
+
+## Role, roster and privacy operations
+
+1. Save every role using Unicode aliases, valid/invalid team codes, empty
+   expedition names and declined consent. No profile may be shared before the
+   user saves consent.
+2. Connect two teams with different team codes. The roster must flag the mismatch
+   and ignore operator roll-call/checkpoint commands from the other code, while
+   still allowing cross-team SOS and lost-trekker alerts.
+3. Request a roll call and submit Safe, Delayed, Resting and Need help from
+   separate phones. Confirm last-seen time and attention counts update once.
+4. Disconnect an accepted peer and confirm the native endpoint closes, roster
+   state becomes disconnected and the peer cannot send new packets.
+5. Log low, medium, high and critical incidents. Confirm nothing is transmitted,
+   no location prompt appears, CSV escapes quotes/newlines and selected trials
+   cannot export.
+6. Use Erase local expedition data and verify profile, roster, checkpoints,
+   incidents, chat, remembered peers and queued messages are removed. Account
+   entitlement and unrelated RoamWise data must remain intact.
+
 ## Calling readiness
 
 - Run Live call readiness. It must report that the current BYTES-only bridge
@@ -99,3 +138,24 @@ below require physical Android radios and must pass before production release.
 - APK/AAB CI is green and two complete field passes succeed on all four devices.
 - Play Data safety and the public privacy policy describe Nearby Devices,
   microphone, optional location, user-initiated sharing, and retention behavior.
+
+
+## Same-session reconnection drill
+
+Run this on every release candidate with two real Android phones:
+
+1. Start Trail Mesh on both phones, compare the digits and accept.
+2. Send a radio check, then move one phone out of range without tapping
+   Disconnect. Confirm both UIs show **automatic rejoin active**.
+3. While separated, queue a safety text. Return the phone to range and verify it
+   reconnects without a second prompt in the same running session, then verify
+   the queued text arrives once.
+4. Tap **Disconnect** on one phone. Keep both phones in range for two minutes and
+   confirm it does not reconnect.
+5. Stop and restart Trail Mesh. Confirm the same phone requires a fresh digit
+   comparison; no trust may survive Stop or app-process death.
+6. Repeat with Bluetooth toggled off/on, Wi-Fi toggled off/on, 1/5/15-minute
+   separation, screen lock, battery saver, and the supported Android API range.
+7. Record reconnect latency, failed attempts and battery change. A UI or unit
+   test is not evidence of field radio quality; complete ridge/forest/camp
+   trials before any operator claim.

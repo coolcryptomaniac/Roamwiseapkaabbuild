@@ -64,6 +64,14 @@ and package name, controlled by **Settings → Google → Usage & diagnostics**.
 Review the APK's other SDKs before choosing the final sharing, required/optional
 and processing answers.
 
+The Operator layer adds local trail alias, role, expedition label, team code,
+voluntary check-in, checkpoint and incident-record processing. These records
+stay on the device unless an Operator explicitly exports them, but the whole-app
+Data Safety review must still account for user-initiated device-to-device sharing
+and exported files. Selected-trial/operator eligibility, organisation name and
+expiry are read from the signed-in Firebase user record; classify these account
+fields consistently with the app's existing account-management declarations.
+
 7. For each selected data type, open **Start/Manage**, choose the correct
    collected/shared answer for the whole current app, select optional where every
    user can avoid that collection, and choose all applicable purposes.
@@ -85,6 +93,12 @@ discovery:
 > only when you separately choose a voice note, location-assisted SOS or file
 > share. RoamWise does not upload these nearby transfers to its servers, but
 > recipients may save or share them. You can stop discovery at any time.
+
+The role setup shown before operator use additionally explains that field-profile
+data is shared only after a matching-digit connection, the team code is not a
+password, incident notes stay local unless deliberately exported, and local
+expedition data can be erased in-app. Do not describe the selected trial as an
+open free trial: it is an admin-approved, account-specific access grant.
 
 It also identifies Google Nearby diagnostics, links the full privacy policy,
 explains that delivery is not guaranteed, and requires **Allow & start** before

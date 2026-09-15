@@ -26,10 +26,15 @@ const edits = [
 
 for (const { file, pattern, replacement, label } of edits) {
   const source = readFileSync(file, 'utf8');
+  const routed = replacement.replace('__SITE__', SITE_ORIGIN);
   if (!pattern.test(source)) {
+    if (source.includes(routed)) {
+      console.log(`Already routed ${label} to the web origin in ${file}`);
+      continue;
+    }
     throw new Error(`Could not route ${label} on demand in ${file}; source layout changed`);
   }
-  const output = source.replace(pattern, replacement.replace('__SITE__', SITE_ORIGIN));
+  const output = source.replace(pattern, routed);
   writeFileSync(file, output);
   console.log(`Routed ${label} to the web origin from ${file}`);
 }
@@ -50,8 +55,10 @@ function htmlFiles(directory) {
 }
 
 let routedContentLinks = 0;
+let existingRoutedContentLinks = 0;
 for (const file of htmlFiles('www')) {
   const source = readFileSync(file, 'utf8');
+  existingRoutedContentLinks += (source.match(/href=(['"])https:\/\/www\.roamwise\.co\.in\/(guides|blog|trips)(?:\/[^'"#?]*)?(?:[?#][^'"]*)?\1/gi) || []).length;
   const output = source.replace(
     /href=(['"])\/(guides|blog|trips)(\/[^'"#?]*)?([?#][^'"]*)?\1/gi,
     (_match, quote, section, path = '/', suffix = '') => {
@@ -62,9 +69,11 @@ for (const file of htmlFiles('www')) {
   if (output !== source) writeFileSync(file, output);
 }
 if (!routedContentLinks) {
-  throw new Error('Could not route Android content links; no guide/blog/trip links were found');
+  if (existingRoutedContentLinks) console.log(`Android content links already routed (${existingRoutedContentLinks})`);
+  else throw new Error('Could not route Android content links; no guide/blog/trip links were found');
+} else {
+  console.log(`Routed ${routedContentLinks} guide/blog/trip links to ${SITE_ORIGIN}`);
 }
-console.log(`Routed ${routedContentLinks} guide/blog/trip links to ${SITE_ORIGIN}`);
 
 copyFileSync('native/nearby/nearby-mesh.js', 'www/nearby-mesh.js');
 const indexFile = 'www/index.html';
