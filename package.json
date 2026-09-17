@@ -6,7 +6,8 @@
     "sync": "npx cap sync",
     "open:android": "npx cap open android",
     "open:ios": "npx cap open ios",
-    "test:trail-mesh": "node scripts/test-trail-mesh-access.mjs"
+    "test:trail-mesh": "node scripts/test-trail-mesh-access.mjs",
+    "test:google-auth-config": "node --test scripts/test-google-services-config.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
