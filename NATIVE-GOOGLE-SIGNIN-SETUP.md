@@ -15,13 +15,15 @@ The build also enables `rgcfaIncludeGoogle` and packages the stable Credential M
    - SHA-1: `FF:81:A4:C5:7E:F0:FD:0B:CB:C5:2B:A6:5F:A1:FE:12:B6:2B:E4:F8`
    - SHA-256: `65:3F:96:EC:2B:3D:84:72:EC:BA:8A:7C:73:B4:F2:98:B9:BE:90:57:7B:4E:0E:42:D7:37:00:C4:0C:6E:D1:62`
 4. In **Authentication > Sign-in method**, enable Google.
-5. In **Google Play Console > Setup > App integrity > App signing**, copy the **App signing key certificate SHA-1**. Add that second SHA-1 to the same Android app in Firebase. This is different from the upload certificate above because Google Play re-signs the APK delivered to users.
+5. Add the Google Play **App signing key certificate** fingerprints to the same Android app in Firebase:
+   - SHA-1: `5A:18:6E:DB:7D:4B:85:50:38:5B:DF:C7:F7:9A:26:C9:F8:AC:66:07`
+   - SHA-256: `22:84:6F:12:F7:FA:0D:E1:F6:3D:FF:79:15:79:FE:68:D1:C0:1E:46:A9:55:14:A3:40:49:48:4F:21:66:96:B5`
+   These are different from the upload certificate above because Google Play re-signs the APK delivered to users.
 6. Download a new `google-services.json` only after both SHA-1 certificates appear in Firebase.
 7. Supply it to this repository using one of:
    - Preferred: base64-encode the complete file and save it as the Actions secret `GOOGLE_SERVICES_JSON_B64`.
    - Simple alternative: upload `google-services.json` to the repository root. Firebase client configuration is not a server secret, but repository history remains public.
-8. Add the Play SHA-1 as the repository variable `PLAY_APP_SIGNING_SHA1`. The release workflow intentionally stops if this variable or its matching OAuth entry is absent, rather than publishing another build whose Google button cannot work.
-9. Run the **Build RoamWise Android** workflow.
+8. Run the **Build RoamWise Android** workflow. The public Play SHA-1 is pinned in the workflow, which intentionally stops if its matching OAuth entry is absent rather than publishing another build whose Google button cannot work.
 
 The build validates all three pieces needed by the native plugin: the Android package, a Web OAuth client used to obtain an ID token, and OAuth entries for both the upload and Play app-signing SHA-1 certificates.
 

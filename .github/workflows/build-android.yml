@@ -26,6 +26,9 @@ env:
   SOURCE_REPO: coolcryptomaniac/roamwise
   SOURCE_BRANCH: main
   BASE_VERSION_CODE: 1000
+  # Public Google Play App Signing certificate fingerprint. Google Play
+  # re-signs the delivered APK with this key instead of the upload key.
+  PLAY_APP_SIGNING_SHA1: '5A:18:6E:DB:7D:4B:85:50:38:5B:DF:C7:F7:9A:26:C9:F8:AC:66:07'
 
 jobs:
   build:
@@ -247,7 +250,6 @@ jobs:
         shell: bash
         env:
           GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
-          PLAY_APP_SIGNING_SHA1: ${{ vars.PLAY_APP_SIGNING_SHA1 }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
