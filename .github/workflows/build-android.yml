@@ -98,6 +98,13 @@ jobs:
           node scripts/prepare-android-web.mjs
           node --check www/nearby-mesh.js
           node scripts/test-trail-mesh-access.mjs
+          # Admin is one live control plane, not a second privileged bundle.
+          # The source app may expose the launcher only after admins/{uid}
+          # resolves, while the complete admin UI and rules stay web-only.
+          grep -q "RW_CANONICAL_ADMIN_URL='https://www.roamwise.co.in/admin/'" www/js/ui/adaptive-shell.js
+          grep -q "collection('admins').doc(u.uid).get()" www/js/ui/adaptive-shell.js
+          test ! -d www/admin
+          test ! -e www/firestore.rules
           grep -q 'Multi-hop relay' www/nearby-mesh.js
           grep -q 'Trail Mesh Operator' www/nearby-mesh.js
           grep -q 'trailMeshTrialSelected' www/nearby-mesh.js
