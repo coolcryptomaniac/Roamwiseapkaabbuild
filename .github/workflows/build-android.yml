@@ -216,8 +216,21 @@ jobs:
       - name: Recreate Android platform
         shell: bash
         run: |
+          set -euo pipefail
           rm -rf android
           npx cap add android
+          cat >> android/variables.gradle <<'GRADLE'
+
+          // Required by @capacitor-firebase/authentication for Google at runtime.
+          // Without this, the plugin compiles against these classes but does not
+          // package them, so a release can build successfully and fail on-device.
+          ext {
+              rgcfaIncludeGoogle = true
+              androidxCredentialsVersion = '1.3.0'
+              androidxCredentialsPlayServicesAuthVersion = '1.3.0'
+              librariesIdentityGoogleidVersion = '1.1.1'
+          }
+          GRADLE
 
       - name: Verify native Google authentication plugin
         shell: bash
@@ -225,11 +238,17 @@ jobs:
           set -euo pipefail
           test -d node_modules/@capacitor-firebase/authentication
           node -e "const p=require('./package.json'); if(!p.dependencies['@capacitor-firebase/authentication']) process.exit(1)"
+          grep -q 'rgcfaIncludeGoogle = true' android/variables.gradle
+          grep -q "androidxCredentialsVersion = '1.3.0'" android/variables.gradle
+          grep -q "androidxCredentialsPlayServicesAuthVersion = '1.3.0'" android/variables.gradle
+          npm run test:google-auth-config
 
       - name: Configure native Firebase for release builds
         shell: bash
         env:
           GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+          PLAY_APP_SIGNING_SHA1: ${{ vars.PLAY_APP_SIGNING_SHA1 }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           if [[ -n "${GOOGLE_SERVICES_JSON_B64:-}" ]]; then
@@ -243,13 +262,21 @@ jobs:
             echo "::error::Native Google sign-in needs google-services.json. Add GOOGLE_SERVICES_JSON_B64 as a repository secret or commit the Firebase Android config at the repository root."
             exit 1
           fi
-          node - <<'NODE'
-          const fs=require('fs');
-          const cfg=JSON.parse(fs.readFileSync('android/app/google-services.json','utf8'));
-          const clients=Array.isArray(cfg.client)?cfg.client:[];
-          const ok=cfg.project_info&&cfg.project_info.project_id==='roamwisepro'&&clients.some(c=>c.client_info&&c.client_info.android_client_info&&c.client_info.android_client_info.package_name==='com.gyanverse.roamwise');
-          if(!ok) throw new Error('google-services.json must be from Firebase project roamwisepro for com.gyanverse.roamwise');
-          NODE
+          if [[ "$EVENT_NAME" != "pull_request" && -z "${PLAY_APP_SIGNING_SHA1:-}" ]]; then
+            echo "::error::Set repository variable PLAY_APP_SIGNING_SHA1 to the App signing key certificate SHA-1 from Google Play Console. Upload-key SHA-1 alone cannot authorize Play-installed builds."
+            exit 1
+          fi
+
+          AUTH_ARGS=(
+            android/app/google-services.json
+            --project roamwisepro
+            --package com.gyanverse.roamwise
+            --sha1 'FF:81:A4:C5:7E:F0:FD:0B:CB:C5:2B:A6:5F:A1:FE:12:B6:2B:E4:F8'
+          )
+          if [[ -n "${PLAY_APP_SIGNING_SHA1:-}" ]]; then
+            AUTH_ARGS+=(--sha1 "$PLAY_APP_SIGNING_SHA1")
+          fi
+          node scripts/validate-google-services.mjs "${AUTH_ARGS[@]}"
 
       - name: Sync refreshed web assets into Android
         run: npx cap sync android
