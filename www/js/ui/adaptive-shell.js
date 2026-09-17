@@ -385,13 +385,30 @@ function drToggle(btn){
   grp.classList.toggle('open');
 }
 function closeDrawer(){ el('drawer').classList.remove('open'); el('drawerBk').classList.remove('open'); var m=el('tb-more'); if(m)m.classList.remove('on'); }
+var RW_CANONICAL_ADMIN_URL='https://www.roamwise.co.in/admin/';
+function rwAdminControlLink(u){
+  if(!u||!u.uid||typeof db==='undefined'||!db||!db.collection)return;
+  db.collection('admins').doc(u.uid).get().then(function(snapshot){
+    var active=(typeof firebase!=='undefined'&&firebase.auth&&firebase.auth().currentUser)||(typeof user!=='undefined'?user:null);
+    if(!snapshot.exists||!active||active.uid!==u.uid)return;
+    var box=el('drAcct');if(!box||el('rwAdminControlLink'))return;
+    var link=document.createElement('a');
+    link.id='rwAdminControlLink';link.className='dr-link';link.href=RW_CANONICAL_ADMIN_URL;
+    link.target='_blank';link.rel='noopener';link.dataset.source='canonical-web-admin';
+    link.innerHTML='<span class="ic">&#128737;&#65039;</span>Admin control center';
+    var signout=box.querySelector('.dr-signout');box.insertBefore(link,signout||null);
+  }).catch(function(){ /* Non-admin and offline accounts simply see no launcher. */ });
+}
 function drawerAccount(u){
   var box = el('drAcct'); if(!box) return;
   if(u){
     var pic = u.photoURL || ('https://api.dicebear.com/9.x/initials/svg?seed='+encodeURIComponent(u.email||'RW'));
-    box.innerHTML = '<div class="dr-acct"><img src="'+pic+'" alt=""><div><div class="n">'+((u.displayName||'Traveler').replace(/[<>]/g,''))+'</div><div class="e">'+((u.email||'').replace(/[<>]/g,''))+'</div></div></div>'+
+    var identity=u.emailVerified?'<span style="color:#16bf96;font-size:10px;font-weight:800">✓ Verified email</span>':'<span style="color:#e8ba6c;font-size:10px;font-weight:800">Email verification pending · normal access active</span>';
+    box.innerHTML = '<div class="dr-acct"><img src="'+pic+'" alt=""><div><div class="n">'+((u.displayName||'Traveler').replace(/[<>]/g,''))+'</div><div class="e">'+((u.email||'').replace(/[<>]/g,''))+'</div>'+identity+'</div></div>'+
+      (!u.emailVerified?'<a class="dr-link" onclick="closeDrawer();resendVerification()"><span class="ic">&#9993;&#65039;</span>Verify later for sensitive features</a>':'')+
       '<a class="dr-link dr-signout" onclick="closeDrawer();authMenu()"><span class="ic">&#8618;</span>Sign out</a>'+
       '<a class="dr-link" style="color:var(--t3);font-size:11px" onclick="deleteAccount()"><span class="ic">&#128465;&#65039;</span>Delete my account</a>';
+    rwAdminControlLink(u);
   } else {
     box.innerHTML = '<button class="dr-signin" onclick="closeDrawer();openAuth()">Sign in / Create account</button>';
   }
@@ -399,4 +416,3 @@ function drawerAccount(u){
 
 /* ---- from app.js lines 8340-8340: drawer Escape-key close listener ---- */
 document.addEventListener('keydown', function(ev){ if(ev.key==='Escape') closeDrawer(); });
-
