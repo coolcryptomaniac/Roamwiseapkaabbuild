@@ -298,6 +298,19 @@ jobs:
           grep -q 'public void disconnect' android/app/src/main/java/com/gyanverse/roamwise/nearby/NearbyMeshPlugin.java
           grep -q 'disconnectFromEndpoint' android/app/src/main/java/com/gyanverse/roamwise/nearby/NearbyMeshPlugin.java
 
+      - name: Configure opt-in Journey Trace foreground service
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/configure-journey-trace.mjs
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.FOREGROUND_SERVICE_LOCATION' "$MANIFEST"
+          grep -q 'android:foregroundServiceType="location"' "$MANIFEST"
+          grep -q 'android:stopWithTask="true"' "$MANIFEST"
+          grep -q 'JourneyTracePlugin.class' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'play-services-location:21.3.0' android/app/build.gradle
+          grep -q 'START_NOT_STICKY' android/app/src/main/java/com/gyanverse/roamwise/journey/JourneyTraceService.java
+
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
