@@ -26,7 +26,7 @@ for(const perm of perms){
     manifest=manifest.replace(/\n\s*<application/, '\n    '+perm+'\n    <application');
   }
 }
-const service='<service android:name=".journey.JourneyTraceService" android:foregroundServiceType="location" android:exported="false" android:stopWithTask="false" />';
+const service='<service android:name=".journey.JourneyTraceService" android:foregroundServiceType="location" android:exported="false" android:stopWithTask="true" />';
 if(!manifest.includes('.journey.JourneyTraceService')){
   manifest=manifest.replace('</application>', '        '+service+'\n    </application>');
 }
