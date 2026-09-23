@@ -6,11 +6,11 @@ Journey Trace V2 uses a user-started **location foreground service** so an activ
 
 - It never starts at app launch, boot, sign-in or itinerary generation.
 - The traveller starts it by tapping **Start Journey** inside RoamWise.
-- Android shows an ongoing **Journey Trace is active** notification while the native service is recording.
+- Android shows an ongoing **Journey Trace is active** notification with an explicit Stop action while the native service is recording.
 - Pause/Finish stops the native service.
 - GPS points are buffered in app-private SharedPreferences and pulled back into the Journey Trace web layer. This plugin does not upload raw location.
 - No ACCESS_BACKGROUND_LOCATION permission is requested by this implementation. The service must be started while the app is visible.
-- The service is START_NOT_STICKY; Android is not asked to resurrect it after process death.
+- The service is START_NOT_STICKY and stops when the app task is swiped away; Android is not asked to resurrect it after process death.
 
 ## Build integration
 
