@@ -138,12 +138,18 @@ public class JourneyTraceService extends Service {
         PendingIntent pending = PendingIntent.getActivity(
             this, 0, launch, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
+        Intent stopIntent = new Intent(this, JourneyTraceService.class);
+        stopIntent.setAction(ACTION_STOP);
+        PendingIntent stopPending = PendingIntent.getService(
+            this, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
         String label = destination == null || destination.trim().isEmpty() ? "your journey" : destination.trim();
         return new NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentTitle("RoamWise Journey Trace is active")
             .setContentText("Recording " + label + " · tap RoamWise to pause or finish")
             .setContentIntent(pending)
+            .addAction(android.R.drawable.ic_media_pause, "Stop", stopPending)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
