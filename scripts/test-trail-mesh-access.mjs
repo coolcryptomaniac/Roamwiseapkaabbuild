@@ -56,5 +56,7 @@ assert.match(nativePlugin, /manuallyDisconnected/);
 assert.match(source, /automatic rejoin is active/);
 assert.match(source, /audioBitsPerSecond:32000/);
 assert.doesNotMatch(source, /id="rwmEco" type="checkbox" checked/);
+assert.doesNotMatch(source, /createElement\('button'\);f\.id='rwMeshFab'/, 'Trail Mesh must not inject a persistent floating control over Ailon Tusk');
+assert.match(source, /explicit Tusk commands/, 'the dedicated/contextual entry-point rationale must stay documented in code');
 
 console.log('Trail Mesh access, trust boundary and packaged-source checks passed.');

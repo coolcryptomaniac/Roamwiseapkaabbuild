@@ -108,7 +108,7 @@ Useful events are `peerFound`, `peerLost`, `verificationRequired`,
 
 ## User tutorial
 
-1. Open **Trail Mesh** from the Android drawer or floating Trail Mesh button.
+1. Open **Trail Mesh** from its dedicated Android drawer item, Trip Chat, or an explicit Ailon Tusk command such as “open Trail Mesh”. It intentionally has no persistent floating button because that obscured planner controls on some phones.
 2. On every participating phone, enter a recognizable trail name and tap
    **Allow & start**. Approve Android's Nearby Devices prompt. Android 12
    (API 31) and older may also request the legacy location permission for
