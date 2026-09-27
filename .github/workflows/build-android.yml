@@ -301,6 +301,10 @@ jobs:
           grep -q 'CashfreePaymentPlugin.class' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
           grep -q 'Type.displayCutout' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
           grep -q 'Type.systemBars' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'webView.getParent' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'Type.ime' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'Insets.NONE' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          ! grep -q 'setOnApplyWindowInsetsListener(webView' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
           grep -q 'CashfreePayment' android/app/src/main/java/com/gyanverse/roamwise/payment/CashfreePaymentPlugin.java
           grep -q 'android:scheme="phonepe"' "$MANIFEST"
 

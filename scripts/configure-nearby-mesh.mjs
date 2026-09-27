@@ -87,19 +87,36 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         // Android 15/16 enforce edge-to-edge for current targets. StatusBar's
-        // overlaysWebView=false no longer changes layout, so apply real system-bar
-        // and display-cutout insets to the entire WebView on every device shape.
+        // overlaysWebView=false no longer changes layout. Resize the WebView's
+        // container instead of padding the WebView itself: WebView padding only
+        // moves HTML scroll content and leaves fixed headers/footers under the bars.
+        // SystemBars.insetsHandling is disabled in capacitor.config.json so this is
+        // the sole native inset listener on every Android WebView version.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         final WebView webView = getBridge().getWebView();
+        final View webContainer = (View) webView.getParent();
         webView.setBackgroundColor(android.graphics.Color.rgb(7, 9, 15));
-        ViewCompat.setOnApplyWindowInsetsListener(webView, (View view, WindowInsetsCompat insets) -> {
+        webContainer.setBackgroundColor(android.graphics.Color.rgb(7, 9, 15));
+        ViewCompat.setOnApplyWindowInsetsListener(webContainer, (View container, WindowInsetsCompat insets) -> {
             Insets safe = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
             );
-            view.setPadding(safe.left, safe.top, safe.right, safe.bottom);
-            return insets;
+            Insets keyboard = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottom = insets.isVisible(WindowInsetsCompat.Type.ime())
+                ? Math.max(safe.bottom, keyboard.bottom)
+                : safe.bottom;
+            container.setPadding(safe.left, safe.top, safe.right, bottom);
+
+            // The parent has already consumed the physical safe area. Forward
+            // zero system-bar insets so WebView/CSS cannot apply them a second time.
+            return new WindowInsetsCompat.Builder(insets)
+                .setInsets(
+                    WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout(),
+                    Insets.NONE
+                )
+                .build();
         });
-        ViewCompat.requestApplyInsets(webView);
+        ViewCompat.requestApplyInsets(webContainer);
         webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
     }
 }
