@@ -297,6 +297,12 @@ jobs:
           grep -q 'android.permission.MODIFY_AUDIO_SETTINGS' "$MANIFEST"
           grep -q 'public void disconnect' android/app/src/main/java/com/gyanverse/roamwise/nearby/NearbyMeshPlugin.java
           grep -q 'disconnectFromEndpoint' android/app/src/main/java/com/gyanverse/roamwise/nearby/NearbyMeshPlugin.java
+          grep -q 'com.cashfree.pg:api:2.5.0' android/app/build.gradle
+          grep -q 'CashfreePaymentPlugin.class' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'Type.displayCutout' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'Type.systemBars' android/app/src/main/java/com/gyanverse/roamwise/MainActivity.java
+          grep -q 'CashfreePayment' android/app/src/main/java/com/gyanverse/roamwise/payment/CashfreePaymentPlugin.java
+          grep -q 'android:scheme="phonepe"' "$MANIFEST"
 
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
