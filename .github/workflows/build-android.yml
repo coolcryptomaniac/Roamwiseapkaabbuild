@@ -342,8 +342,13 @@ jobs:
 
       - name: Configure release signing and version
         shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           set -euo pipefail
+          test -n "$KEYSTORE_PASSWORD" || { echo "KEYSTORE_PASSWORD secret is missing"; exit 1; }
+          test -n "$KEY_ALIAS" || { echo "KEY_ALIAS secret is missing"; exit 1; }
           cat >> android/app/build.gradle <<GRADLE
 
           android {
@@ -357,9 +362,9 @@ jobs:
               signingConfigs {
                   release {
                       storeFile file('rw.keystore')
-                      storePassword 'roamwise2026'
-                      keyAlias 'roamwise'
-                      keyPassword 'roamwise2026'
+                      storePassword System.getenv('KEYSTORE_PASSWORD')
+                      keyAlias System.getenv('KEY_ALIAS')
+                      keyPassword System.getenv('KEYSTORE_PASSWORD')
                   }
               }
               buildTypes {

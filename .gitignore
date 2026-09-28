@@ -2,3 +2,13 @@ node_modules/
 android/
 .firecrawl/
 *.log
+
+# Signing / credentials — never commit these
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+.env
+.env.*
+!.env.example
+local.properties
