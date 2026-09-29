@@ -16,6 +16,10 @@
       "style": "DARK",
       "backgroundColor": "#07090F"
     },
+    "SystemBars": {
+      "insetsHandling": "disable",
+      "style": "DARK"
+    },
     "SplashScreen": {
       "launchShowDuration": 800,
       "backgroundColor": "#07090F",
