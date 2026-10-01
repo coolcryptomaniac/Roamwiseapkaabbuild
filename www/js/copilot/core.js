@@ -169,7 +169,9 @@ function rwAskKasarFest(){
   var input=el('heroInput');
   if(!input) return;
   var origin=String((el('kasarFestOrigin')||{}).value||'').trim().replace(/[<>\r\n]/g,' ').slice(0,60);
-  input.value='Plan the Kasar Music Fest 2.0 weekend in Almora for Oct 2–5, 2026. '+(origin?'My starting city is '+origin+'. Tailor the arrival and onward route to this city. ':'')+'Include Rahgir and Nupur Pant, schedule uncertainty, Delhi/Mumbai arrival routes, traffic and road checks, monkey safety, respectful local price tips, and compare Milan Heights with The Moksha Retreat.';
+  input.value=rwKasarFestivalEnded()
+    ?'Plan a Kasar Music Fest 2.0 follow-up for a future visit to Almora. '+(origin?'My starting city is '+origin+'. Tailor the arrival and onward route to this city. ':'')+'The festival is over; include Kasar Devi and Almora things to do, current route checks, respectful local price tips, and ask Milan Heights for its next available dates through RoamWise.'
+    :'Plan the Kasar Music Fest 2.0 weekend in Almora for Oct 2–5, 2026. '+(origin?'My starting city is '+origin+'. Tailor the arrival and onward route to this city. ':'')+'Include Rahgir and Nupur Pant, schedule uncertainty, Delhi/Mumbai arrival routes, traffic and road checks, monkey safety, respectful local price tips, Almora things to do, and Milan Heights as the first RoamWise booking pilot. Other properties are not bookable in RoamWise yet.';
   if(origin){try{track('kasar_origin_added');}catch(e){/* anonymous aggregate only */}}
   cpFocusHero();
   /* The festival has a verified, curated answer. Send it directly so a
@@ -177,12 +179,24 @@ function rwAskKasarFest(){
      destination picks or a pasted-text response. */
   setTimeout(function(){try{copilotSend(true);}catch(e){/* user can still tap Send */}},650);
 }
+function rwKasarFestivalEnded(now){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(now||new Date())>='2026-10-05';
+}
+window.rwTrackMilanWhatsApp=function(){try{if(typeof track==='function')track('kasar_milan_whatsapp_open')}catch(e){}};
 function cpSmartAnswer(t){
   /* Curated Kasar Music Fest weekend answer: keep this deterministic so Ailon
      Tusk can answer the homepage feature without an external AI key. */
   if(/kasar\s*(?:devi\s*)?(?:music\s*fest|festival)|(?:nupur\s*pant|rahgir).{0,50}(?:kasar|fest)|(?:kasar|fest).{0,50}(?:nupur\s*pant|rahgir)/i.test(String(t||''))){
     var originMatch=String(t||'').match(/My starting city is ([^.\n]+)/i);
     var originNote=originMatch?'<br><b>Starting in '+esc2(originMatch[1].trim())+'</b> · Check exact-date rail/flight connections and the final road transfer; keep a time buffer for the hill approach.':'';
+    if(rwKasarFestivalEnded()){
+      var nextStay='Hello Milan Heights, I found your stay through RoamWise. I am planning a visit to Almora and would like to know your next available dates. Please share room options, availability, the final total including applicable taxes, payment method and booking terms. Please note this enquiry came through RoamWise.';
+      return '<b>Your Kasar Music Fest weekend has passed</b><br>Plan a fresh visit around Almora town, Lala Bazaar, local food and Kasar Devi. Check current road and weather conditions before travelling; the hill approach can take longer than expected.'
+        +'<br><br><b>Stay in Almora</b> Milan Heights is the RoamWise stay pilot. Approximate room price: ₹1,613–₹3,226 per room, per night. Room, date and availability affect the quote; confirm the final total including applicable taxes directly with the hotel.'
+        +'<br><a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://wa.me/917302315845?text='+encodeURIComponent(nextStay)+'" onclick="window.rwTrackMilanWhatsApp&&window.rwTrackMilanWhatsApp()">Ask Milan Heights for its next available dates on WhatsApp ↗</a>'
+        +'<br><br><b>Getting there</b>'+originNote+' Check exact-date connections and live Maps before departure. Reserve your final taxi ahead and avoid a tight connection or a tired night drive.'
+        +'<br><br><a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="/partner/?role=customer&amp;destination=Almora">Book &amp; Stay · Almora ↗</a>';
+    }
     return '<b>Kasar Music Fest 2.0 · Almora · 3–4 October 2026</b>'
       +'<br>Rahgir and Nupur Pant are announced. The ₹2,000 pass covers both festival days, 3–4 Oct. BookMyShow lists 4:30 pm for Saturday; Doi Stays gives 5 pm–midnight on both days. Confirm exact entry time and artist slots.'
       +'<br><br><b>Meet the artists</b>'
@@ -194,8 +208,8 @@ function cpSmartAnswer(t){
       +'<br>Sat 3 Oct · Take a slow morning, then head to Kasar Devi for festival day one. Keep return transport arranged in advance.'
       +'<br>Sun 4 Oct · Festival day two, covered by the same pass. Explore Almora town and its market during the day, then return to Kasar Devi for the evening show.'
       +'<br>Mon 5 Oct · Breakfast, check out and depart.'
-      +'<br><br><b>Which stay fits best?</b> Milan Heights is the town-base pick for a livelier Almora feel, market time and town exploring; arrange a ride to Kasar Devi. The Moksha Retreat is the venue-side pick if festival access and a quieter hillside setting come first.'
-      +'<br>Milan Heights direct room enquiry: call <a style="color:var(--gold2,#C8913E)" href="tel:+917302315845" onclick="track(\'kasar_milan_call_click\')">+91 73023 15845</a> or <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.instagram.com/milan_height/" onclick="track(\'kasar_milan_dm_click\')">DM its Instagram ↗</a>. When you reserve, mention “I found Milan Heights on RoamWise.” Confirm room availability and total rates directly; this is an enquiry link, not live inventory or an instant reservation.'
+      +'<br><br><b>Stay in Almora</b> Milan Heights is the RoamWise stay pilot, close to Almora town and its market. Approximate room price: ₹1,613–₹3,226 per room, per night. Rates vary by room, date and availability; ask the hotel for the final total including applicable taxes.'
+      +'<br><a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://wa.me/917302315845?text=Hi%20Milan%20Heights%2C%20I%20found%20your%20stay%20through%20RoamWise.%20I%20am%20interested%20in%20the%20Kasar%20Music%20Fest%20weekend%20in%20Almora%2C%202%E2%80%935%20October%202026%2C%20for%202%20guests.%20Please%20share%20room%20options%2C%20availability%2C%20the%20final%20total%20including%20all%20applicable%20taxes%2C%20payment%20method%20and%20booking%20terms.%20Please%20note%20this%20enquiry%20came%20through%20RoamWise." onclick="window.rwTrackMilanWhatsApp&&window.rwTrackMilanWhatsApp()">WhatsApp Milan Heights · mention RoamWise ↗</a>'
       +'<br><br><b>Getting there from Delhi, Mumbai or elsewhere</b>'+originNote
       +'<br>Delhi/NCR by road: the usual corridor runs Hapur → Moradabad → Rampur/Rudrapur → Haldwani → Kathgodam → Bhimtal/Bhowali → Almora → Kasar Devi. Start rested, budget slack for weekend queues and aim to do the final winding climb in daylight. <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/Delhi,+India/Kasar+Devi,+Uttarakhand/">Open the route in Maps ↗</a>'
       +'<br>Mumbai / long-distance: connect to Delhi by air or rail, or consider Pantnagar only if a flight operates on your dates. Kathgodam is the common railhead; the Almora district lists Pantnagar as its nearest airport, about 127 km from Almora. Reserve the last taxi ahead and avoid a tight same-day connection.'
@@ -204,15 +218,13 @@ function cpSmartAnswer(t){
       +'<br><b>With local shopkeepers and drivers</b> Ask politely for the full price and inclusions before ordering or riding; clarify tolls, waiting and luggage fees, and keep a receipt or UPI record. Ask before taking photos, keep noise down and compare a quote calmly if it doesn’t fit—don’t assume one person’s price represents everyone.'
       +'<br><br><a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://in.bookmyshow.com/events/kasar-music-fest-2-0/ET00517675">Tickets on BookMyShow ↗</a>'
       +' · <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://doistays.com/events.html">Doi Stays event details ↗</a>'
-      +' · <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://themokshakasar.com/rooms.html">Moksha stay enquiry ↗</a>'
-      +' · <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Milan+Heights+Almora">Find Milan Heights ↗</a>'
+      +' · <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.booking.com/searchresults.html?ss=Almora%2C%20Uttarakhand&amp;checkin=2026-10-02&amp;checkout=2026-10-05&amp;group_adults=2">Compare nearby stays on Booking.com ↗</a>'
       +'<br><br><b>Unlock RoamWise Pro for this trip</b> — full itineraries, budget tracking, WhatsApp sharing, packing lists and unlimited Smart Planner searches. One-time Founder offer: ₹100.'
       +'<br><button class="tact" style="margin-top:7px" onclick="return rwOpenPaySafely(event)">Unlock Pro · ₹100 ↗</button>'
       +'<br><br><b>Books by Mohit Pandey on Amazon</b>'
       +'<br><a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.amazon.in/AI-Ki-Pathshala-Mohit-Pandey/dp/B0H5K7XF55">AI Ki Pathshala ↗</a>'
       +' · <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.amazon.in/Yuga-Silicon-novel-code-memory-ebook/dp/B0GX32LF8R">Yuga: The Silicon Age ↗</a>'
       +' · <a style="color:var(--gold2,#C8913E)" target="_blank" rel="noopener" href="https://www.amazon.in/Volts-Vengeance-Encyclopedia-Mohit-Pandey/dp/B0H61VZLCQ">Volts &amp; Vengeance ↗</a>'
-      +'<br><br><span style="font-size:10.5px;color:var(--t3)">Milan Heights direct room enquiry: call +91 73023 15845 or DM Instagram. Confirm room availability, total rates and transport directly; there is no live reservation connection yet.</span>';
   }
   var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function meta(d){
