@@ -283,6 +283,11 @@ jobs:
       - name: Sync refreshed web assets into Android
         run: npx cap sync android
 
+      - name: Verify push-notifications plugin is in the Android build
+        run: |
+          set -euo pipefail
+          grep -q 'capacitor-push-notifications' android/capacitor.settings.gradle || { echo '::error::@capacitor/push-notifications is not in the Android project; native push cannot work.'; exit 1; }
+
       - name: Configure opt-in Nearby trekking mesh
         shell: bash
         run: |
