@@ -56,6 +56,79 @@
 @media (prefers-reduced-motion:reduce){#rwVeil i::after{animation:none;width:100%}}
 </style>
 <noscript><style>#rwVeil{display:none}</style></noscript>
+<script id="rw-oldbrowser">
+/* Browsers that cannot run the app (Internet Explorer, very old Android/Opera Mini) get a plain message
+   and the light page instead of a blank screen. ES5 only on purpose. */
+(function(){var ok;try{ok=window.Promise&&window.fetch&&Object.assign&&Array.prototype.includes&&window.Map&&window.Set&&('classList' in document.documentElement);}catch(e){ok=false;}
+if(ok)return;window.__RW_OLD=true;
+document.write('<div style="font:16px/1.5 system-ui,Arial,sans-serif;background:#07090f;color:#ede8df;padding:28px;max-width:520px;margin:0 auto"><h1 style="font-size:22px">Please update your browser</h1><p>RoamWise needs a newer browser than this one. Open it in the latest Chrome, Edge, Firefox, Safari or Samsung Internet.</p><p><a style="color:#e8ba6c;font-weight:700" href="/lite/">Open the light version instead</a></p></div>');
+})();
+</script>
+<script id="rw-net">
+/* Network tier. Decides how much optional weight (opening film, sound, ads, photos,
+   service-worker install) the first visit may pull while the app is still starting.
+   Tiers: vslow (GPRS/2G, Data Saver), slow (3G / under ~0.6 Mbps), medium (under ~2.5 Mbps),
+   fast. Uses the Network Information API where it exists (Chrome/Android); elsewhere it
+   measures how fast the HTML itself arrived. Only ever reads, never blocks. */
+(function(){
+  var w=window,d=document,n=w.navigator,c=n.connection||n.mozConnection||n.webkitConnection||null;
+  var order=['fast','medium','slow','vslow'];
+  function classify(){
+    var et=c&&c.effectiveType||'',dl=c&&+c.downlink||0,rtt=c&&+c.rtt||0,sd=!!(c&&c.saveData);
+    if(sd||et==='slow-2g'||et==='2g'||(dl&&dl<0.15))return 'vslow';
+    if(et==='3g'||(dl&&dl<0.6)||rtt>=700)return 'slow';
+    if((dl&&dl<2.5)||rtt>=300)return 'medium';
+    return 'fast';
+  }
+  function measured(){
+    try{
+      var e=w.performance.getEntriesByType('navigation')[0];
+      if(!e||!e.encodedBodySize||e.encodedBodySize<30000||!e.transferSize)return 'fast';
+      var ms=e.responseEnd-e.responseStart;if(ms<50)return 'fast';
+      var kbps=e.encodedBodySize*8/ms;
+      return kbps<80?'vslow':kbps<500?'slow':kbps<2000?'medium':'fast';
+    }catch(x){return 'fast';}
+  }
+  /* Weak phones: 2 GB of RAM or fewer, or 2 cores or fewer. They parse scripts slowly even on a fast link, so
+     a 'fast' reading is lowered to 'medium' (no opening film or sound, fewer photos, ads after boot). */
+  var lowEnd=(n.deviceMemory&&n.deviceMemory<=2)||(n.hardwareConcurrency&&n.hardwareConcurrency<=2)||false;
+  var net=w.__RW_NET={tier:c?classify():measured(),saveData:!!(c&&c.saveData),known:!!c,lowEnd:!!lowEnd,mem:n.deviceMemory||0,cores:n.hardwareConcurrency||0};
+  if(lowEnd&&net.tier==='fast')net.tier='medium';
+  function paint(){var h=d.documentElement,i;for(i=0;i<order.length;i++)h.classList.remove('rw-net-'+order[i]);h.classList.add('rw-net-'+net.tier);}
+  paint();
+  /* only ever move toward slower during a visit, so a flaky reading cannot re-enable heavy loads */
+  if(c&&c.addEventListener)c.addEventListener('change',function(){var t=classify();if(order.indexOf(t)>order.indexOf(net.tier)){net.tier=t;paint();}});
+  net.slow=function(){return net.tier!=='fast';};
+  /* Light version (/lite/, about 8 KB gzip). Automatic only for a first visit on a 2G/GPRS link to the
+     bare home URL: no cached app yet, no query or hash to lose (referral and pass links keep working),
+     not inside the native app, and not after "Open full app". Everyone else on a slow link is offered it
+     on the loading screen below. */
+  function wantsLite(et,search,hash,path,fullChosen,hasWorker,inApp){
+    return (et==='slow-2g'||et==='2g')&&!search&&!hash&&(path==='/'||path==='/index.html')&&!fullChosen&&!hasWorker&&!inApp;
+  }
+  net.wantsLite=wantsLite;
+  try{
+    var fullChosen=false;try{fullChosen=!!w.sessionStorage.getItem('rw_full');}catch(x){}
+    if(c&&wantsLite(c.effectiveType||'',w.location.search,w.location.hash,w.location.pathname,fullChosen,!!(n.serviceWorker&&n.serviceWorker.controller),!!w.RW))w.location.replace('/lite/');
+  }catch(x){}
+  /* veil: honest message + real progress while scripts arrive on a slow link */
+  if(net.tier!=='fast'){
+    var ticks=0;
+    var iv=setInterval(function(){
+      var v=d.getElementById('rwVeil');if(!v){if(w.__RW_BOOTED)clearInterval(iv);return;}
+      if(++ticks>=6&&!d.getElementById('rwLiteOffer')){
+        var a=d.createElement('a');a.id='rwLiteOffer';a.href='/lite/';a.textContent='Taking long? Open the light version';
+        a.style.cssText='margin-top:6px;padding:10px 16px;border:1px solid rgba(232,186,108,.6);border-radius:12px;color:#e8ba6c;text-decoration:none;font:700 14px system-ui,sans-serif';
+        v.appendChild(a);
+      }
+      var total=d.querySelectorAll('script[src]').length||1,done=0,r=w.performance.getEntriesByType('resource'),i;
+      for(i=0;i<r.length;i++)if(r[i].initiatorType==='script'&&r[i].responseEnd>0)done++;
+      var pct=Math.min(99,Math.round(done*100/total)),sm=v.querySelector('small');
+      if(sm)sm.textContent=(net.tier==='vslow'?'Very slow connection. ':'Slow connection. ')+'Loading the essentials, '+pct+'%';
+    },700);
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="google-adsense-account" content="ca-pub-4943859484482348">
 <meta name="theme-color" content="#080B18">
