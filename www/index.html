@@ -47,6 +47,7 @@
 </script>
 <style id="rw-veil-css">
 #rwVeil{position:fixed;inset:0;z-index:2147482000;background:#05060d;color:#f3e6c4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font:600 22px/1.2 system-ui,-apple-system,sans-serif;letter-spacing:.2px;transition:opacity .25s ease}
+#rwVeil img{width:72px;height:72px;border-radius:20px;object-fit:cover;box-shadow:0 0 0 2px rgba(232,186,108,.7),0 0 34px rgba(232,186,108,.35)}
 #rwVeil b{color:#e8ba6c}
 #rwVeil i{display:block;width:140px;height:3px;border-radius:3px;background:rgba(232,186,108,.18);overflow:hidden}
 #rwVeil i::after{content:"";display:block;width:45%;height:100%;background:#e8ba6c;border-radius:3px;animation:rwVeilBar 1.1s ease-in-out infinite}
@@ -231,7 +232,8 @@ document.write('<div style="font:16px/1.5 system-ui,Arial,sans-serif;background:
 }
 </script>
 <link rel="canonical" href="https://www.roamwise.co.in">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307090F'/%3E%3Cpath d='M12 46 26 20l8 14 6-9 12 21z' fill='%23E8BA6C'/%3E%3Ccircle cx='46' cy='16' r='5' fill='%23BF8CFF'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <!-- PWA: iOS ignores SVG data-URI touch icons in most versions, so this must be a real PNG -->
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -240,15 +242,19 @@ document.write('<div style="font:16px/1.5 system-ui,Arial,sans-serif;background:
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="RoamWise">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="/assets/fonts/outfit-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
 <script src="vendor/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="vendor/firebase/10.14.1/firebase-app-compat.js" defer></script>
 <script src="vendor/firebase/10.14.1/firebase-auth-compat.js" defer></script>
 <script src="vendor/firebase/10.14.1/firebase-firestore-compat.js" defer></script>
 <script src="vendor/firebase/10.14.1/firebase-app-check-compat.js" defer></script>
+<link rel="preload" href="app-base.css" as="style">
+<link rel="preload" href="css/base/01-tokens.css" as="style">
+<link rel="preload" href="css/base/02-shell.css" as="style">
+<link rel="preload" href="css/base/03-features-legacy.css?v=rw-checkout-focus-1" as="style">
+<link rel="preload" href="css/base/04-accounts-and-extras.css?v=rw-auth-nonblocking-2" as="style">
+<link rel="preload" href="css/base/05-desktop-and-discovery.css" as="style">
+<link rel="preload" href="css/base/06-commerce-and-social.css" as="style">
 <link rel="stylesheet" href="app.css?v=rw-v124-personal-group-planner">
 <link rel="stylesheet" href="mobile-stability.css?v=rw-v125-compact-tusk">
 <link rel="stylesheet" href="design/roamwise-akatsuki-theme.css?v=rw-v125-akatsuki-tusk">
@@ -485,12 +491,13 @@ html{-webkit-text-size-adjust:100%}
 }
 </style>
 </head>
-<body class="rw-akatsuki-theme">
-<div id="rwVeil" role="status" aria-live="polite"><span>Roam<b>Wise</b></span><i></i><small>Getting things ready…</small></div>
+<body class="rw-akatsuki-theme shell" data-view="home">
+<div id="rwVeil" role="status" aria-live="polite"><img src="/assets/img/roamwise-logo-176.webp" alt="" width="72" height="72" fetchpriority="high"><span>Roam<b>Wise</b></span><i></i><small>Getting things ready…</small></div>
 <div class="intro" id="intro" onclick="killIntro()">
   <div class="kumo" style="top:16%;left:10%"></div><div class="kumo k2" style="bottom:20%;right:12%"></div>
   <div class="introMap"></div>
   <div class="ninja"></div><div class="ninja n2"></div><div class="ninja n3"></div>
+  <img class="introLogo" src="/assets/img/roamwise-logo-176.webp" alt="" width="104" height="104" decoding="async">
   <div class="it">ROAMWISE</div>
   <div class="is">Shinobi Edition</div>
   <div class="ig">escape the crowds &bull; discover your world</div>
@@ -507,7 +514,7 @@ html{-webkit-text-size-adjust:100%}
 <nav class="nav">
   <div class="nav-inner">
     <a class="logo-wrap" href="/" aria-label="RoamWise home">
-      <div class="logo-icon">R</div>
+      <img class="logo-icon logo-img" src="/assets/img/roamwise-logo-176.webp" width="34" height="34" alt="RoamWise" decoding="async" fetchpriority="high">
     </a>
     <div class="sw-tabs">
       <a class="sw-tab inactive" href="/home.html" aria-label="Articles &amp; Guides"><span class="sw-tab-icon">&#128240;</span> <span>Articles &amp; Guides</span></a>
@@ -1081,7 +1088,7 @@ function rwDismissCreatorBanner(){
 <footer class="site-footer v v-home">
   <div class="foot-inner">
     <div>
-      <div class="foot-brand"><div class="logo-icon">RW</div><span class="logo-text">Roam<span>Wise</span> Pro</span></div>
+      <div class="foot-brand"><img class="logo-icon logo-img" src="/assets/img/roamwise-logo-176.webp" width="36" height="36" alt="RoamWise" loading="lazy" decoding="async"><span class="logo-text">Roam<span>Wise</span> Pro</span></div>
       <p class="foot-tag">The one-payment travel planner. Built in the Himalayas &#127956;&#65039; for travelers everywhere &mdash; itineraries, route comparisons and trip budgets.</p>
     </div>
     <div>
@@ -1118,7 +1125,10 @@ function rwDismissCreatorBanner(){
 </footer>
 
 <!-- APP SHELL: bottom tabs + drawer -->
-<nav class="tabbar" id="tabbar"></nav>
+<nav class="tabbar" id="tabbar" style="grid-template-columns:repeat(5,1fr)"><button id="tb-home" class="on" onclick="window.rwTabGo&amp;&amp;rwTabGo('home')"><span class="ti"><svg class="rwi" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5"/><path d="M6 10.5V19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-8.5"/><path d="M10 20v-4.5a2 2 0 0 1 4 0V20"/></svg></span>Home</button><button id="tb-plan" onclick="window.rwTabGo&amp;&amp;rwTabGo('plan')"><span class="ti"><svg class="rwi" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4 3 11l6 2.5L12 20l3-7.5L21 4Z"/><path d="M9 13.5 21 4"/></svg></span>Plan</button><button id="tb-copilot" onclick="window.rwTabGo&amp;&amp;rwTabGo('copilot')"><span class="ti"><svg class="rwi" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m12 7 2 5-2 5-2-5 2-5Z"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></span>Copilot</button><button id="tb-store" onclick="window.rwTabGo&amp;&amp;rwTabGo('store')"><span class="ti"><svg class="rwi" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>Store</button><button id="tb-more" onclick="window.rwTabGo&amp;&amp;rwTabGo('more')"><span class="ti"><svg class="rwi" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>More</button></nav>
+<script>(function(){try{var n=document.getElementById("tabbar");if(!n)return;var t=localStorage.getItem("rw_tabs");if(t&&t!=="null"&&t!=='["home","plan","copilot","store","more"]'){n.innerHTML="";return;}var l=localStorage.getItem("rw_last_tab")||"home";var b=document.getElementById("tb-"+l),h=document.getElementById("tb-home");if(b&&h&&b!==h){h.classList.remove("on");b.classList.add("on");}}catch(e){}})();
+/* Instant shell: the header, side-menu button and bottom tabs are plain HTML, so on a fast or medium link the loading veil lifts after the first frame instead of waiting for ~180 scripts. Slow links keep the veil (it shows honest progress while taps would do nothing). */
+(function(){try{var n=window.__RW_NET;if(n&&n.tier!=="fast"&&n.tier!=="medium")return;var go=function(){var v=document.getElementById("rwVeil");if(!v)return;v.className="rw-veil-off";setTimeout(function(){if(v.parentNode)v.parentNode.removeChild(v);},300);};(window.requestAnimationFrame||setTimeout)(function(){(window.requestAnimationFrame||setTimeout)(go);});}catch(e){}})();</script>
 
 <div class="drawer-bk" id="drawerBk" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="RoamWise menu" aria-hidden="true">
