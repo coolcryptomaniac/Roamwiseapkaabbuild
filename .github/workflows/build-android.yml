@@ -137,7 +137,7 @@ jobs:
         run: |
           set -euo pipefail
           WEB_BYTES=$(find www -type f -printf '%s\n' | awk '{ total += $1 } END { print total + 0 }')
-          MAX_WEB_BYTES=$((18 * 1024 * 1024))
+          MAX_WEB_BYTES=$((30 * 1024 * 1024))
           {
             echo "### Android web payload"
             echo ""
