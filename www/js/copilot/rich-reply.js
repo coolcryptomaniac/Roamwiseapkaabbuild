@@ -162,6 +162,8 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   try{ rwRemember('tusk', (answerHTML||'').replace(/<[^>]*>/g,' ').slice(0,200), {}); }catch(e){ /* best-effort, ignore */ }
   var isCard = actions.length && String(actions[0]).indexOf('tk-card')>-1;
   var _html = parts.join(isCard? '<div style="height:10px"></div>' : '<hr style="border:none;border-top:1px dashed var(--b2,#2A2A36);margin:10px 0">');
+  try{ if(intents.smalltalk==='greet' && typeof rwUmChipsHTML==='function') _html += rwUmChipsHTML(); }catch(e){ /* optional */ }
+  try{ if(!intents.smalltalk && typeof rwUmNotice==='function') _html += rwUmNotice(); }catch(e){ /* optional */ }
   /* Every answer ends with tappable actions — an answer is never a dead end. */
   try{ if(!intents.smalltalk&&!isKasarFestival) _html += rwTuskRail(intents.dest||'', raw||''); }catch(e){ /* best-effort, ignore */ }
   /* Lightweight per-response feedback — bot replies only (cpFinish only ever
@@ -174,7 +176,7 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   _html += '<div class="tk-fb rw-fb" data-kind="'+_kind+'" data-ck="'+_fe(_fbCk)+'" data-q="'+_fe(_fbQ)+'" data-dest="'+_fe(String(intents.dest||'').slice(0,60))+'">Helpful?'
     +'<button type="button" onclick="rwTuskFeedback(this,true)" aria-label="Helpful">👍</button>'
     +'<button type="button" onclick="rwTuskFeedback(this,false)" aria-label="Not helpful">👎</button></div>';
-  bubble.innerHTML = _html;
+  if(!(typeof rwFxReveal==='function' && rwFxReveal(bubble,_html,intents,raw))) bubble.innerHTML = _html;   /* typing effect or instant text */
   var log=el(_cpTargetLog)||el('cpLog');
   if(log){
     /* land the reader at the TOP of the new answer — bottom-scrolling a tall
