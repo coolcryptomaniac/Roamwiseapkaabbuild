@@ -10,6 +10,36 @@ function updateBrief() {
   $('artEmail').href = 'mailto:founder@roamwise.co.in?subject=' + encodeURIComponent('RoamWise art × hospitality: ' + selected.name) + '&body=' + encodeURIComponent(text);
   $('artWhatsApp').href = 'https://wa.me/919987379730?text=' + encodeURIComponent(text);
 }
+const WA = '919015954049';
+const waLink = text => 'https://wa.me/' + WA + '?text=' + encodeURIComponent(text);
+function workMessage(w) {
+  if (w.status === 'Sold') return `Namaste Bhavitavya Kala Studio \u{1F64F}\n\nI found you through RoamWise. I saw "${w.title}" and would like to discuss a similar customised painting. Please share how this works, price and timeline.`;
+  const what = w.type === 'Print' ? 'order the print' : 'enquire about the original painting';
+  return `Namaste Bhavitavya Kala Studio \u{1F64F}\n\nI found you through RoamWise and would like to ${what} "${w.title}". Please share price, availability and delivery details.`;
+}
+function renderWorks() {
+  const box = $('artWorks'); const works = (data && data.artists[0].artworks) || [];
+  if (!box) return;
+  box.innerHTML = works.map(w => {
+    const cta = w.status === 'Sold' ? 'Ask for something similar' : (w.type === 'Print' ? 'Order on WhatsApp' : 'Enquire on WhatsApp');
+    const meta = [w.medium, w.size].filter(Boolean).map(esc).join(' · ');
+    return `<article class="art-work${w.status === 'Sold' ? ' is-sold' : ''}"><img src="${esc(w.image)}" alt="${esc(w.title)}, ${esc(w.type.toLowerCase())} by Natasha Guleria" loading="lazy"><div><span class="art-status">${esc(w.status)} · ${esc(w.type)}</span><h3>${esc(w.title)}</h3>${meta ? `<p class="art-small">${meta}</p>` : ''}<p class="art-price">${esc(w.price)}</p><a class="art-wa" href="${esc(waLink(workMessage(w)))}" target="_blank" rel="noopener">${cta} ↗</a><a class="art-small" href="${esc(safeHttps(w.url))}" target="_blank" rel="noopener">Studio page ↗</a></div></article>`;
+  }).join('');
+}
+let buyerCity = '';
+function buyerBrief(b) {
+  const a = data.artists[0];
+  return `Hello RoamWise team,\n\nPlease introduce ${a.name} (${a.studio}) to ${b.name} in ${b.city}.\n\nWhy it may fit: ${b.reasons.join('; ')}.\nHer work: https://www.roamwise.co.in/creators/artists.html\nPortfolio: ${safeHttps(a.website)}\n\nNo commitment is implied by either side.`;
+}
+function renderBuyers() {
+  const box = $('artBuyers'); if (!box || !data || !data.buyers) return;
+  const rows = data.buyers.filter(b => (b.forArtists || ['natasha-guleria']).includes('natasha-guleria') && (!buyerCity || b.city === buyerCity));
+  box.innerHTML = rows.map(b => `<article class="art-match"><span class="art-status">Research prospect</span><h3>${esc(b.name)}</h3><span class="art-small">${esc(b.city)} · ${esc(b.kind)}</span><ul>${b.reasons.map(r => `<li>${esc(r)}</li>`).join('')}</ul><p class="art-small">${esc(b.evidence)}</p><a href="${esc(safeHttps(b.sourceUrl))}" target="_blank" rel="noopener">Source ↗</a> <a href="${esc(safeHttps(b.contactUrl))}" target="_blank" rel="noopener">${esc(b.contactType)} ↗</a><a class="art-button secondary" href="mailto:founder@roamwise.co.in?subject=${encodeURIComponent('Introduce Natasha Guleria to ' + b.name)}&body=${encodeURIComponent(buyerBrief(b))}">Request an introduction</a></article>`).join('');
+  const note = $('artBuyersNote'); if (note) note.textContent = `${rows.length} organisations. ${data.buyersNote || ''}`;
+}
+document.querySelectorAll('.art-city').forEach(btn => btn.addEventListener('click', () => {
+  buyerCity = btn.dataset.city; document.querySelectorAll('.art-city').forEach(x => x.classList.toggle('is-on', x === btn)); renderBuyers();
+}));
 function render() {
   if (!data) return;
   const rows = rankArtistProperties(data.artists[0], data.properties, {goal:$('artGoal').value, region:$('artRegion').value});
@@ -31,5 +61,5 @@ $('artCopy').addEventListener('click', async()=>{
   catch { $('artDraft').focus(); $('artDraft').select(); $('artStatus').textContent='Select and copy the enquiry manually.'; }
 });
 try {
-  const r=await fetch('artists-data.json'); if(!r.ok) throw new Error('unavailable'); data=await r.json(); render();
+  const r=await fetch('artists-data.json'); if(!r.ok) throw new Error('unavailable'); data=await r.json(); renderWorks(); renderBuyers(); render();
 } catch { $('artStatus').textContent='The shortlist could not load. The portfolio and email introduction links still work.'; }
