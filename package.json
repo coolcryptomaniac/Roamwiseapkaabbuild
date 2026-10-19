@@ -15,7 +15,7 @@
     "@capacitor/ios": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@capacitor/geolocation": "^8.0.0",
-    "@capacitor/camera": "^8.2.5",
+    "@capacitor/camera": "^8.2.6",
     "@capgo/capacitor-speech-recognition": "^8.3.2",
     "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/app": "^8.0.0",
