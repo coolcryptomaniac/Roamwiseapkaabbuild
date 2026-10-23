@@ -261,6 +261,7 @@ document.write('<div style="font:16px/1.5 system-ui,Arial,sans-serif;background:
 <link rel="stylesheet" href="design/home-polish.css?v=rw-v1">
 <link rel="stylesheet" href="memories/memories.css?v=1">
 <link rel="stylesheet" href="books/books.css?v=1">
+<link rel="stylesheet" href="music/home.css?v=1">
 <script src="js/runtime/freshness.js?v=rw-v124-personal-group-planner" defer></script>
 <style id="rwPolish">
 /* ===== rwPolish — press feel, elevation, motion, pill tab bar ===== */
@@ -813,6 +814,14 @@ function rwDismissCreatorBanner(){
   <div class="rwb-mount"></div>
 </section>
 
+<section class="xsec v v-home v-explore" id="rwMusic" aria-labelledby="rwmTitle">
+  <span class="rwm-eyebrow">THE MUSIC ROOM</span>
+  <h2 class="rwm-h" id="rwmTitle">Albums to <em>travel with</em></h2>
+  <p class="rwm-sub">Songs by Mohit Pandey from the Himalayas. Pick a cover, shuffle by mood, or let the library choose.</p>
+  <div class="rwm-row" id="rwmRow" role="list" aria-label="Albums"></div>
+  <div class="rwm-cta"><a class="rwm-btn" href="/music/">Open the music library</a><a class="rwm-ghost" href="/music/#shuffle">Surprise me</a></div>
+</section>
+
 <section class="xsec v v-film" id="musicEventsIndia" style="margin:12px 14px 18px;padding:18px;background:linear-gradient(145deg,rgba(76,53,37,.38),rgba(18,18,28,.95));border:1px solid rgba(232,186,108,.3);border-radius:22px">
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
     <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2,#C8913E);font-weight:800">RoamWise music weekends · India</span>
@@ -1299,13 +1308,14 @@ function rwDismissCreatorBanner(){
       <a class="foot-link" href="creators/match.html?role=creator&amp;invite=founding">Creators · register &amp; get matched with stays</a>
       <a class="foot-link" href="local-business/">Local businesses · get matched with creators</a>
       <a class="foot-link" href="books/">Books &amp; eBooks · Pothi, Amazon, Flipkart</a>
+      <a class="foot-link" href="map/">Uttarakhand map · stays, food, culture</a>
       <a class="foot-link" href="memories/">Memories · Dussehra, Kasar Fest, Startup Garage &amp; more</a>
       <a class="foot-link" href="creators/artists.html">Natasha Guleria · Brand Ambassador &amp; artist matches</a>
       <a class="foot-link" href="creators/match.html?role=property">Hosts · find a creator for your property</a>
       <a class="foot-link" href="#app" onclick="event.preventDefault();tabGo('plan');scrollTo(0,document.getElementById('app').offsetTop-10)">Plan a trip</a>
       <a class="foot-link" onclick="rwOpenPaySafely(event)">Unlock Pro</a>
       <a class="foot-link" onclick="openSettings()">Settings &amp; AI keys</a>
-      <a class="foot-link" href="https://www.roamwise.co.in/blog/" target="_blank">Blog</a>
+      <a class="foot-link" href="https://www.roamwise.co.in/blog/" target="_blank" rel="noopener">Blog</a>
     </div>
     <div>
       <div class="foot-h">Company</div>
@@ -1339,6 +1349,7 @@ function rwDismissCreatorBanner(){
   <a class="dr-link" onclick="closeDrawer();tabGo('sacred')"><span class="ic">&#2384;</span>Sacred journeys &amp; Digital Bhakti</a>
   <a class="dr-link" href="/local-business/"><span class="ic">&#127978;</span>Shops &amp; cafes &middot; get creators</a>
   <a class="dr-link" href="/books/"><span class="ic">&#128218;</span>Books &middot; samples &amp; buy links</a>
+  <a class="dr-link" href="/music/"><span class="ic">&#127925;</span>Music library &middot; albums by Mohit</a>
   <a class="dr-link" href="/memories/"><span class="ic">&#127902;&#65039;</span>Memories &middot; events, photos &amp; videos</a>
   <a class="dr-link" onclick="closeDrawer();tabGo('film')"><span class="ic">&#127902;&#65039;</span>Music &amp; memories</a>
   <div id="drAcct">
@@ -1429,12 +1440,12 @@ function rwDismissCreatorBanner(){
   <a class="dr-link" onclick="drLangPick()"><span class="ic">🌐</span>Language<span id="drLangVal" style="margin-left:auto;color:var(--t3);font-size:11px"></span></a>
   <div id="drLangList" style="display:none;padding:2px 0 6px 28px"></div>
   <a class="dr-link" onclick="closeDrawer();openSettings()"><span class="ic">⚙️</span>Settings</a>
-  <a class="dr-link" href="/team/" target="_blank"><span class="ic">👥</span>Team &amp; investors</a>
-  <a class="dr-link" href="/pricing.html" target="_blank"><span class="ic">💳</span>Pricing</a>
-  <a class="dr-link" href="/privacy.html" target="_blank"><span class="ic">🔒</span>Privacy policy</a>
-  <a class="dr-link" href="/terms.html" target="_blank"><span class="ic">📜</span>Terms of use</a>
-  <a class="dr-link" href="/refund-policy.html" target="_blank"><span class="ic">↩️</span>Cancellation &amp; Refunds</a>
-  <a class="dr-link" href="/legal/contest-rules.html" target="_blank"><span class="ic">🏆</span>Contest rules</a>
+  <a class="dr-link" href="/team/" target="_blank" rel="noopener"><span class="ic">👥</span>Team &amp; investors</a>
+  <a class="dr-link" href="/pricing.html" target="_blank" rel="noopener"><span class="ic">💳</span>Pricing</a>
+  <a class="dr-link" href="/privacy.html" target="_blank" rel="noopener"><span class="ic">🔒</span>Privacy policy</a>
+  <a class="dr-link" href="/terms.html" target="_blank" rel="noopener"><span class="ic">📜</span>Terms of use</a>
+  <a class="dr-link" href="/refund-policy.html" target="_blank" rel="noopener"><span class="ic">↩️</span>Cancellation &amp; Refunds</a>
+  <a class="dr-link" href="/legal/contest-rules.html" target="_blank" rel="noopener"><span class="ic">🏆</span>Contest rules</a>
   <a class="dr-link" href="https://roamwise.co.in/help/" onclick="event.preventDefault();rwOpenSite('help/')" rel="noopener"><span class="ic">❓</span>Help &amp; FAQ</a>
   <a class="dr-link" onclick="closeDrawer();openWizard()"><span class="ic">🧠</span>AI setup wizard (60 sec)</a>
   <a class="dr-link" onclick="closeDrawer();shareApp('app')"><span class="ic">📤</span>Share RoamWise (+15 XP)</a>
@@ -1446,7 +1457,7 @@ function rwDismissCreatorBanner(){
 <div class="dr-grp"><button class="dr-gh" onclick="drToggle(this)">⚖ Legal<span class="chev">›</span></button><div class="dr-gb">
   <a class="dr-link" onclick="closeDrawer();openLegal('privacy')"><span class="ic">🔒</span>Privacy policy</a>
   <a class="dr-link" onclick="closeDrawer();openLegal('terms')"><span class="ic">📄</span>Terms &amp; refunds</a>
-  <a class="dr-link" href="/refund-policy.html" target="_blank"><span class="ic">↩️</span>Cancellation &amp; Refund Policy</a>
+  <a class="dr-link" href="/refund-policy.html" target="_blank" rel="noopener"><span class="ic">↩️</span>Cancellation &amp; Refund Policy</a>
 </div></div>
 <div class="dr-out">RoamWise Pro v3.1<br>Made in the Himalayas &#127956;&#65039; by Mohit Pandey</div>
 </aside>
@@ -1791,6 +1802,7 @@ function rwDismissCreatorBanner(){
 <script src="js/ui/creator-property-board.js" defer></script>
 <script src="js/ui/dussehra-card.js" defer></script>
 <script src="js/ui/music-gallery.js" defer></script>
+<script src="js/ui/music-room.js" defer></script>
 <script src="js/payments/plan-picker.js?v=rw-checkout-focus-1" defer></script>
 <script src="js/data/regions.js" defer></script>
 <script src="js/data/country-info.js" defer></script>
@@ -1837,6 +1849,7 @@ function rwDismissCreatorBanner(){
 <script src="js/copilot/webgpu-ai.js" defer></script>
 <script src="js/copilot/nmims-answers.js" defer></script>
 <script src="js/copilot/event-trips.js" defer></script>
+<script src="js/copilot/ask-link.js" defer></script>
 <script src="js/copilot/answer-cache.js" defer></script>
 <script src="js/copilot/user-memory.js" defer></script>
 <script src="js/copilot/shared-learning.js" defer></script>
