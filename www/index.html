@@ -255,6 +255,7 @@ document.write('<div style="font:16px/1.5 system-ui,Arial,sans-serif;background:
 <link rel="preload" href="css/base/06-commerce-and-social.css" as="style">
 <link rel="preload" href="css/base/07-tusk-readability.css" as="style">
 <link rel="preload" href="css/base/08-tusk-motion.css" as="style">
+<link rel="stylesheet" href="design/trip-desk.css?v=1">
 <link rel="stylesheet" href="app.css?v=rw-v124-personal-group-planner">
 <link rel="stylesheet" href="mobile-stability.css?v=rw-v125-compact-tusk">
 <link rel="stylesheet" href="design/roamwise-akatsuki-theme.css?v=rw-v125-akatsuki-tusk">
@@ -569,9 +570,33 @@ html{-webkit-text-size-adjust:100%}
   </div>
 <section class="v v-home" id="rwFeatured" aria-label="Featured partners"></section>
 
+<section class="v v-home" id="rwMatchLinks" aria-label="Find your match">
+  <style>
+  #rwMatchLinks{margin:6px 14px 10px}
+  #rwMatchLinks h2{margin:0 0 8px;font:800 11.5px/1.2 system-ui,sans-serif;letter-spacing:.16em;color:#e8ba6c}
+  #rwMatchLinks .ml-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px;scroll-snap-type:x proximity}
+  #rwMatchLinks .ml-row::-webkit-scrollbar{display:none}
+  #rwMatchLinks a{flex:none;scroll-snap-align:start;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid rgba(232,186,108,.4);background:rgba(232,186,108,.08);color:#f3d9a4;font:700 13px system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+  #rwMatchLinks a:active{transform:scale(.97)}#rwMatchLinks a:focus-visible{outline:2px solid #FFE0AE;outline-offset:2px}
+  </style>
+  <h2>FIND YOUR MATCH</h2>
+  <nav class="ml-row" aria-label="Matching doors">
+    <a href="/creators/match.html?role=creator&amp;invite=founding&amp;src=home-top">🎥 Travel creators</a>
+    <a href="/partner/join/?src=home-top">🏡 Stays</a>
+    <a href="/yoga/?src=home-top">🧘 Yoga teachers</a>
+    <a href="/partner/join/?src=home-top&amp;retreats=1">🏔️ Resorts for retreats</a>
+    <a href="/creators/join-artist.html?src=home-top">🎨 Painting artists</a>
+    <a href="/local-business/?src=home-top">🏪 Cafes &amp; shops</a>
+    <a href="#partner-music" data-hub="music">🎶 Music artists</a>
+    <a href="#partner-transport" data-hub="transport">🚕 Transport</a>
+    <a href="#partner-college" data-hub="college">🎓 Colleges</a>
+  </nav>
+</section>
+
 <section class="v v-home" id="bigSix" aria-label="Main ways to use RoamWise" style="margin:14px 0 4px">
   <div class="bs-grid">
     <button type="button" class="bs-tile bs-stay" onclick="openListing()"><span class="bs-ic" aria-hidden="true">&#127969;</span><b>Book &amp; Stay</b><small>Local stays. Enquire on WhatsApp.</small></button>
+<button type="button" class="bs-tile bs-stay" onclick="rwOpenTripDesk()"><b>Flights, trains &amp; rides</b><small>Electric first. Your whole trip together.</small></button>
     <a class="bs-tile bs-nomad" href="nomads/"><span class="bs-ic" aria-hidden="true">&#128187;</span><b>Nomad Match</b><small>Work stays, 15 days to 3 months.</small></a>
     <a class="bs-tile bs-creator" href="creators/match.html?role=creator&amp;invite=founding"><span class="bs-ic" aria-hidden="true">&#127909;</span><b>Creator Match</b><small>Free stays for your content.</small></a>
     <a class="bs-tile bs-prop" href="creators/match.html?role=property"><span class="bs-ic" aria-hidden="true">&#129309;</span><b>Creators &times; Stays</b><small>Hosts: find creators who fit.</small></a>
@@ -1263,7 +1288,7 @@ function rwDismissCreatorBanner(){
   <div class="exp-grid">
     <div class="exp" style="border-color:rgba(232,186,108,.4)">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <img id="creatorPic" src="https://www.roamwise.co.in/creator.jpg" alt="Mohit Pandey"
+        <img id="creatorPic" src="team/mohit-pandey.webp" alt="Mohit Pandey"
           style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2.5px solid var(--gold2);flex-shrink:0"
           onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 72 72%22%3E%3Ccircle cx=%2236%22 cy=%2236%22 r=%2236%22 fill=%22%23161022%22/%3E%3Ctext x=%2236%22 y=%2246%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-size=%2226%22 font-weight=%22bold%22 fill=%22%23E8BA6C%22%3EMP%3C/text%3E%3Cpath d=%22M14 58l10-14 6 8 5-6 13 12z%22 fill=%22%23C4302B%22 opacity=%22.85%22/%3E%3C/svg%3E'">
         <div><div class="exp-name" style="margin-bottom:2px">Mohit Pandey</div>
@@ -1594,10 +1619,10 @@ function rwDismissCreatorBanner(){
         <div class="feat-item"><span class="feat-ck">&#10003;</span>Unlimited Smart Planner searches</div>
       </div>
       <!-- ===== TESTIMONIALS: replace the quote/who text below with REAL user quotes when you have them ===== -->
-      <div class="pay-testi" id="payTesti">
+      <div class="pay-testi" id="payTesti" style="display:none">
         <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <div class="quote" id="testiQuote">&ldquo;Planned our whole Manali trip in one evening &mdash; the budget split alone saved us so many arguments.&rdquo;</div>
-        <div class="who" id="testiWho">&mdash; Priya, group trip to Himachal</div>
+        <div class="quote" id="testiQuote"></div>
+        <div class="who" id="testiWho"></div>
       </div>
       <div id="payIndiaSec">
       <div id="founderBanner" style="display:none;margin-bottom:12px;padding:13px 14px;border-radius:16px;color:#fff;background:linear-gradient(135deg,#C8913E,#8E5B1F);box-shadow:0 8px 26px rgba(200,145,62,.28)"></div>
@@ -1823,6 +1848,8 @@ function rwDismissCreatorBanner(){
 <script src="js/payments/plan-picker.js?v=rw-checkout-focus-1" defer></script>
 <script src="js/data/regions.js" defer></script>
 <script src="js/data/country-info.js" defer></script>
+<script src="js/data/atlas-world.js" defer></script>
+<script src="js/data/atlas-resolver.js" defer></script>
 <script src="js/data/place-overrides.js" defer></script>
 <script src="js/data-sync/rwdata.js" defer></script>
 <script src="js/data-sync/key-sync.js" defer></script>
@@ -1874,6 +1901,7 @@ function rwDismissCreatorBanner(){
 <script src="js/copilot/core.js?v=rw-route-quiet-1" defer></script>
 <script src="js/copilot/rich-reply.js" defer></script>
 <script src="js/copilot/tusk-persona.js" defer></script>
+<script src="js/copilot/atlas-answers.js" defer></script>
 <script src="js/copilot/tusk-knowledge.js" defer></script>
 <script src="js/copilot/answer-cards.js" defer></script>
 <script src="js/copilot/agent.js" defer></script>
@@ -1889,6 +1917,10 @@ function rwDismissCreatorBanner(){
 <script src="js/itinerary/journey-log.js" defer></script>
 <script src="js/itinerary/map-view.js" defer></script>
 <script src="js/itinerary/trip-footprint.js" defer></script>
+<script defer src="js/trip-desk/core.js?v=3"></script>
+<script defer src="js/trip-desk/plan.js?v=1"></script>
+<script defer src="js/trip-desk/history.js?v=2"></script>
+<script defer src="js/trip-desk/ui.js?v=2"></script>
 <script src="js/itinerary/trip-vault.js" defer></script>
 <script src="js/itinerary/meters.js" defer></script>
 <script src="js/itinerary/place-disambiguation.js" defer></script>
