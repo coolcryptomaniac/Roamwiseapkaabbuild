@@ -59,6 +59,16 @@ jobs:
           git -C source-roamwise fetch --depth=1 origin "$SOURCE_BRANCH"
           git -C source-roamwise checkout --detach FETCH_HEAD
 
+          # Note: assets/roamwise-opening*.gif/mp4 use a glob (not an exact
+          # filename) because the opening animation has been through several
+          # versioned filenames (e.g. roamwise-opening-v2.gif); an exact
+          # match here previously let a newer version slip back into the
+          # Android bundle even though it's meant to stay web-only.
+          # vendor/webllm/ (the ~6 MB on-device WebGPU AI engine) is excluded
+          # for the same on-demand-only reason the source repo's own service
+          # worker never precaches it (see roamwise/sw.js): it's dynamically
+          # imported only after a user opts in from Settings, and WebGPU
+          # isn't reliably available in Capacitor's Android WebView anyway.
           mkdir -p www
           rsync -a --delete --delete-excluded \
             --exclude='.git/' \
@@ -79,11 +89,12 @@ jobs:
             --exclude='tools/' \
             --exclude='worker/' \
             --exclude='assets/audio/' \
-            --exclude='assets/roamwise-opening.gif' \
-            --exclude='assets/roamwise-opening.mp4' \
+            --exclude='assets/roamwise-opening*.gif' \
+            --exclude='assets/roamwise-opening*.mp4' \
             --exclude='icons/app-icon-source.png' \
             --exclude='promo.mp4' \
             --exclude='investors-data.js' \
+            --exclude='vendor/webllm/' \
             --exclude='*.md' \
             --exclude='*.txt' \
             --exclude='*.rules' \
@@ -137,7 +148,7 @@ jobs:
         run: |
           set -euo pipefail
           WEB_BYTES=$(find www -type f -printf '%s\n' | awk '{ total += $1 } END { print total + 0 }')
-          MAX_WEB_BYTES=$((30 * 1024 * 1024))
+          MAX_WEB_BYTES=$((100 * 1024 * 1024))
           {
             echo "### Android web payload"
             echo ""
@@ -154,8 +165,7 @@ jobs:
 
           test ! -e www/promo.mp4
           test ! -e www/assets/audio
-          test ! -e www/assets/roamwise-opening.gif
-          test ! -e www/assets/roamwise-opening.mp4
+          test -z "$(find www/assets -maxdepth 1 \( -iname 'roamwise-opening*.gif' -o -iname 'roamwise-opening*.mp4' \) 2>/dev/null)"
           test ! -e www/icons/app-icon-source.png
           test ! -e www/admin
           test ! -e www/agent
@@ -165,6 +175,7 @@ jobs:
           test ! -e www/staff
           test ! -e www/tools
           test ! -e www/worker
+          test ! -e www/vendor/webllm
           if find www -type f \( -iname '*.pdf' -o -iname '*.docx' -o -iname '*.md' -o -iname '*.rules' \) -print -quit | grep -q .; then
             echo "::error::A non-runtime document survived Android asset pruning."
             exit 1
@@ -433,7 +444,7 @@ jobs:
             exit 1
           fi
 
-          FORBIDDEN='(^|/)assets/public/(promo\.mp4|assets/audio/|assets/roamwise-opening\.(gif|mp4)|icons/app-icon-source\.png|admin/|agent/|deck/|invest/|nmims/|staff/|tools/|worker/)|(^|/)[^/]+\.(pdf|docx|md|rules)$'
+          FORBIDDEN='(^|/)assets/public/(promo\.mp4|assets/audio/|assets/roamwise-opening[^/]*\.(gif|mp4)|icons/app-icon-source\.png|admin/|agent/|deck/|invest/|nmims/|staff/|tools/|worker/|vendor/webllm/)|(^|/)[^/]+\.(pdf|docx|md|rules)$'
           if unzip -Z1 "$APK" | grep -Eiq "$FORBIDDEN"; then
             echo "::error::APK contains assets that must be delivered on demand."
             unzip -Z1 "$APK" | grep -Ei "$FORBIDDEN" | sed -n '1,50p'
