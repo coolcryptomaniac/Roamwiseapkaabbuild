@@ -33,6 +33,17 @@
    ================================================================= */
 
 /* --- 1. ACTION RAIL --- */
+/* Deterministic UI-only context. Never represents a live advisory or confirmed booking. */
+function rwTuskRailContext(raw){
+  var q=String(raw||'').toLowerCase();
+  if(/\b(road|landslide|blocked|closure|traffic|safe|safety|rasta|raasta|sadak)\b|सड़क|रास्ता|भूस्खलन/.test(q)) return 'safety';
+  if(/\b(food|eat|restaurant|cafe|khana|khaana|dish|cuisine)\b|खाना|भोजन/.test(q)) return 'food';
+  if(/\b(weather|rain|snow|forecast|barish|mausam)\b|मौसम|बारिश/.test(q)) return 'weather';
+  if(/\b(best time|when to go|season|kab ja|kab jana)\b|कब जाएं|कब जाना/.test(q)) return 'season';
+  if(/\b(stay|hotel|homestay|room|book|booking)\b|होटल|बुकिंग/.test(q)) return 'stay';
+  return 'general';
+}
+
 function rwTuskRail(dest, raw){
   var d = (dest||'').replace(/'/g, "\\'");
   var q = (raw||'').replace(/'/g, "\\'").slice(0,120);
@@ -47,6 +58,15 @@ function rwTuskRail(dest, raw){
   h+=btn('\ud83d\udcb0','Budget',"openMoneyLayer()");
   h+=btn('\u23f0','Remind me',"rwRemindAsk('"+q+"')");
   h+=btn('\ud83d\udd0a','Read aloud',"rwTuskReadLast()");
+  h+=btn('⏯️','Pause / Resume',"rwTuskPauseResume()");
+  h+=btn('🔁','Replay',"rwTuskReplaySpeech()");
+  h+=btn('✨','Voice mode',"RWTuskVoiceStudio.start()");
+  h+=btn('🎚️','Speed',"rwTuskCycleSpeechRate()");
+  var topic=rwTuskRailContext(raw);
+  if(d && topic==='safety') h+=btn('⚠️','Road advisories', "cpFollow('Check dated official road and safety advisories for "+d+"')");
+  if(d && topic==='food') h+=btn('🍲','Local food', "cpFollow('What local food should I try in "+d+"?')");
+  if(d && topic==='weather') h+=btn('☁️','Weather details', "cpFollow('Check the weather and forecast for "+d+"')");
+  if(d && topic==='season') h+=btn('📅','Best season', "cpFollow('When is the best time to visit "+d+"?')");
   h+=btn('\ud83d\udcd6','Log feeling',"openJourneyLog()");
   return h+'</div>';
 }
@@ -167,6 +187,8 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   try{ if(!intents.smalltalk && typeof rwUmNotice==='function') _html += rwUmNotice(); }catch(e){ /* optional */ }
   /* Every answer ends with tappable actions — an answer is never a dead end. */
   try{ if(!intents.smalltalk&&!isKasarFestival) _html += rwTuskRail(intents.dest||'', raw||''); }catch(e){ /* best-effort, ignore */ }
+  /* Curated, public local partners and artists only; not booking inventory. */
+  try{ if(!intents.smalltalk && window.RWConnectedDiscovery) _html+=RWConnectedDiscovery.html(raw,intents); }catch(e){}
   /* Lightweight per-response feedback — bot replies only (cpFinish only ever
      finishes a 'bot' bubble). Anonymous daily counter, same pattern as track()
      elsewhere; no per-message record, no user identity. */
@@ -185,6 +207,7 @@ async function cpFinish(bubble, answerHTML, intents, raw){
     var topPos = bubble.offsetTop - 8;
     log.scrollTop = topPos>0 ? topPos : 0;
   }
+  try{ if(window.RWTuskVoiceStudio) RWTuskVoiceStudio.answer(answerHTML,raw,intents); }catch(e){}
   _cpHist.push({q:raw, a:bubble.textContent.slice(0,300)}); if(_cpHist.length>8) _cpHist.shift();
   try{ track('copilot_uses'); }catch(e){ /* analytics best-effort, ignore */ }
 }
