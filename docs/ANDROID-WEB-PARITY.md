@@ -1,0 +1,5 @@
+# Actual Android APK/AAB builder parity
+This is the **coolcryptomaniac/Roamwiseapkaabbuild** repository, separate from the website repository. The old checked-in `www` bundle can become stale. `npm run android:prepare` now clones the latest RoamWise main, builds the public web bundle, copies current assets into the Android webDir, injects a native navigation bridge, and runs Capacitor sync.
+Use this command in the existing APK/AAB release workflow **after npm install and before Gradle builds**. A plain Gradle build without this step may still ship stale assets. Never enable an unverified remote `server.url` or unrestricted `allowNavigation`.
+The bridge preserves same-site navigation inside Android and opens explicit external new-tab links through Capacitor Browser. Cashfree, Google/Firebase auth, downloads, microphone, camera, GPS, push notifications, keyboard insets and Android back navigation need device smoke tests; a link bridge alone cannot guarantee all of them.
+Build a signed AAB/APK, install on a real Android 15 device, test login, shop Cashfree sandbox, UPI, treks, packages, maps, deep links and return flows before release.
