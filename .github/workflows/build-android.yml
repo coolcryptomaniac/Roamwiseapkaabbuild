@@ -227,6 +227,9 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Install native browser handoff plugin for this build
+        run: npm install --no-save --no-package-lock --no-audit --no-fund @capacitor/browser@^8.0.0
+
       - name: Recreate Android platform
         shell: bash
         run: |
