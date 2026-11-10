@@ -1,0 +1,22 @@
+name: Android web parity check
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/sync-roamwise-web.cjs'
+      - 'scripts/android-bridge.js'
+      - 'package.json'
+      - '.github/workflows/web-parity-check.yml'
+permissions:
+  contents: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check scripts/sync-roamwise-web.cjs && node --check scripts/android-bridge.js
+      - run: npm run web:refresh
+      - run: node --test scripts/test-web-parity.mjs
