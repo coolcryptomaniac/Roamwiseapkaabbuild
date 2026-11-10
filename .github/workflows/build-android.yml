@@ -291,6 +291,14 @@ jobs:
           fi
           node scripts/validate-google-services.mjs "${AUTH_ARGS[@]}"
 
+      - name: Inject Android navigation bridge into refreshed website
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp scripts/android-bridge.js www/android-bridge.js
+          node -e "const fs=require('fs');const p='www/index.html';let s=fs.readFileSync(p,'utf8');if(!s.includes('android-bridge.js'))s=s.replace('</head>','<script defer src=\\\"/android-bridge.js\\\"></script>\\n</head>');fs.writeFileSync(p,s)"
+          grep -q 'android-bridge.js' www/index.html
+
       - name: Sync refreshed web assets into Android
         run: npx cap sync android
 
