@@ -256,6 +256,7 @@ jobs:
           test -d node_modules/@capacitor-firebase/authentication
           node scripts/inject-android-bridge.cjs
           node --check www/android-bridge.js
+          node --test scripts/test-android-navigation.mjs
 
       - name: Sync refreshed web assets into Android
         run: npx cap sync android
