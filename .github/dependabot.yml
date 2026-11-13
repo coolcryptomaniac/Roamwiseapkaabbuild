@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    ignore:
+      # @capacitor-firebase/authentication 8.x accepts firebase ^12 only; firebase 13 broke every
+      # Android build from 11 Nov 2026 (npm ERESOLVE). Lift this when the plugin supports 13.
+      - dependency-name: "firebase"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
