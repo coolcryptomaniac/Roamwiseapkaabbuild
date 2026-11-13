@@ -1,6 +1,6 @@
 {
  "version": 1,
- "checked": "2026-11-04",
+ "checked": "2026-11-12",
  "regions": [
   {
    "id": "almora",
@@ -360,21 +360,21 @@
    "regions": []
   },
   {
-   "id": "auto-20261103-8-trekkers-still-stranded-in-uttarkashi-",
-   "kind": "crowd",
+   "id": "auto-20261110-heavy-rainfall-alert-issued-in-uttarakha",
+   "kind": "rain",
    "official": false,
    "auto": true,
-   "title": "8 trekkers still stranded in Uttarkashi over 5 days",
-   "detail": "Rediff reports this. Check with local police or the district administration before you travel.",
-   "from": "2026-11-03",
-   "until": "2026-11-06",
-   "source": "Rediff",
-   "sourceUrl": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQYS1VYWVlUXo0emVkRDdKdU5JS1RKMXc2NFpJRkRGTzNfMHJVV1pnUlllS1RhR0I5c1FpNFgtM2Z2XzgwY1ZWbU1vS09lWGhLb1FWcGpNWHZXZjlVVlpQZXVlbThHZ3FETmlJUVRYX2s1VGVteDJnZzNKMnhQRE9nOFUxUzNuSE5ka3hDWU9TSDB4MjF0anViSGktQzU4cWNYSjh5U2pVcnRGMnRfOVhfQmFBOFJOdEsxNG9JR0g2cUtJYlBxZzZBYTJ3U3lDMnpX0gHTAUFVX3lxTE9ibmFUNWc5YXRSUy1WNkFNZ0xrd0d0Zlhrb1VwclIyVHRRaUFJclRJN1lZSkRDZWFscDhEcG9WQ2xJMnBTdV9pWE9XRF9OODRoUFA4SVRSRW9xcElsQlhJaGtEZC1ydDFBMHdMMWluU3FFdHlfbTBXQVBUbGVZeG5TOHkxSVNZY0dkZE5LZmNfMDV0RWRpaWtJSjMzMHV1LUJzcEZ2WXJqRFlfWF82SE93NjdSbmg4bGVkWlg2SGlhUWxfWjlOYXc3X1ZpbTR5VE9qYzA?oc=5",
+   "title": "Heavy rainfall alert issued in Uttarakhand; Kedarnath pedestrian route disrupted",
+   "detail": "DD News reports this. Check with local police or the district administration before you travel.",
+   "from": "2026-11-10",
+   "until": "2026-11-12",
+   "source": "DD News",
+   "sourceUrl": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPS1cxYmlrVFBwaU0zZkdUQUJIMjY0VExDd1lJbzEtMGlfYUcwd2I3WFpCUEZTdV9adnFrYktQYlhrdXRCa09XLVZMNDRyak5hYkJxaVB6RThjNmRZY0xTbVRyOFlNSHNTNzlTckc2dk9GU1hLcTZCay1DeTRRN1RnNlg4dTByNm9NQW9oMUpKWnBSS2J1Si1Hd25pLTJ2NEZQLWRQdjdTaWk?oc=5",
    "match": [
-    "uttarkashi"
+    "kedarnath"
    ],
    "regions": [
-    "uttarkashi"
+    "rudraprayag"
    ]
   },
   {
@@ -416,24 +416,6 @@
    ],
    "regions": [
     "dehradun"
-   ]
-  },
-  {
-   "id": "auto-20261102-uttarakhand-badrinath-turns-picturesque-",
-   "kind": "snow",
-   "official": false,
-   "auto": true,
-   "title": "Uttarakhand: Badrinath turns picturesque after fresh snowfall, plunging temperatures…",
-   "detail": "www.indiagazette.com reports this. Check with local police or the district administration before you travel.",
-   "from": "2026-11-02",
-   "until": "2026-11-05",
-   "source": "www.indiagazette.com",
-   "sourceUrl": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxNOENJTGFTQllzd3BCNUZPTXBRMXlfM1R1UWJiUXZWMG14OGdTakVLZVUtNTF1dTAyOE9xU054bWxXV3NaUGE2dGRiRTdmNVRtT2tsUVdmSzFmQVBhMFZhUG9aa2ZXZFVGTUJITmZKak41Vk8tV3VKUkpJSUxQcE5JSTFjZjNySmgxc0tjTjB3RXU4ZjNNNGREUlgwZ1Z0WUZtX0lSMUJtYzI1Q3REYVdxOFFkNEtZNGhVbnlhank3V0xIOG5sQ2NFb1QxQ21kOUJsTm9CNHM4X0RJSElhNGZYTWtLRTJmMnc?oc=5",
-   "match": [
-    "badrinath"
-   ],
-   "regions": [
-    "chamoli"
    ]
   }
  ]

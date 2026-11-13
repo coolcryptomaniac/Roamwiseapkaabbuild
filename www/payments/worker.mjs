@@ -37,4 +37,37 @@ async function webhook(req,env,provider){
   var raw=await req.text(),event;try{event=JSON.parse(raw)}catch(e){return out({error:'invalid_json'},400)}var ok=false;if(provider==='razorpay')ok=await verifyRazorpay(raw,req.headers,env);else if(provider==='cashfree')ok=await verifyCashfree(raw,req.headers,env);else if(provider==='stripe')ok=await verifyStripe(raw,req.headers,env);else if(provider==='paypal')ok=await verifyPayPal(event,req.headers,env);if(!ok)return out({error:'invalid_signature'},401);var eventId=String(event.id||event.event_id||event.data&&event.data.order&&event.data.order.order_id||crypto.randomUUID()).slice(0,180);await saveEvent(env,provider,eventId,String(event.event||event.type||event.event_type||'unknown').slice(0,120),raw);await fulfill(env,provider,eventId,event);return out({ok:true,eventId})
 }
 
-export default {async fetch(req,env){var u=new URL(req.url),c=cors(req,env);if(req.method==='OPTIONS')return new Response(null,{status:204,headers:c});if(req.method==='GET'&&u.pathname==='/health')return out({status:'ok',service:'roamwise-payment-router-v5'},200,c);if(req.method==='GET'&&u.pathname==='/v1/providers')return out({providers:providerPublicView()},200,c);if(req.method==='POST'&&u.pathname==='/v1/payments/route')return quote(req,env);if(req.method==='POST'&&u.pathname==='/v1/payments/create')return createPayment(req,env);var m=u.pathname.match(/^\/v1\/webhooks\/(razorpay|cashfree|stripe|paypal|instamojo)$/);if(req.method==='POST'&&m)return webhook(req,env,m[1]);return out({error:'not_found'},404,c)}};
+
+// Amor Hospitality stays are priced and paid only on the roamwise-api Worker (worker/handlers/stay-cashfree.js),
+// from the sealed rate book. This legacy router never prices them and holds no supplier rates (13 Nov 2026).
+function stayQuote(){
+ throw Object.assign(new Error('Book this stay at roamwise.co.in/packages/amor-checkout.html.'),{status:422});
+}
+async function createStayPayment(req,env){
+ const corsHeaders=cors(req,env);
+ if(!allowedOrigin(req,env))return out({error:'origin_not_allowed'},403,corsHeaders);
+ if(!env.CASHFREE_APP_ID||!env.CASHFREE_SECRET_KEY||!env.STAY_ORDERS)return out({error:'stay_checkout_not_configured'},503,corsHeaders);
+ let b;try{b=await readJson(req)}catch(e){return out({error:'invalid_json'},400,corsHeaders)}
+ let q;try{q=stayQuote(b,env)}catch(e){return out({error:'invalid_quote',message:e.message},e.status||422,corsHeaders)}
+ const phone=String(b.phone||'').replace(/[\s()-]/g,''),email=String(b.email||'').trim();
+ if(!/^\+?\d{10,15}$/.test(phone)||!/^\S+@\S+\.\S+$/.test(email))return out({error:'valid_phone_and_email_required'},422,corsHeaders);
+ const id='rwstay_'+safeId(crypto.randomUUID()),live=String(env.CASHFREE_ENV||'sandbox')==='live';
+ const record={...q,id,phone,email,createdAt:new Date().toISOString(),status:'payment_initiated',confirmed:false};
+ await env.STAY_ORDERS.put(id,JSON.stringify(record));
+ const body={order_id:id,order_amount:q.amount,order_currency:'INR',customer_details:{customer_id:id,customer_phone:phone,customer_email:email},order_note:(q.label+' '+q.checkin+' '+q.checkout+' '+q.portion+'% advance/full').slice(0,200),order_meta:{return_url:'https://roamwise.co.in/packages/amor-checkout.html?order_id='+encodeURIComponent(id)}};
+ const base=live?'https://api.cashfree.com':'https://sandbox.cashfree.com';
+ let response,data;try{response=await fetch(base+'/pg/orders',{method:'POST',headers:{'content-type':'application/json','x-api-version':env.CASHFREE_API_VERSION||'2026-01-01','x-client-id':env.CASHFREE_APP_ID,'x-client-secret':env.CASHFREE_SECRET_KEY,'x-idempotency-key':id},body:JSON.stringify(body)});data=await response.json()}catch(e){return out({error:'cashfree_unreachable'},502,corsHeaders)}
+ if(!response.ok||!data.payment_session_id||data.order_id!==id||Number(data.order_amount)!==q.amount)return out({error:'cashfree_order_failed'},502,corsHeaders);
+ return out({orderId:id,paymentSessionId:data.payment_session_id,environment:live?'production':'sandbox',quote:q},200,corsHeaders)
+}
+async function stayStatus(req,env,id){
+ const c=cors(req,env);if(!env.STAY_ORDERS||!env.CASHFREE_APP_ID||!env.CASHFREE_SECRET_KEY)return out({error:'not_configured'},503,c);
+ const record=await env.STAY_ORDERS.get(id,'json');if(!record)return out({error:'not_found'},404,c);
+ const base=String(env.CASHFREE_ENV||'sandbox')==='live'?'https://api.cashfree.com':'https://sandbox.cashfree.com';
+ const r=await fetch(base+'/pg/orders/'+encodeURIComponent(id),{headers:{'x-api-version':env.CASHFREE_API_VERSION||'2026-01-01','x-client-id':env.CASHFREE_APP_ID,'x-client-secret':env.CASHFREE_SECRET_KEY}});if(!r.ok)return out({error:'status_unavailable'},502,c);
+ const data=await r.json();if(data.order_id!==id||Number(data.order_amount)!==record.amount)return out({error:'payment_mismatch'},409,c);
+ if(data.order_status==='PAID'&&record.status!=='paid_pending_confirmation'){record.status='paid_pending_confirmation';await env.STAY_ORDERS.put(id,JSON.stringify(record))}
+ return out({orderId:id,status:data.order_status==='PAID'?'paid_pending_confirmation':data.order_status,confirmed:false},200,c)
+}
+
+export default {async fetch(req,env){var u=new URL(req.url),c=cors(req,env);if(req.method==='OPTIONS')return new Response(null,{status:204,headers:c});if(req.method==='GET'&&u.pathname==='/health')return out({status:'ok',service:'roamwise-payment-router-v5'},200,c);if(req.method==='GET'&&u.pathname==='/v1/providers')return out({providers:providerPublicView()},200,c);if(req.method==='POST'&&u.pathname==='/v1/payments/route')return quote(req,env);if(req.method==='POST'&&u.pathname==='/v1/payments/create')return createPayment(req,env);if(req.method==='POST'&&u.pathname==='/v1/stays/checkout')return createStayPayment(req,env);if(req.method==='GET'&&/^\/v1\/stays\/status\/rwstay_[A-Za-z0-9_-]+$/.test(u.pathname))return stayStatus(req,env,u.pathname.split('/').pop());var m=u.pathname.match(/^\/v1\/webhooks\/(razorpay|cashfree|stripe|paypal|instamojo)$/);if(req.method==='POST'&&m)return webhook(req,env,m[1]);return out({error:'not_found'},404,c)}};

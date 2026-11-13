@@ -14,7 +14,7 @@
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function digits(v) { return String(v || '').replace(/\D/g, ''); }
   function norm(v) { return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
-  function photoUrl(src) { return typeof src === 'string' && /^assets\/property-photos\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/i.test(src) ? '../' + src : ''; }
+  function photoUrl(src) { if(typeof src!=='string')return ''; if(/^assets\/property-photos\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/i.test(src))return '../'+src; try { var u=new URL(src); return u.protocol==='https:' && ['assets.simplotel.com','nanauresort.com'].includes(u.hostname) ? u.href : ''; } catch(e){return '';} }
   function supportWa() { var c = (root.RW_PARTNER_CONFIG && root.RW_PARTNER_CONFIG.chat) || {}; return digits(c.supportWhatsapp); }
 
   function allStays() {
@@ -32,12 +32,10 @@
   function nights(ctx) { var a = new Date(ctx.checkin + 'T12:00:00'), b = new Date(ctx.checkout + 'T12:00:00'); var n = Math.round((b - a) / 864e5); return n > 0 ? n : 0; }
   function tripLine(ctx) { var n = nights(ctx); return (ctx.checkin || '?') + ' to ' + (ctx.checkout || '?') + (n ? ' (' + n + ' night' + (n > 1 ? 's' : '') + ')' : '') + ', ' + ctx.guests + ' guest' + (ctx.guests > 1 ? 's' : ''); }
 
-  function stayMessage(p, ctx) {
-    return 'Hello ' + p.name + ', I found your stay through RoamWise. Check-in: ' + ctx.checkin + '. Check-out: ' + ctx.checkout + '. Guests: ' + ctx.guests +
-      '. Please share available room options, the final total including all applicable taxes, payment method, and booking terms. Please note this enquiry came through RoamWise.';
-  }
-  function roamwiseMessage(p, ctx) {
-    return 'Hello RoamWise, I would like to enquire about ' + p.name + ' (' + (p.area ? p.area + ', ' : '') + p.zone + '). Check-in: ' + ctx.checkin + '. Check-out: ' + ctx.checkout + '. Guests: ' + ctx.guests + '. Please confirm availability and the final total including taxes.';
+  /* The RoamWise quote form (escapes) prefills from these params, so the guest never retypes dates. */
+  function quoteUrl(p, ctx) {
+    var q = { stay: p.name, zone: p.zone || '', start: ctx.checkin || '', end: ctx.checkout || '', guests: ctx.guests || '' };
+    return '/escapes/?' + Object.keys(q).filter(function (k) { return q[k] !== ''; }).map(function (k) { return k + '=' + encodeURIComponent(q[k]); }).join('&') + '#request-quote';
   }
   function openEnquiry(subject, body) {
     var wa = supportWa();
@@ -67,19 +65,20 @@
   }
 
   function card(p, ctx) {
-    var ph = (p.photos || []).map(function (x) { return { src: photoUrl(x.src), alt: x.alt }; }).filter(function (x) { return x.src; })[0];
-    var wa = whatsappOf(p), milan = root.RW_MILAN_PILOT && root.RW_MILAN_PILOT.isMilan(p.name);
+    var ph = (p.photos || (p.heroImage ? [{src:p.heroImage,alt:p.name}] : [])).map(function (x) { return { src: photoUrl(x.src), alt: x.alt }; }).filter(function (x) { return x.src; })[0];
+    var milan = root.RW_MILAN_PILOT && root.RW_MILAN_PILOT.isMilan(p.name);
     var price = milan ? '<p class="rw-stay-price"><b>Approx. ₹1,613–₹3,226 per room, per night</b></p>' : '<p class="rw-stay-price muted">Rate confirmed by the host for your dates.</p>';
-    var action = wa
-      ? '<a class="btn rw-stay-wa" data-stay-wa="' + esc(p.id) + '" href="https://wa.me/' + wa + '?text=' + encodeURIComponent(stayMessage(p, ctx)) + '" target="_blank" rel="noopener noreferrer">Ask ' + esc(p.name) + ' on WhatsApp ↗</a>'
-      : '<button class="btn rw-stay-ask" type="button" data-stay-ask="' + esc(p.id) + '">Ask RoamWise to confirm →</button>';
+    // Keep customer booking relationship at RoamWise. Do not route paid prospects to hosts.
+    var pay = typeof root.rwBookingRoutes === 'function' ? root.rwBookingRoutes(p).filter(function (r) { return r.type === 'pay'; })[0] : null;
+    var href = pay ? pay.href + (ctx.checkin ? '&checkin=' + encodeURIComponent(ctx.checkin) : '') + (ctx.checkout ? '&checkout=' + encodeURIComponent(ctx.checkout) : '') : quoteUrl(p, ctx);
+    var action = '<a class="btn rw-stay-ask" data-stay-ask="' + esc(p.id) + '" href="' + esc(href) + '">' + (pay ? 'Book &amp; pay →' : 'Book through RoamWise →') + '</a>';
     var maps = p.mapsUrl ? ' <a class="rw-stay-map" href="' + esc(p.mapsUrl) + '" target="_blank" rel="noopener noreferrer">Map ↗</a>' : '';
     return '<article class="rw-stay-card" data-stay="' + esc(p.id) + '">' +
       (ph ? '<img class="rw-stay-img" loading="lazy" src="' + esc(ph.src) + '" alt="' + esc(ph.alt || p.name) + '">' : '') +
       '<div class="rw-stay-body"><span class="eyebrow">ROAMWISE STAY · ' + esc(String(p.zone || '').toUpperCase()) + '</span>' +
       '<h2>' + esc(p.name) + '</h2><p class="muted">' + esc(p.area || '') + maps + '</p><div class="rw-stay-badges">' + badgeHtml(p) + '</div>' +
       price + '<p>' + esc(p.hook || '') + '</p><div class="actions">' + action + '</div>' +
-      '<small class="muted">Your dates, guest count and that you found the stay through RoamWise go with the message. Confirm your reservation directly with the host.</small></div></article>';
+      '<small class="muted">RoamWise coordinates availability, your quotation and booking confirmation. A payment receipt alone does not guarantee a room.</small></div></article>';
   }
 
   function renderStays(h, ctx) {
@@ -89,12 +88,8 @@
     if (hit.length) { head = '<p class="rw-stay-head"><b>' + hit.length + ' RoamWise stay' + (hit.length > 1 ? 's' : '') + (ctx.destination ? ' in ' + esc(ctx.destination) : '') + '</b> · ' + esc(tripLine(ctx)) + '</p>'; list = hit; }
     else { head = '<p class="rw-stay-head"><b>No RoamWise stay in “' + esc(ctx.destination) + '” yet.</b> Here are the places we do have:</p>'; list = all; }
     h.innerHTML = head + '<div class="rw-stay-list">' + list.map(function (p) { return card(p, ctx); }).join('') + '</div>' + groupLink();
-    Array.prototype.forEach.call(h.querySelectorAll('[data-stay-wa]'), function (a) { a.addEventListener('click', function () { track('stay_whatsapp_open'); if (/milan/i.test(a.getAttribute('data-stay-wa'))) track('kasar_milan_whatsapp_open'); }); });
-    Array.prototype.forEach.call(h.querySelectorAll('[data-stay-ask]'), function (b) {
-      b.addEventListener('click', function () {
-        var p = all.filter(function (x) { return x.id === b.getAttribute('data-stay-ask'); })[0]; if (!p) return;
-        track('stay_roamwise_enquiry'); openEnquiry('Stay enquiry: ' + p.name, roamwiseMessage(p, ctx));
-      });
+    Array.prototype.forEach.call(h.querySelectorAll('[data-stay-ask]'), function (a) {
+      a.addEventListener('click', function () { track('stay_roamwise_enquiry'); });
     });
   }
 
@@ -128,14 +123,14 @@
     try {
       root.firebase.firestore().collection('config').doc('partners').get().then(function (d) {
         var list = d.exists && d.data() && Array.isArray(d.data().list) ? d.data().list : [];
-        list.forEach(function (x) { if (x && x.id) live[x.id] = { bookingWhatsapp: x.bookingWhatsapp, bookingMode: x.bookingMode }; });
+        list.forEach(function (x) { if (x && x.id) live[x.id] = { bookingMode: x.bookingMode }; });
       }).catch(function () {}).then(done);
     } catch (e) { done(); }
   }
 
   root.RWStaysHub = {
     render: function (h, ctx, cat) { if (cat && cat !== 'stay') { renderOther(h, ctx, cat); return; } renderStays(h, ctx); loadLive(function () { if (Object.keys(live).length) renderStays(h, ctx); }); },
-    allStays: allStays, matches: matches, stayMessage: stayMessage
+    allStays: allStays, matches: matches, quoteUrl: quoteUrl
   };
   if (typeof module === 'object' && module.exports) module.exports = root.RWStaysHub;
 })(typeof window === 'undefined' ? globalThis : window);

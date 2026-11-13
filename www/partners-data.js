@@ -26,15 +26,14 @@ window.RW_PARTNER_TIERS = [
    Unapproved research stays remain hidden. The explicit review marker is required. */
 window.rwStayPublicEligible = function(p){
   return !!p && p.listingReady===true && (p.verified==='signed' ||
-    (p.verified==='founder-approved' && p.enquiryOnly===true && p.founderApproval==='Mohit Pandey · 2026-10-18'));
+    (p.verified==='founder-approved' && p.enquiryOnly===true && (p.founderApproval==='Mohit Pandey · 2026-10-18' || p.founderApproval==='Mohit Pandey · 2026-11-06')));
 };
 
 /* Homepage pilot. The user confirmed Milan Heights has signed; availability,
    rates and the final reservation are still confirmed directly with the hotel. */
 window.RW_PARTNER_SEED = [{
   id:'p_milan_heights', cat:'stay', zone:'Almora', area:'Milan Chowk, Almora',
-  name:'Milan Heights', verified:'signed', listingReady:true, bookingMode:'whatsapp',
-  bookingWhatsapp:'917302315845', supportEmail:'support@roamwise.co.in',
+  name:'Milan Heights', verified:'signed', listingReady:true, bookingMode:'roamwise', supportEmail:'support@roamwise.co.in',
   badges:['partner'],
   photos:[
     {src:'assets/property-photos/milan-heights-front.jpg',alt:'Milan Heights building and restaurant entrance at Milan Chowk, Almora',caption:'Milan Heights frontage · photo shared for this listing'},
@@ -45,9 +44,9 @@ window.RW_PARTNER_SEED = [{
 },{
   /* Onboarded by the founder and approved in admin (partnerPublicProfiles, verifiedAt 2026-10-06).
      No WhatsApp number or photos are on file yet, so the listing routes guests through the
-     RoamWise stays flow rather than a direct chat. Add bookingWhatsapp/photos when received. */
+     RoamWise stays flow rather than a direct chat. Add photos when received. */
   id:'p_soulmate_homestay', cat:'stay', zone:'Almora', area:'Kotyura',
-  name:'Soulmate Homestay', verified:'signed', listingReady:true, bookingMode:'whatsapp', bookingWhatsapp:'919105334889',
+  name:'Soulmate Homestay', verified:'signed', listingReady:true, bookingMode:'roamwise',
   photos:[
     {src:'assets/property-photos/soulmate-front.jpg',alt:'Soulmate Homestay and restaurant entrance with yellow steps in Kotyura, Almora',caption:'Entrance · photo shared for this listing'},
     {src:'assets/property-photos/soulmate-cafe.jpg',alt:'Soulmate cafe seating with a wooden wall and cow mural',caption:'Cafe seating · photo shared for this listing'},
@@ -55,7 +54,7 @@ window.RW_PARTNER_SEED = [{
     {src:'assets/property-photos/soulmate-walkway.jpg',alt:'Soulmate covered walkway lit with lanterns and star lights at night',caption:'Walkway at night · photo shared for this listing'}
   ],
   supportEmail:'support@roamwise.co.in',
-  /* Signed partners book by WhatsApp only (never via an OTA). Hidden until bookingMode:'whatsapp' + bookingWhatsapp are saved from the partner admin. */
+  /* Guests book and pay through RoamWise only (never via an OTA or the host's own number). */
   mapsUrl:'https://www.google.com/maps/search/?api=1&query=Soulmate+Homestay+Kotyura+Almora',
   badges:['local','quiet'],
   hook:'Kumaoni cooking and Himalayan surroundings in Kotyura, Almora, with a local host. Ask RoamWise to confirm rooms, dates and the final total.'
@@ -63,16 +62,16 @@ window.RW_PARTNER_SEED = [{
   /* Approved in the partner admin (MOU accepted 2026-09-30). Details below come from public
      travel-site listings (hotels.com / Expedia): Chachoga Road near Hotel Vintage, free
      breakfast, Wi-Fi and balconies, about 0.6 km from Mall Road. No rating or rate is shown
-     until the Trust Desk price audit is complete. Add bookingWhatsapp/photos when received. */
+     until the Trust Desk price audit is complete. Add photos when received. */
   id:'p_new_himank', cat:'stay', zone:'Manali', area:'Chachoga Road, near Hotel Vintage',
-  name:'New Himank', verified:'signed', listingReady:true,
+  name:'New Himank', verified:'signed', listingReady:true, bookingMode:'roamwise',
   photos:[
     {src:'assets/property-photos/new-himank-room.webp',alt:'New Himank guest room with wooden panelling, large windows and a TV in Manali',caption:'Guest room · photo shared for this listing'},
     {src:'assets/property-photos/new-himank-dining.webp',alt:'New Himank attic dining hall with wooden ceiling and window views in Manali',caption:'Dining hall · photo shared for this listing'},
     {src:'assets/property-photos/new-himank-signboard.webp',alt:'New Himank signboard on the building front in Manali',caption:'Entrance signboard · photo shared for this listing'}
   ],
   supportEmail:'support@roamwise.co.in',
-  /* Signed partners book by WhatsApp only (never via an OTA). Hidden until bookingMode:'whatsapp' + bookingWhatsapp are saved from the partner admin. */
+  /* Guests book and pay through RoamWise only (never via an OTA or the host's own number). */
   mapsUrl:'https://www.google.com/maps/search/?api=1&query=New+Himank+Homestay+Chachoga+Road+Manali',
   hook:'Homestay with an on-site restaurant on Chachoga Road, Manali, about a 7-minute walk to Mall Road. Public listings mention free breakfast, Wi-Fi and balconies in every room. Ask RoamWise to confirm rooms, dates and the final total.'
 },{
@@ -81,8 +80,7 @@ window.RW_PARTNER_SEED = [{
      (thedevinehomestay.com). Partner Free, 7% on completed stays; availability confirmed on WhatsApp and calls.
      Photos: uploaded by the business owner to its Justdial listing (16 Oct 2026); the MOU authorises their use. */
   id:'p_woodbook_devine', cat:'stay', zone:'Tirthan Valley', area:'Galoon, P.O. Deotha, Banjar (near Laida Secret Waterfall)',
-  name:'Woodbook The Devine Homestay', verified:'signed', listingReady:true, bookingMode:'whatsapp',
-  bookingWhatsapp:'917807491275', supportEmail:'support@roamwise.co.in',
+  name:'Woodbook The Devine Homestay', verified:'signed', listingReady:true, bookingMode:'roamwise', supportEmail:'support@roamwise.co.in',
   propertyType:'Homestay', roomCount:5, maxGuests:14,
   photos:[
     {src:'assets/property-photos/woodbook-treehouse.webp',alt:'A-frame wooden treehouse with a balcony and the cottage beside it, Woodbook, Banjar',caption:'Treehouse \u00b7 photo from the property\u2019s own listing'},
@@ -105,7 +103,7 @@ window.RW_PARTNER_SEED = [{
      seed fields win over the live Firestore entry on merge, so contact, route and policy stay in the partner admin.
      Photos: supplied by the founder on 16 Oct 2026 for this listing under the MOU content permission (clause 12).
      Replace with the owner's own photos when received. "RoamWise Checked" is computed by RWTrust, not set here. */
-  id:'p_big_bro_hotel', cat:'stay', zone:'Almora', area:'Ghurson', name:'Big Bro Hotel', verified:'signed', listingReady:true,
+  id:'p_big_bro_hotel', cat:'stay', zone:'Almora', area:'Ghurson', name:'Big Bro Hotel', verified:'signed', listingReady:true, bookingMode:'roamwise',
   /* Long stays (MOU Annexure A1 / Schedule B B3): 15 nights Rs 30,000; 1 month Rs 50,000; 3 months Rs 1,50,000 in total
      (Rs 50,000 a month); 4 rooms; minimum 15 nights. Owner told the founder on 17 Oct 2026: Wi-Fi 100 Mbps, inverter backup. Owner confirmed the inverter covers the rooms (backup 'full'), a desk and chair
      and a quiet spot for calls exist. No guest kitchen and no shared work area; meals means the paid hotel restaurant, not included in the rate. verified:false until a speed test is on file. */
@@ -124,7 +122,7 @@ window.RW_PARTNER_SEED = [{
   id:'p_corbett_jungle_view', cat:'stay', zone:'Lansdowne', area:'Ghildiyal Gaon, P.O. Bansi, Pauri Garhwal 246155',
   name:'Corbett Jungle View Homestay', verified:'founder-approved', listingReady:true,
   founderApproval:'Mohit Pandey · 2026-10-18', enquiryOnly:true, ownerMouAccepted:false,
-  bookingMode:'whatsapp', bookingWhatsapp:'917037365263', bookingPhone:'919867012129',
+  bookingMode:'roamwise',
   supportEmail:'support@roamwise.co.in', propertyType:'Family homestay', roomCount:6, maxGuests:12,
   badges:['founder'],
   mapsUrl:'https://www.google.com/maps/search/?api=1&query=Corbett+Jungle+View+Homestay+Ghildiyal+Gaon+Bansi+Lansdowne',
@@ -134,9 +132,35 @@ window.RW_PARTNER_SEED = [{
   ],
   videoUrl:'https://www.youtube.com/shorts/g_Nl3QI5HOo',
   instagramUrl:'https://www.instagram.com/reel/DZXJj9ATtyB/',
-  hook:'A peaceful six-bedroom homestay in Ghildiyal Gaon near Bansi, in the Lansdowne region. Public listings mention attached bathrooms, Wi-Fi, kitchen access and parking. Ask owner Rekha Shastri on WhatsApp to confirm rooms, meals, rates and timings. Founder-introduced; enquiries only, property agreement pending.'
+  hook:'A peaceful six-bedroom homestay in Ghildiyal Gaon near Bansi, in the Lansdowne region. Public listings mention attached bathrooms, Wi-Fi, kitchen access and parking. Hosted by owner Rekha Shastri; RoamWise confirms rooms, meals, rates and timings for your dates. Founder-introduced; enquiries only, property agreement pending.'
 
-}];
+},
+  /* Amor Hospitality supplied rate sheets & galleries 6 Nov 2026. These are
+     INTERNAL INTAKE records, not approved listings: no signed MOU, no photo
+     redistribution approval on file, no inventory hold or checkout approval.
+     No net rates or sales-manager contacts should appear in public scripts. */
+  {id:'p_amor_tattwaa',cat:'stay',zone:'Jim Corbett',area:'Sitabani Gate, Bhalon',
+   name:'The Tattwaa Corbett Spa & Resort',propertyType:'Forest resort',roomCount:60,
+   verified:'founder-approved',listingReady:true,founderApproval:'Mohit Pandey · 2026-11-06',enquiryOnly:true,bookingMode:'enquiry',supportEmail:'support@roamwise.co.in',
+   website:'https://www.tattwaa.com/',
+   heroImage:'https://assets.simplotel.com/simplotel/image/upload/w_5000,h_3693/x_0,y_568,w_5000,h_2813,r_0,c_crop,q_80,fl_progressive/w_1650,c_fit,f_auto/the-tattwaa-corbett-spa-resort/SHOT_BY_AUG_-_2024_71_ifbgth', photos:[{src:'https://assets.simplotel.com/simplotel/image/upload/w_5000,h_3693/x_0,y_568,w_5000,h_2813,r_0,c_crop,q_80,fl_progressive/w_1650,c_fit,f_auto/the-tattwaa-corbett-spa-resort/SHOT_BY_AUG_-_2024_71_ifbgth',alt:'Official Tattwaa Corbett resort photograph'}], hook:'Forest resort near Sitabani Gate with spa, pool, group and event facilities. Rates and partnership approval pending.'},
+  {id:'p_amor_nanau',cat:'stay',zone:'Jim Corbett',area:'Patkote Road, Sitabani Gate',
+   name:'Nanau Resort & Spa',propertyType:'Boutique forest retreat',roomCount:23,
+   verified:'founder-approved',listingReady:true,founderApproval:'Mohit Pandey · 2026-11-06',enquiryOnly:true,bookingMode:'enquiry',supportEmail:'support@roamwise.co.in',
+   website:'https://nanauresort.com/',
+   heroImage:'https://nanauresort.com/wp-content/uploads/2026/01/20.jpg', photos:[{src:'https://nanauresort.com/wp-content/uploads/2026/01/20.jpg',alt:'Official Nanau Resort resort photograph'}], hook:'Pet-friendly boutique retreat with spa and selected plunge-pool rooms. Enquiry only; commercial approval pending.'},
+  {id:'p_amor_padma',cat:'stay',zone:'Manali',area:'Naggar Road',
+   name:'Padma Villa — Private Mountain Estate',propertyType:'Luxury villa',roomCount:6,
+   verified:'founder-approved',listingReady:true,founderApproval:'Mohit Pandey · 2026-11-06',enquiryOnly:true,bookingMode:'enquiry',supportEmail:'support@roamwise.co.in',
+   instagramUrl:'https://www.instagram.com/padmavillamanali/',
+   /* No property photo yet: cards render as text until Amor sends one we may use. */
+   hook:'Six-key boutique mountain villa for small groups, with select jacuzzi and bath-tub suites. Enquiry only; terms pending.'},
+  {id:'p_amor_aramness',cat:'stay',zone:'Gir',area:'Gir National Park, Gujarat',
+   name:'Aramness Gir',propertyType:'Luxury wilderness retreat',
+   heroImage:'https://assets.simplotel.com/simplotel/image/upload/x_0,y_39,w_1970,h_1970,r_0,c_crop,q_80,fl_progressive/w_550,f_auto,c_fit/aramness/Kothis,_Aramness_Gallery_24', photos:[{src:'https://assets.simplotel.com/simplotel/image/upload/x_0,y_39,w_1970,h_1970,r_0,c_crop,q_80,fl_progressive/w_550,f_auto,c_fit/aramness/Kothis,_Aramness_Gallery_24',alt:'Aramness Gir Kothi exterior, official property gallery'}],
+   verified:'founder-approved',listingReady:true,founderApproval:'Mohit Pandey · 2026-11-06',enquiryOnly:true,bookingMode:'enquiry',supportEmail:'support@roamwise.co.in',
+   hook:'Luxury private-pool Kothis near Gir National Park. Partner rate sheet received; final listing terms pending.'}
+];
 
 /* Commission model — what we actually earn, stated plainly for both sides. */
 window.RW_PARTNER_MODEL = {

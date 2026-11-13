@@ -31,7 +31,7 @@ function rwCardArt(x){
 }
 function rwListingPhotoUrl(src){
   if(typeof rwUploadedPhotoOk==='function'&&rwUploadedPhotoOk(src)) return src;
-  return typeof src==='string'&&/^assets\/property-photos\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/i.test(src)?src:'';
+  if(typeof src==='string'&&/^assets\/property-photos\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/i.test(src))return src;try{var u=new URL(src);if(u.protocol==='https:'&&['assets.simplotel.com','nanauresort.com'].includes(u.hostname))return u.href;}catch(e){}return '';
 }
 function rwListingAttr(value){
   return esc2(value).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -113,7 +113,7 @@ function rwTrustBlock(x){
   if(!ok.length) return '';
   return '<div class="lst-confirm" style="margin-top:10px"><b>What RoamWise checked</b><br>'
     + ok.map(function(c){ return '\u2713 '+esc2(c.label); }).join('<br>')
-    + '<br><i>Automatic paperwork check, not an inspection. Always confirm rates and terms with the property.</i></div>';
+    + '<br><i>Automatic paperwork check, not an inspection. RoamWise confirms rates and terms before you pay.</i></div>';
 }
 function rwListOpen(id){
   var all=rwListingAll();
