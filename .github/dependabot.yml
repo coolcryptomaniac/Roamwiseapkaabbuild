@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    ignore:
+      # @capacitor-firebase/authentication 8.x needs firebase ^12; a firebase 13 bump broke every APK/AAB build (5-13 Nov 2026).
+      - dependency-name: "firebase"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
