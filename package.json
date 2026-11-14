@@ -13,7 +13,7 @@
     "android:prepare": "npm run web:refresh && npx cap sync android"
   },
   "dependencies": {
-    "@capacitor/android": "^8.5.3",
+    "@capacitor/android": "^8.6.0",
     "@capacitor/ios": "^8.6.0",
     "@capacitor/core": "^8.5.3",
     "@capacitor/geolocation": "^8.2.4",
