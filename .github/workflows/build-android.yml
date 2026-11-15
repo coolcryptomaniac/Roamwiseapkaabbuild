@@ -227,9 +227,6 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Install native browser handoff plugin for this build
-        run: npm install --no-save --no-package-lock --no-audit --no-fund @capacitor/browser@^8.0.0
-
       - name: Recreate Android platform
         shell: bash
         run: |
@@ -249,28 +246,34 @@ jobs:
           }
           GRADLE
 
-      - name: Wire Firebase google-services.json for native Google sign-in
+      # Without google-services.json the native Firebase app never starts. The
+      # Google sign-in plugin then fails to load ("needs the latest app build")
+      # and turning on notifications crashes the app. This step was dropped by
+      # mistake in #60; a release build must never ship without it again.
+      - name: Configure native Firebase for release builds
         shell: bash
         env:
           GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
-          UPLOAD_SHA1: 'FF:81:A4:C5:7E:F0:FD:0B:CB:C5:2B:A6:5F:A1:FE:12:B6:2B:E4:F8'
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          # Source: the Actions secret (preferred) or a google-services.json in the repo root.
-          if [ -n "${GOOGLE_SERVICES_JSON_B64:-}" ]; then
+          if [[ -n "${GOOGLE_SERVICES_JSON_B64:-}" ]]; then
             printf '%s' "$GOOGLE_SERVICES_JSON_B64" | base64 -di > android/app/google-services.json
-          elif [ -f google-services.json ]; then
+          elif [[ -f google-services.json ]]; then
             cp google-services.json android/app/google-services.json
-          else
-            echo "::warning title=Google sign-in not configured::No google-services.json (secret GOOGLE_SERVICES_JSON_B64 or repo-root file). This build works, but Continue with Google will not. See NATIVE-GOOGLE-SIGNIN-SETUP.md."
+          elif [[ "$EVENT_NAME" == "pull_request" ]]; then
+            echo "::warning::Native Firebase configuration is not available to this PR build; compilation is still verified."
             exit 0
+          else
+            echo "::error::The Android app needs google-services.json. Add GOOGLE_SERVICES_JSON_B64 as a repository secret or commit the Firebase Android config at the repository root."
+            exit 1
           fi
-          # A file that is present but wrong (other project, missing Web client, missing upload or Play SHA-1) stops the build:
-          # shipping it would give users a Google button that fails on their phone.
           node scripts/validate-google-services.mjs android/app/google-services.json \
-            --project roamwisepro --package com.gyanverse.roamwise \
-            --sha1 "$UPLOAD_SHA1" --sha1 "$PLAY_APP_SIGNING_SHA1"
-          grep -q "com.google.gms.google-services" android/app/build.gradle || { echo '::error::The Android project does not apply the google-services Gradle plugin.'; exit 1; }
+            --project roamwisepro \
+            --package com.gyanverse.roamwise \
+            --sha1 'FF:81:A4:C5:7E:F0:FD:0B:CB:C5:2B:A6:5F:A1:FE:12:B6:2B:E4:F8' \
+            --sha1 "$PLAY_APP_SIGNING_SHA1"
+          echo "NATIVE_FIREBASE_CONFIGURED=1" >> "$GITHUB_ENV"
 
       - name: Verify native Google authentication plugin
         shell: bash
@@ -420,6 +423,15 @@ jobs:
           test -s "$APK"
           test -s "$AAB"
           test -s "$MAPPING"
+          # The Firebase app id must be compiled into the release, or Google
+          # sign-in and push notifications break on the device.
+          if [[ "${NATIVE_FIREBASE_CONFIGURED:-}" == "1" ]]; then
+            grep -rqs 'google_app_id' android/app/build/generated/res || {
+              echo "::error::google-services.json was not applied to the release build."; exit 1; }
+            grep -q 'Browser' android/app/src/main/assets/capacitor.plugins.json || \
+              grep -q 'capacitorjs.plugins.browser' android/app/src/main/assets/capacitor.plugins.json || {
+              echo "::error::The Browser plugin is missing from the Android build."; exit 1; }
+          fi
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner -print | sort -V | tail -n 1)
           test -x "$APKSIGNER"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
