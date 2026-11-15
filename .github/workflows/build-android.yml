@@ -249,6 +249,29 @@ jobs:
           }
           GRADLE
 
+      - name: Wire Firebase google-services.json for native Google sign-in
+        shell: bash
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+          UPLOAD_SHA1: 'FF:81:A4:C5:7E:F0:FD:0B:CB:C5:2B:A6:5F:A1:FE:12:B6:2B:E4:F8'
+        run: |
+          set -euo pipefail
+          # Source: the Actions secret (preferred) or a google-services.json in the repo root.
+          if [ -n "${GOOGLE_SERVICES_JSON_B64:-}" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON_B64" | base64 -di > android/app/google-services.json
+          elif [ -f google-services.json ]; then
+            cp google-services.json android/app/google-services.json
+          else
+            echo "::warning title=Google sign-in not configured::No google-services.json (secret GOOGLE_SERVICES_JSON_B64 or repo-root file). This build works, but Continue with Google will not. See NATIVE-GOOGLE-SIGNIN-SETUP.md."
+            exit 0
+          fi
+          # A file that is present but wrong (other project, missing Web client, missing upload or Play SHA-1) stops the build:
+          # shipping it would give users a Google button that fails on their phone.
+          node scripts/validate-google-services.mjs android/app/google-services.json \
+            --project roamwisepro --package com.gyanverse.roamwise \
+            --sha1 "$UPLOAD_SHA1" --sha1 "$PLAY_APP_SIGNING_SHA1"
+          grep -q "com.google.gms.google-services" android/app/build.gradle || { echo '::error::The Android project does not apply the google-services Gradle plugin.'; exit 1; }
+
       - name: Verify native Google authentication plugin
         shell: bash
         run: |
@@ -256,7 +279,7 @@ jobs:
           test -d node_modules/@capacitor-firebase/authentication
           node scripts/inject-android-bridge.cjs
           node --check www/android-bridge.js
-          node --test scripts/test-android-navigation.mjs
+          node --test scripts/test-android-navigation.mjs scripts/test-google-services-config.mjs
 
       - name: Sync refreshed web assets into Android
         run: npx cap sync android
