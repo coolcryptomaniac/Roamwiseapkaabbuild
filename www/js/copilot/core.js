@@ -1,41 +1,8 @@
 // @ts-nocheck
-/* ==================== COPILOT: CORE (chat + parser + intent memory + world resolver) ====================
-   Extracted verbatim from app.js (Phase 4b modularization).
-   This is deliberately ONE file, not the five originally proposed
-   (chat.js / web-lookup.js / intent-memory.js) — the deterministic-parser
-   copilot core is one interleaved ~890-line block (Phase 4a's finding,
-   re-verified for Phase 4b): cpParseRegex() calls into the mini-web-lookup
-   helpers (rwKnownMap/rwScanKnown/rwFuzzyPlace) dozens of times, the World
-   Place Resolver's rwKnownMap() is itself built from cpParseRegex's own
-   known-place data, and copilotSend() drives the whole thing end to end.
-   Splitting these three "modules" into separate files would not reduce
-   coupling, only scatter it — so per the phase-4b brief's explicit
-   allowance, it ships as one file, well under the 1000-line hard cap.
-   Contains, in source order:
-     - AI TRAVEL COPILOT: openCopilot/cpFocusHero/closeCopilot/cpClearChat/
-       cpBubble/cpModelChips, cpDbFind/cpSmartAnswer, rolling chat memory
-       (rwRemember/rwRecall/rwAskedBefore), the deterministic parser
-       (cpParseRegex) and copilotSend() itself.
-     - SELF-IMPROVING INTENT MEMORY (rwLearnIntent/rwUserProfile).
-     - MINI WEB LOOKUP (rwMiniSearch/rwWebAnswerHTML + the known-place /
-       fuzzy-match helpers cpParseRegex depends on).
-     - WORLD GEOCODER + WORLD PLACE RESOLVER (rwGeocode/rwVerifyDest,
-       RW_PLACE_OVERRIDES/rwResolvePlace).
-   LOAD-ORDER NOTE: this file contains app.js's original top-level
-   `if(lsGet('rw_keep_chat')==='1'){...} else {...}` init block, which
-   executes at PARSE TIME (not from inside a function). That is exactly the
-   class of hazard Phase 4a flagged — moving it into a module that loads
-   BEFORE app.js used to risk a ReferenceError if lsGet/lsSet weren't yet
-   defined. That is now resolved structurally: js/core/storage-utils.js
-   (a true leaf utility, zero dependencies) loads first in index.html,
-   before this file and before app.js, so lsGet/lsSet are always already
-   defined by the time this runs, regardless of relative order. Every other
-   cross-reference in this file (cpDbFind, DB, rwDetectState,
-   rwDetectCountry, RW_COMMON_WORDS, aiCallAny, cpFinish, cpActionsHTML,
-   rwTuskAsk, rwMasalaWrap, tkSmalltalk, rwLearn, wvGuide, CITY_NAME_FIXUPS,
-   RW_HOME_CC, etc.) is a normal function-body reference resolved at call
-   time, long after every script on the page — including app.js — has
-   finished loading, so none of them are order-sensitive. ==== */
+/* Ailon Tusk core: chat, cpParseRegex intent/context, search and geocoder.
+   Depends on storage-utils.js loading first; other globals resolve at runtime.
+   Planning-first reply routing lives in itinerary-rescue.js and user-memory.js.
+   Keep private queries out of public search fallback. */
 /* ==================== AI TRAVEL COPILOT ====================
    One box, natural language, no menus: "Reaching Manali tomorrow, rain
    expected, find a cafe to work from, bus back to Delhi Sunday, keep it
@@ -272,7 +239,12 @@ function cpSmartAnswer(t){ if(t===window.rwTripAiFor && window.RWTripDesk && RWT
     var out='<b>'+hit.name+'</b> · '+hit.country+' ('+hit.region+')';
     var dm=t.match(/(\d+)\s*[- ]?\s*day/i),nd=dm?parseInt(dm[1],10):0;
     out+=costLine(hit,nd);
-    if(hit.visa) out+='<br>🛂 '+hit.visa.type+' · '+hit.visa.cost+' · '+hit.visa.days+' days'+(hit.visa.note? ' — '+hit.visa.note:'');
+    // Visa processing-duration metadata is NOT the user's requested trip length.
+    // For domestic cities do not render a confusing "0 days" line.
+    if(hit.visa && hit.country==='India' && hit.visa.type==='None')
+      out+='<br>🛂 Domestic travel within India · no international visa needed for Indian travellers (check any applicable local entry rules)';
+    else if(hit.visa)
+      out+='<br>🛂 Visa/entry requirements must be checked with official authorities for your nationality and travel dates.';
     if(best) out+='<br>📅 Best months: '+best;
     if(low) out+=' · quietest: <b>'+low+'</b>';
     out+='<br><span style="font-size:10.5px;color:var(--t3)">Planning estimates, not live bookable prices. Compare exact dates and inclusions before paying.</span>';
@@ -286,13 +258,17 @@ function cpSmartAnswer(t){ if(t===window.rwTripAiFor && window.RWTripDesk && RWT
    CORS-open. NOT Google crawling (blocked + against ToS); the card links out to
    full Google / DuckDuckGo results in one tap, which covers the same need. */
 async function rwMiniSearch(q){
+  // All providers below are public, including Wikipedia and DuckDuckGo.
+  // Never transmit sensitive queries even when the Worker rejects them.
+  if(typeof rwTuskIsPublicQuery!=='function'||!rwTuskIsPublicQuery(q))return null;
   q=String(q||'').slice(0,140);
   var out={abs:null, absSrc:null, absUrl:null, hits:[]};
   var jobs=[];
+  jobs.push(rwTuskWorkerSearch(q,out));
   jobs.push(fetch('https://api.duckduckgo.com/?q='+encodeURIComponent(q)+'&format=json&no_html=1&skip_disambig=1')
     .then(function(r){return r.json();}).then(function(d){
       var a=d.AbstractText||d.Answer||d.Definition||'';
-      if(a){ out.abs=String(a).slice(0,420); out.absSrc=d.AbstractSource||'DuckDuckGo'; out.absUrl=d.AbstractURL||''; }
+      if(a && !out.trustedSummary){ out.abs=String(a).slice(0,420); out.absSrc=d.AbstractSource||'DuckDuckGo'; out.absUrl=d.AbstractURL||''; }
       (d.RelatedTopics||[]).slice(0,3).forEach(function(x){
         if(x && x.Text && x.FirstURL) out.hits.push({t:String(x.Text).slice(0,110), u:x.FirstURL, s:'DDG'});
       });
@@ -310,30 +286,41 @@ async function rwMiniSearch(q){
   try{ await Promise.all(jobs); }catch(e){ /* best-effort, ignore */ }
   return (out.abs || out.hits.length) ? out : null;
 }
-function rwWebAnswerHTML(q, res){
+function rwWebAnswerHTML(q,res){
+  // Public web matches are leads for verification, not a model-certified answer.
+  // Keep links explicitly HTTPS and render useful swipeable source cards.
   var g='https://www.google.com/search?q='+encodeURIComponent(q);
   var dd='https://duckduckgo.com/?q='+encodeURIComponent(q);
-  var out='<div class="tk-card"><div class="tk-head" style="background:linear-gradient(150deg,#1E3A5F,#0A1628)">'
-    +'<div class="tk-place">🔎 Web lookup</div>'
-    +'<div class="tk-meta">Free open sources · “'+esc2(String(q).slice(0,70))+'”</div></div>'
-    +'<div class="tk-sec">';
-  if(res.abs){
-    out+='<div style="font-size:12.5px;line-height:1.65;color:var(--t2)">'+esc2(res.abs)+'</div>'
-      +'<div style="font-size:10.5px;color:var(--t3);margin-top:4px">Source: '+esc2(res.absSrc||'web')
-      +(res.absUrl? ' · <a href="'+res.absUrl+'" target="_blank" rel="noopener" style="color:var(--gold,#E8BA6C)">open</a>':'')+'</div>';
+  function safe(url){
+    try{var u=new URL(String(url||''));return u.protocol==='https:'?u.href:'';}catch(e){return '';}
   }
-  if(res.hits.length){
-    out+='<div class="tk-lab" style="margin-top:9px">Top matches</div>'
-      + res.hits.slice(0,4).map(function(h){
-          return '<div class="tk-bul"><a href="'+h.u+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline dotted">'+esc2(h.t)+'</a> <span style="color:var(--t3);font-size:10px">'+esc2(h.s)+'</span></div>';
-        }).join('');
+  var summary=String(res&&res.abs||'').slice(0,650);
+  var hits=Array.isArray(res&&res.hits)?res.hits.filter(function(hit){return safe(hit.u);}).slice(0,6):[];
+  var out='<div class="tk-card rw-search-results"><div class="tk-head" style="background:linear-gradient(140deg,#273052,#151f36)"><div class="tk-place">🔎 Sources to explore</div>'
+    +'<div class="tk-meta">Public web results · '+esc2(String(q).slice(0,85))+'</div></div><div class="tk-sec">';
+  if(summary){
+    out+='<div style="font-size:12.5px;line-height:1.65;margin-bottom:8px">'+esc2(summary)+'</div>'
+      +'<div style="font-size:11px;color:var(--t3)">Context from '+esc2(res.absSrc||'open sources')
+      +(safe(res.absUrl)?' · <a href="'+esc2(safe(res.absUrl))+'" target="_blank" rel="noopener noreferrer">Read original ↗</a>':'')+'</div>';
   }
-  out+='<div class="tk-chips" style="margin-top:10px">'
-    +'<a class="tk-chip" style="text-decoration:none" target="_blank" rel="noopener" href="'+g+'">🌐 Full Google results</a>'
-    +'<a class="tk-chip" style="text-decoration:none" target="_blank" rel="noopener" href="'+dd+'">🦆 DuckDuckGo</a>'
-    +'</div>'
-    +'<div style="font-size:10px;color:var(--t3);margin-top:7px">Wikipedia + DuckDuckGo open APIs — no key, nothing tracked.</div>'
-    +'</div></div>';
+  if(res.checkedAt)out+='<p style="font-size:11px;color:var(--t3)">Curated source last reviewed: '+esc2(String(res.checkedAt))+'</p>';
+  if(res.liveVerificationRequired)out+='<p style="font-size:11px;color:var(--gold,#E8BA6C)">Background guidance only — check live prices, dates, availability or service status with the official operator.</p>';
+  if(hits.length){
+    out+='<div style="font-size:11px;letter-spacing:.05em;font-weight:800;margin-top:12px">Swipe verified links — read the underlying pages before relying on them</div>'
+      +'<div data-rw-carousel="sources" role="list" aria-label="Search sources" tabindex="0" style="display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:10px;padding:10px 1px 12px;-webkit-overflow-scrolling:touch">'
+      +hits.map(function(h){
+        var u=safe(h.u),name='';
+        try{name=new URL(u).hostname.replace(/^www\./,'');}catch(e){name='source';}
+        return '<a role="listitem" href="'+esc2(u)+'" target="_blank" rel="noopener noreferrer" style="flex:0 0 clamp(184px,68vw,248px);min-height:118px;border:1px solid #e2b4ff55;border-radius:14px;background:linear-gradient(145deg,#211b3f,#102d35);padding:13px;scroll-snap-align:start;color:#f5efff;text-decoration:none">'
+          +'<span style="font-size:10px;color:#eecb8f;display:block;margin-bottom:6px">'+esc2(name)+' · '+esc2(String(h.s||'web'))+'</span>'
+          +'<b style="font-size:12.5px;line-height:1.45;display:block">'+esc2(String(h.t||'Open source').slice(0,195))+'</b>'
+          +'<span style="font-size:11px;color:#b9dce4;display:block;margin-top:9px">Open source ↗</span></a>';
+      }).join('')+'</div>';
+  }
+  if(!hits.length&&!summary)out+='<p>Search providers returned no confirmed matches. Try a more precise public question or use an official organiser website.</p>';
+  out+='<div class="tk-chips" style="margin-top:9px"><a class="tk-chip" style="text-decoration:none" target="_blank" rel="noopener" href="'+g+'">🌐 Google Search ↗</a>'
+    +'<a class="tk-chip" style="text-decoration:none" target="_blank" rel="noopener" href="'+dd+'">DuckDuckGo ↗</a></div>'
+    +'<p style="font-size:10px;color:var(--t3);margin-top:10px">These are linked source excerpts, not independent fact-checking. Live lookup may be unavailable when the search service is not configured.</p></div></div>';
   return out;
 }
 /* One canonical known-place map: curated overrides + DB + major cities. Used by
@@ -481,7 +468,10 @@ function cpParseRegex(t){
   var RAW_T = t;
   t = String(t).replace(/^\s*(hey+|hii+|hi|hello+|helo|yo|namaste|namaskar|hola|sup|wassup|bhai|bro|dear|please|pls)\b[\s,!.]*/i, '');
   var BARE = t.replace(/[^a-z]/gi,'');
-  if(!BARE || /^(thanks?|thankyou|thx|ty|ok(ay)?|hmm+|nice|cool|great|good|wow|love(it|you)?|bye|goodbye|gn|goodnight|goodmorning|gm|noneofthese|none)$/i.test(BARE)){
+  // Hindi/Kannada voice transcripts are not empty greetings merely because
+  // their destination names use a non-Latin script.
+  var HAS_INDIC=/[\u0900-\u097f\u0c80-\u0cff]/.test(t);
+  if((!BARE&&!HAS_INDIC) || /^(thanks?|thankyou|thx|ty|ok(ay)?|hmm+|nice|cool|great|good|wow|love(it|you)?|bye|goodbye|gn|goodnight|goodmorning|gm|noneofthese|none)$/i.test(BARE)){
     var out0={dest:null,to:null,days:null,budget:null,wants:[],smalltalk: !BARE ? 'greet' : (/thank|thx|ty/i.test(BARE)?'thanks':(/bye|gn|goodnight/i.test(BARE)?'bye':(/none/i.test(BARE)?'none':'nice')))};
     return out0;
   }
@@ -805,8 +795,7 @@ async function rwResolvePlace(name){
 function copilotSend(fromHero){
   var inp = el(fromHero? 'heroInput' : 'cpInput');
   var t=(inp && inp.value||'').trim(); if(!t) return;
-  /* Search must stay quiet. The previous 10-second CTA music cue restarted on
-     every prompt and broke concentration; retain tactile feedback only. */
+  /* Keep search quiet; haptics only, no restarting music. */
   try{ if(typeof rwStopCue==='function')rwStopCue(false);if(typeof rwHaptic==='function')rwHaptic('light'); }catch(e){ /* best-effort, ignore */ }
   inp.value='';
   if(fromHero){
@@ -815,7 +804,8 @@ function copilotSend(fromHero){
     var hl=el('heroLog'); if(hl) hl.style.display='block';
   } else { _cpTargetLog='cpLog'; }
   var aiText=null; cpBubble(t.replace(/[<>]/g,''),'me');
-  /* Startup Garage / NMIMS pass questions and "I am a creator / I own a stay": fixed answers, no AI call. */
+  try{if(window.RWEventHandoff&&RWEventHandoff.answerInCopilot(t,fromHero))return;}catch(e){/* normal copilot fallback */}
+  try{var summit=window.RWSummitAtlas&&window.RWSummitAtlas.answer(t,{force:false,language:document.getElementById('rwHomeVoiceLang')?.value||'en-IN'});if(summit){var safe=String(summit.text).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});var html='<b>✦ Ailon Tusk · BTS 2026</b><p>'+safe+'</p><p><a href="/summit/">Explore summit toolkit ↗</a> · <a href="'+summit.source+'" target="_blank" rel="noopener">Official source ↗</a></p>';cpBubble(html,'bot');try{if(window.RWTuskVoiceStudio)RWTuskVoiceStudio.answer(html,t,{});}catch(e){}return;}}catch(e){/* normal copilot fallback */}
   try{
     var _nm=(typeof rwNmimsAnswer==='function')?rwNmimsAnswer(t):null;
     if(_nm){ var _nmb=cpBubble('\u2026','bot'); try{track('nmims_ailon');}catch(e){/* anonymous counter, best-effort */} rwNmimsShow(_nmb,_nm); return; }
@@ -922,23 +912,7 @@ function copilotSend(fromHero){
         +facts+(hist? 'Conversation so far:\n'+hist+'\n':'')+'User: '+(aiText||t)+'\nCopilot:';
       aiCallAny(prompt, 260, function(err, txt){
         var answer = (txt||'').trim();
-        if(!answer){
-          var kb2 = cpSmartAnswer(t) || '', _old = (kb2||!_ck) ? null : rwAnsStale(_ck); if(_old) kb2 = _old;
-          // Deterministic destination guidance; no live status implied.
-          if(!kb2 && intents && intents.dest){
-            kb2='<b>Explore '+esc2(String(intents.dest).slice(0,90))+'</b><br>Plan routes, itineraries and stay enquiries. Tell me your dates, origin, group size and budget. Verify current prices, availability, weather and roads before booking.';
-          }
-          // Offline fallback has no confirmed prices, bookings or live conditions.
-          var days=Math.max(0,Math.min(14,Math.floor(Number(intents&&intents.days)||0))),rows=[];
-          if(days&&intents&&intents.dest&&(!kb2||kb2.indexOf('<b>Explore ')===0)){
-            for(var d=1;d<=days;d++)rows.push('<p><strong>Day '+d+':</strong> '+(d===1?'Arrival and local orientation':d===days?'Checkout and return journey':d%2?'Explore a verified local attraction':'Culture, food and flexible activities')+'; verify timings and availability.</p>');
-            kb2='<h3>'+days+'-day outline for '+esc2(String(intents.dest).slice(0,90))+'</h3><p>Offline plan only. No live prices or bookings verified.</p>'+rows.join('')+'<p>Share dates, origin, group size and budget.</p>';
-          }
-          var note = (typeof rwAiDownNote==='function') ? rwAiDownNote(err, !!_old) : '<span class="rw-note">\u26a1 AI engines unreachable right now \u2014 answered by Ailon Tusk\u2019s own engine.</span>';
-          if(intents.dest) rwLearn(intents.dest);
-          cpFinish(thinking, (kb2? kb2+'<br>':'')+note, intents, t);
-          return;
-        }
+        if(!answer){ rwTuskSearchFailure(thinking,t,intents,err); return; }
         /* AI wants a clarifying question with tappable options \u2014 render real
            chips via rwTuskAsk instead of dumping "ASK: ... || a | b" as text. */
         var askM = answer.match(/^ASK:\s*(.+?)\s*\|\|\s*(.+)$/i);
