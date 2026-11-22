@@ -364,7 +364,8 @@ jobs:
           p.write_text(m)
           PY
           grep -q 'default_notification_icon' android/app/src/main/AndroidManifest.xml
-          grep -q 'ic_stat_roamwise' android/app/src/main/res/drawable/ic_stat_roamwise.xml
+          grep -q 'android:pathData' android/app/src/main/res/drawable/ic_stat_roamwise.xml
+          grep -q '@drawable/ic_stat_roamwise' android/app/src/main/AndroidManifest.xml
 
       - name: Ensure required Android permissions
         shell: bash
