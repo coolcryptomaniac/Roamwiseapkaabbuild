@@ -320,6 +320,52 @@ jobs:
       - name: Generate RoamWise icons and splash
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#07090F' --splashBackgroundColor '#07090F' || true
 
+      # Android requires a WHITE transparent status-bar silhouette, not the
+      # full-colour launcher JPEG. Trace the two Himalayan peaks from the
+      # official RoamWise mountain logo for a recognisable tiny mark.
+      # The launcher/splash artwork remains unchanged.
+      - name: Brand Android notification status icon
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p android/app/src/main/res/drawable android/app/src/main/res/values
+          cat > android/app/src/main/res/drawable/ic_stat_roamwise.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="24dp" android:height="24dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFFFF"
+                  android:pathData="M1.25,20.5 L9.9,7.25 L13.9,13.2 L17.05,9.25 L22.75,20.5 Z"/>
+          </vector>
+          XML
+          cat > android/app/src/main/res/values/rw_notifications.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources><color name="rw_notification_tint">#D9A85F</color></resources>
+          XML
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          m = p.read_text()
+          wanted = [
+              ('com.google.firebase.messaging.default_notification_icon', '@drawable/ic_stat_roamwise'),
+              ('com.google.firebase.messaging.default_notification_color', '@color/rw_notification_tint')
+          ]
+          marker = '<application'
+          for key, resource in wanted:
+              if key in m:
+                  continue
+              start = m.find(marker)
+              if start < 0:
+                  raise SystemExit('Android application element missing')
+              end = m.find('>', start)
+              if end < 0:
+                  raise SystemExit('Android application opening tag incomplete')
+              m = m[:end+1] + '\n        <meta-data android:name="' + key + '" android:resource="' + resource + '" />' + m[end+1:]
+          p.write_text(m)
+          PY
+          grep -q 'default_notification_icon' android/app/src/main/AndroidManifest.xml
+          grep -q 'ic_stat_roamwise' android/app/src/main/res/drawable/ic_stat_roamwise.xml
+
       - name: Ensure required Android permissions
         shell: bash
         run: |
