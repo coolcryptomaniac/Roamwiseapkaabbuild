@@ -43,6 +43,15 @@ function cleanCanonical(value){
  }catch(_e){}
  return null;
 }
+function placeKey(value){
+ const s=String(value||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}\p{M}]+/gu,' ').trim();
+ return s.length>=2&&s.length<=80?s:null;
+}
+async function searchPlaceIndex(db,value){
+ const key=placeKey(value);if(!key)return [];
+ const rows=await db.prepare("SELECT source_id,name,country_iso,admin_region,feature_type,source_url,attribution FROM public_place_index WHERE name_key=? ORDER BY country_iso,source_id LIMIT 7").bind(key).all();
+ return rows.results||[];
+}
 async function searchDestination(db,term){
  // Escape LIKE wildcard characters: a search term must not turn into a full table scan.
  const like='%'+term.replace(/[\\%_]/g,'\\$&')+'%';
@@ -63,6 +72,8 @@ async function getDestination(db,slug){
  WHERE slug=? AND status='published' AND indexed=1 AND human_approved_at IS NOT NULL
  AND (next_review_at IS NULL OR date(next_review_at)>=date('now')) LIMIT 1`).bind(slug).first();
  if(!approved(row))return null;
+ const sources=await db.prepare(`SELECT source_url,supports,checked_at FROM public_destination_source
+ WHERE destination_id=? AND (expires_at IS NULL OR date(expires_at)>=date('now')) LIMIT 12`).bind(row.id).all();
  const faqs=await db.prepare(`SELECT question,answer,reviewed_at FROM public_destination_faq
  WHERE destination_id=? AND status='published' AND reviewed_at IS NOT NULL
  AND (valid_until IS NULL OR date(valid_until)>=date('now')) LIMIT 12`).bind(row.id).all();
@@ -77,6 +88,7 @@ async function getDestination(db,slug){
  return {id:row.id,slug:row.slug,name:row.name,country:row.country_iso,
  region:row.region||null,summary:row.summary||'',url:cleanCanonical(row.canonical_url),
  humanReviewedAt:row.human_approved_at,sourceCheckedAt:row.source_checked_at,
+ sources:(sources.results||[]).filter(s=>{try{const u=new URL(s.source_url);return u.protocol==='https:'&&!u.username&&!u.password&&s.checked_at;}catch(_){return false;}}).map(s=>({url:s.source_url,supports:s.supports,checkedAt:s.checked_at})),
  faq:(faqs.results||[]).map(x=>({question:x.question,answer:x.answer,reviewedAt:x.reviewed_at})),
  itineraries:items,pricesVerified:false,availabilityVerified:false};
 }
@@ -108,8 +120,10 @@ async function getMediaIndex(db,env){
 }
 async function getMedia(db,bucket,id){
  if(!/^[a-zA-Z0-9_-]{1,96}$/.test(id))return new Response('Not found',{status:404});
- const row=await db.prepare(`SELECT id,r2_key,mime_type,size_bytes,rights_status,license_proof,status,reviewed_at,published_at,alt_text
- FROM public_destination_media WHERE id=? LIMIT 1`).bind(id).first();
+ const row=await db.prepare(`SELECT m.id,m.r2_key,m.mime_type,m.size_bytes,m.rights_status,m.license_proof,m.status,m.reviewed_at,m.published_at,m.alt_text
+ FROM public_destination_media m JOIN public_destination d ON d.id=m.destination_id
+ WHERE m.id=? AND d.status='published' AND d.indexed=1 AND d.human_approved_at IS NOT NULL
+ AND (d.next_review_at IS NULL OR date(d.next_review_at)>=date('now')) LIMIT 1`).bind(id).first();
  if(!mediaApproved(row))return new Response('Not found',{status:404});
  const file=await bucket.get(row.r2_key);
  if(!file||file.size>4*1024*1024)return new Response('Not found',{status:404});
@@ -135,6 +149,11 @@ export default {
     const q=safeQuery(url.searchParams.get('q'));
     if(!q)return response({error:'query_must_be_2_to_80_characters'},400,headers);
     return response({version:1,items:await searchDestination(env.PUBLIC_KNOWLEDGE_DB,q),liveBooking:false},200,headers);
+   }
+   if(path==='/v1/places'){
+    const q=safeQuery(url.searchParams.get('q'));
+    if(!q)return response({error:'invalid_place'},400,headers);
+    return response({version:1,kind:'geographic-reference',items:await searchPlaceIndex(env.PUBLIC_KNOWLEDGE_DB,q),liveBooking:false},200,headers);
    }
    if(path==='/v1/media-manifest')return response(await getMediaIndex(env.PUBLIC_KNOWLEDGE_DB,env),200,headers);
    const dest=path.match(/^\/v1\/destinations\/([a-z0-9-]+)$/);

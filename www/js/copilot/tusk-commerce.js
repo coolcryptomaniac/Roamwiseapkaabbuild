@@ -10,7 +10,7 @@
  var safeId=/^[a-z0-9-]{1,80}$/;
  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
  function rupees(paise){return '₹'+(Number(paise||0)/100).toLocaleString('en-IN',{maximumFractionDigits:2});}
- function money(inr){return '₹'+Math.round(Number(inr)||0).toLocaleString('en-IN');}
+ function money(inr){return '₹'+(Number(inr)||0).toLocaleString('en-IN',{maximumFractionDigits:2});}
  function allowedQuery(q){
    if(typeof rwTuskIsPublicQuery!=='function'||!rwTuskIsPublicQuery(q))return false;
    return !/\b(?:emergency|ambulance|police|sos|assault|suicide|self harm|medical|injury|landslide|missing person|scam|fraud|otp|password)\b|आपातकाल|इमरजेंसी|मदद चाहिए/i.test(q||'');
@@ -19,7 +19,7 @@
    q=String(q||'').toLowerCase();
    if(!allowedQuery(q))return '';
    if(/\b(?:hoodie|tote|headband|shop|merch|merchandise|buy a|buy the|gift|souvenir|shopping|aipan shirt|t-shirt)\b|हुडी|खरीदना|शॉप|उपहार/i.test(q))return 'shop';
-   if(/\b(?:trek|trekking|hiking|guide|hike)\b|ट्रेक|ट्रेकिंग/i.test(q))return 'treks';
+   if(/\b(?:trek|trekking|hiking|trek guide|hike)\b|ट्रेक|ट्रेकिंग/i.test(q))return 'treks';
    if(/\b(?:package|packages|honeymoon|wedding|holiday deal|family holiday|resort package|tour package)\b|पैकेज|हनीमून|शादी/i.test(q))return 'packages';
    if(/\b(?:hotel|homestay|room|resort|stay|book a villa|book a cottage|accommodation)\b|होटल|होमस्टे|कमरा|रुकना/i.test(q))return 'stays';
    return '';
@@ -34,10 +34,20 @@
     .then(function(data){cache[path]={time:Date.now(),data:data};return data;})
     .finally(function(){if(timer)clearTimeout(timer);});
  }
- function items(kind,data,q){
-   // Never put an unrelated Manali offer under a query for another city.
-   var destination=String(q||'').toLowerCase().match(/\b(?:manali|almora|corbett|gir|nainital|ranikhet|kasar devi|tirthan|lansdowne|delhi|mumbai|goa|bengaluru|jaipur|paris|london|zurich|kathmandu)\b/);
-   destination=destination?destination[0]:'';
+ function scopeFor(q,intents){
+   var d=typeof rwLocalAtlasRecord==='function'?rwLocalAtlasRecord(q,intents):null;
+   if(d)return d.id==='coorg'?'Coorg':d.name;
+   if(intents&&(intents.multi||intents._route||intents._weakDest||intents._needsPlaceVerification))return null;
+   if(intents&&intents.dest)return String(intents.dest).slice(0,100);
+   var m=String(q||'').match(/\b(?:manali|almora|corbett|gir|nainital|ranikhet|kasar devi|tirthan|lansdowne|delhi|mumbai|goa|coorg|bengaluru|jaipur|paris|london|zurich|kathmandu)\b/i);
+   return m?m[0]:'';
+ }
+ function placeMatch(value,scope){
+   var norm=function(x){return String(x||'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();};
+   return !!scope&&(' '+norm(value)+' ').includes(' '+norm(scope)+' ');
+ }
+ function items(kind,data,q,scope){
+   var destination=scope;
    var lower=String(q||'').toLowerCase();
    if(kind==='shop'){
      var all=Array.isArray(data.products)?data.products:[];
@@ -47,7 +57,7 @@
    if(kind==='packages'){
      var packages=(Array.isArray(data.packages)?data.packages:[]).filter(function(p){return p.open!==false;});
      if(destination)packages=packages.filter(function(p){
-       return String(p.name+' '+(p.properties||[]).map(function(x){return x.name+' '+(x.place||'');}).join(' ')).toLowerCase().indexOf(destination)>-1;
+       return placeMatch(p.name+' '+(p.properties||[]).map(function(x){return x.name+' '+(x.place||'');}).join(' '),destination);
      });
      var group=/(?:honeymoon|romantic|couple|हनीमून)/i.test(q)?'honeymoon':/(?:wedding|marriage|shaadi|शादी)/i.test(q)?'wedding':'';
      if(group){var matching=packages.filter(function(p){return p.group===group||String(p.name).toLowerCase().indexOf(group)>-1;});if(matching.length)packages=matching;}
@@ -55,11 +65,19 @@
    }
    if(kind==='stays'){
      var stays=data.stays||{}, keys=Object.keys(stays);
-     var matched=keys.filter(function(id){var s=stays[id];return s&&String(s.name+' '+s.place).toLowerCase().split(/[ ,]+/).some(function(w){return w.length>3&&lower.indexOf(w)>-1;});});
+     var matched=keys.filter(function(id){var s=stays[id];return s&&(destination?placeMatch(s.name+' '+s.place,destination):String(s.name+' '+s.place).toLowerCase().split(/[ ,]+/).some(function(w){return w.length>3&&lower.indexOf(w)>-1;}));});
      if(destination&&!matched.length)return [];
      return (matched.length?matched:keys).slice(0,2).map(function(id){var s=stays[id];return {id:id,type:'stay',title:s.name,subtitle:s.place||'Check dates and availability',price:'Exact quote at checkout',buy:true};});
    }
    return [{id:'treks',type:'treks',title:'Verified treks and guides',subtitle:'Choose a departure and check operator approval, seats and price',price:'Price verified at operator checkout',buy:false}];
+ }
+ function relatedShop(data,scope){
+   var name=String(scope||'').toLowerCase().trim();
+   var kumaon=/^(almora|kasar devi|binsar|ranikhet|kausani|haldwani|nainital|bhimtal|mukteshwar|kumaon|dwarahat|sitalakhet)$/i.test(name);
+   return (Array.isArray(data.products)?data.products:[]).filter(function(p){
+     var words=String(p.name+' '+(p.description||'')).toLowerCase();
+     return placeMatch(p.name,name)||(kumaon&&/\b(?:almora|kumaon|kumaoni|aipan)\b/i.test(words));
+   }).slice(0,2).map(function(p){return {id:p.id,type:'shop',title:p.name,subtitle:'Destination-inspired merchandise · not necessarily locally made',price:rupees(p.pricePaise)+' item price · delivery quoted later',picture:p.image,buy:!!data.checkoutOpen};});
  }
  function dataFor(kind){return get(kind==='shop'?'/shop/catalogue':kind==='treks'?'/treks/catalog':'/stays/rates');}
  function cardMarkup(a){
@@ -80,16 +98,29 @@
     +'<button type="button" data-tusk-hide-offers style="border:0;background:none;color:#c9bcdc;font-size:11px;text-decoration:underline;cursor:pointer">Hide these offers</button>'
     +'<p style="font-size:10px;color:#c9bcdc;margin:5px 0 0">Listing prices are indicative; server quote, availability, booking terms and Cashfree confirmation control checkout. No booking is confirmed just by paying.</p></div></section>';
  }
+ function enquiry(scope,offline){
+   return '<section class="tk-card rw-tusk-commerce"><div class="tk-sec"><b>'+esc(scope)+' · stay and package enquiry</b><p style="font-size:12px">'+(offline?'Live catalogue could not be checked.':'No matching direct-checkout listing was returned.')+' No payment is requested until a real offer is available.</p><a class="tk-chip" href="/escapes/?zone='+encodeURIComponent(scope)+'#request-quote">Request a quote</a></div></section>';
+ }
  function cardsHTML(raw,intents){
+   var scope=scopeFor(raw,intents),destinationGuide=!!(intents&&intents._rwAllowDestinationCommerce);
    var kind=category(raw);
-   if(!kind||hidden()||(intents&&(intents.smalltalk||intents._noGenericActions||intents._offers||intents._stayDesk)))return Promise.resolve('');
-   return dataFor(kind).then(function(d){return railMarkup(kind,items(kind,d,raw));}).catch(function(){return '';});
+   if(hidden()||scope===null||(intents&&(intents.smalltalk||intents._offers||intents._stayDesk||intents._noGenericActions&&!destinationGuide)))return Promise.resolve('');
+   if(destinationGuide&&scope&&(!kind||kind==='stays'||kind==='packages')){
+     if(!allowedQuery(String(raw).length<5?'Guide to '+raw:raw))return Promise.resolve('');
+     return Promise.all([get('/stays/rates').catch(()=>null),get('/shop/catalogue').catch(()=>null)]).then(function(results){
+       var data=results[0],shop=results[1];
+       if(!data)return enquiry(scope,true)+(shop?railMarkup('shop',relatedShop(shop,scope)):'');
+       var list=items('packages',data,raw,scope).concat(items('stays',data,raw,scope));
+       return (list.length?railMarkup('destination',list):enquiry(scope,false))+(shop?railMarkup('shop',relatedShop(shop,scope)):'');
+     }).catch(function(){return enquiry(scope,true);});
+   }
+   if(!kind)return Promise.resolve('');
+   return dataFor(kind).then(function(d){var list=items(kind,d,raw,scope);return list.length?railMarkup(kind,list):scope&&(kind==='stays'||kind==='packages')?enquiry(scope,false):'';}).catch(function(){return '';});
  }
  function speakCardsInto(container,raw,intents){
-   var kind=category(raw);
-   if(!container||!kind||hidden()||(intents&&(intents._noGenericActions||intents.smalltalk)))return Promise.resolve();
-   return dataFor(kind).then(function(d){
-     var markup=railMarkup(kind,items(kind,d,raw));if(!markup)return;
+   if(!container)return Promise.resolve();
+   return cardsHTML(raw,intents).then(function(markup){
+     if(!markup)return;
      var host=document.createElement('div');host.innerHTML=markup;
      while(host.firstChild)container.appendChild(host.firstChild);
    }).catch(function(){});
@@ -191,15 +222,16 @@
    return true;
  }
  function doQuote(){
-   if(!state||busy||!readyToQuote())return Promise.resolve();
+   if(!state||busy||state.paymentAttempted||!readyToQuote())return Promise.resolve();
    var cur=state;busy=true;cur.pay.disabled=true;say('Checking the final amount with RoamWise…');
    var b=formValues(),endpoint=cur.kind==='shop'?'/shop/quote':'/stays/quote';
    return request(endpoint,cur.kind==='shop'?b:b).then(function(d){
      if(state!==cur)return;
      var q=cur.kind==='shop'?d:d.quote;
      if(!q||!Number.isFinite(Number(cur.kind==='shop'?q.totalPaise:q.amount))||Number(cur.kind==='shop'?q.totalPaise:q.amount)<=0)throw Error('Invalid quote returned');
-     if(cur.kind==='shop'&&!q.methods.cashfree){cur.quote=null;say('Cashfree is not enabled for this item. Use full shop checkout or enquiry.');return;}
-     cur.quote={body:b,amount:cur.kind==='shop'?Number(q.totalPaise):Number(q.amount),data:q,signature:JSON.stringify(b)};
+     if(cur.kind==='shop'&&(!q.methods||!q.methods.cashfree)){cur.quote=null;say('Cashfree is not enabled for this item. Use full shop checkout or enquiry.');return;}
+     if(JSON.stringify(formValues())!==JSON.stringify(b)){markDirty();return;}
+     cur.quote={expiresAt:Date.now()+5*60*1000,body:b,amount:cur.kind==='shop'?Number(q.totalPaise):Number(q.amount),data:q,signature:JSON.stringify(b)};
      var full=cur.kind==='shop'?rupees(q.totalPaise):money(q.amount);
      var total=cur.kind==='shop'?' (including '+rupees(q.shippingPaise)+' delivery)':' · total '+(q.total!=null?money(q.total):'to be confirmed');
      cur.details.textContent='Pay now '+full+total+'. Availability / supplier acceptance is not guaranteed by payment.';
@@ -225,9 +257,9 @@
      }).catch(function(){if(state===cur)say('Payment status unavailable. Do not pay again; contact RoamWise with reference '+id);});
  }
  function doPay(){
-   if(!state||busy||!state.quote||!validForm())return Promise.resolve();
+   if(!state||busy||state.paymentAttempted||!state.quote||!validForm())return Promise.resolve();
    var cur=state,b=formValues();
-   if(JSON.stringify(b)!==cur.quote.signature){markDirty();return Promise.resolve();}
+   if(Date.now()>=cur.quote.expiresAt||JSON.stringify(b)!==cur.quote.signature){markDirty();return Promise.resolve();}
    busy=true;cur.pay.disabled=true;say('Creating a secure Cashfree session…');
    var amount=cur.quote.amount, payload;
    if(cur.kind==='shop'){
@@ -236,6 +268,8 @@
    }else{
      payload=Object.assign({},b,{email:cur.form.elements.email.value.trim(),phone:cur.form.elements.phone.value.trim(),shareWithSupplier:cur.form.elements.shareWithSupplier.checked});
    }
+   payload.expectedAmountPaise=cur.kind==='shop'?amount:Math.round(amount*100);
+   cur.paymentAttempted=true;
    return request(cur.kind==='shop'?'/shop/order':'/stays/checkout',payload).then(function(d){
      if(state!==cur)return;
      var sent=cur.kind==='shop'?Number(d.totalPaise):Number(d.quote&&d.quote.amount);
@@ -243,6 +277,8 @@
      var session=cur.kind==='shop'?d.payment_session_id:d.paymentSessionId;
      if(!session||!d.orderId)throw Error('Payment session missing. Check your order before retrying.');
      var id=String(d.orderId),token=String(d.token||'');
+     cur.orderRef=id;
+     var statusButton=el('button','Check payment status');statusButton.type='button';statusButton.onclick=function(){checkStatus(cur,id,token);};cur.form.appendChild(statusButton);
      if(cur.kind==='shop'&&token){try{localStorage.setItem('rwShopOrder.'+id,token);}catch(e){}}
      cur.details.textContent='Reference '+id+'. Cashfree securely handles the payment. Do not initiate a second charge until this order is checked.';
      say('Opening Cashfree secure payment window…');

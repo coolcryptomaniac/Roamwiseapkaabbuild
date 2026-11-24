@@ -45,30 +45,25 @@ function rwTuskRailContext(raw){
 }
 
 function rwTuskRail(dest, raw){
-  var d = (dest||'').replace(/'/g, "\\'");
-  var q = (raw||'').replace(/'/g, "\\'").slice(0,120);
-  function btn(icon,label,fn){
-    return '<button class="rw-rail-btn" onclick="'+fn+'"><span>'+icon+'</span>'+label+'</button>';
+  var d=String(dest||'').slice(0,120), q=String(raw||'').slice(0,120), topic=rwTuskRailContext(raw);
+  function attr(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function arg(v){return JSON.stringify(v);}
+  function btn(icon,label,fn){return '<button class="rw-rail-btn" onclick="'+attr(fn)+'"><span>'+icon+'</span>'+label+'</button>';}
+  var h='<div class="rw-rail"><div class="rw-rail-h">Useful next steps</div>';
+  if(d&&topic==='general'){
+    h+=btn('🗺️','Map','openTripMap('+arg(d)+',null)');
+    h+=btn('🗓️','Plan it','cpGoPlan('+arg(d)+',0)');
+    h+=btn('🛏️','Find stays','cpFollow('+arg('Find stays in '+d)+')');
   }
-  var h='<div class="rw-rail"><div class="rw-rail-h">DO SOMETHING WITH THIS</div>';
-  if(d) h+=btn('\ud83d\uddfa\ufe0f','Map',"openTripMap('"+d+"',null)");
-  if(d) h+=btn('\ud83e\udded','Navigate',"rwTuskNavigate('"+d+"')");
-  if(d) h+=btn('\ud83d\uddd3\ufe0f','Plan it',"cpGoPlan('"+d+"',0)");
-  if(d) h+=btn('\ud83d\udecd\ufe0f','Book',"cpFollow('Book this trip to "+d+"')");
-  h+=btn('\ud83d\udcb0','Budget',"openMoneyLayer()");
-  h+=btn('\u23f0','Remind me',"rwRemindAsk('"+q+"')");
-  h+=btn('\ud83d\udd0a','Read aloud',"rwTuskReadLast()");
-  h+=btn('⏯️','Pause / Resume',"rwTuskPauseResume()");
-  h+=btn('🔁','Replay',"rwTuskReplaySpeech()");
-  h+=btn('✨','Voice mode',"RWTuskVoiceStudio.start()");
-  h+=btn('🎚️','Speed',"rwTuskCycleSpeechRate()");
-  var topic=rwTuskRailContext(raw);
-  if(d && topic==='safety') h+=btn('⚠️','Road advisories', "cpFollow('Check dated official road and safety advisories for "+d+"')");
-  if(d && topic==='food') h+=btn('🍲','Local food', "cpFollow('What local food should I try in "+d+"?')");
-  if(d && topic==='weather') h+=btn('☁️','Weather details', "cpFollow('Check the weather and forecast for "+d+"')");
-  if(d && topic==='season') h+=btn('📅','Best season', "cpFollow('When is the best time to visit "+d+"?')");
-  h+=btn('\ud83d\udcd6','Log feeling',"openJourneyLog()");
-  return h+'</div>';
+  if(d&&topic==='stay')h+=btn('🛏️','Compare stays','cpFollow('+arg('Compare available stays in '+d)+')');
+  if(d&&topic==='safety')h+=btn('⚠️','Road advisories','cpFollow('+arg('Check dated official road and safety advisories for '+d)+')');
+  if(d&&topic==='food')h+=btn('🍲','Local food','cpFollow('+arg('What local food should I try in '+d+'?')+')');
+  if(d&&topic==='weather')h+=btn('☁️','Weather details','cpFollow('+arg('Check the weather and forecast for '+d)+')');
+  if(d&&topic==='season')h+=btn('📅','Best season','cpFollow('+arg('When is the best time to visit '+d+'?')+')');
+  h+=btn('🔊','Read aloud','rwTuskReadLast()');
+  h+='<details class="rw-extra-actions"><summary>More controls</summary>'+btn('⏯️','Pause / Resume','rwTuskPauseResume()')+btn('🔁','Replay','rwTuskReplaySpeech()')+btn('🎚️','Speed','rwTuskCycleSpeechRate()');
+  if(d)h+=btn('🧭','Navigate','rwTuskNavigate('+arg(d)+')')+btn('⏰','Remind me','rwRemindAsk('+arg(q)+')');
+  return h+'</details></div>';
 }
 function rwTuskNavigate(dest){
   /* Let the installed navigation app own continuous turn-by-turn GPS. That
@@ -178,6 +173,7 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   var isKasarFestival=/kasar\s*(?:devi\s*)?(?:music\s*fest|festival)|(?:nupur\s*pant|rahgir).{0,50}(?:kasar|fest)|(?:kasar|fest).{0,50}(?:nupur\s*pant|rahgir)/i.test(String(raw||''));
   var actions = (isKasarFestival || intents._noGenericActions) ? [] : await cpActionsHTML(intents);
   var parts=[]; if(answerHTML) parts.push(answerHTML);
+  if(intents._rwDestinationId&&typeof rwReviewedAtlasHTML==='function'){try{var reviewed=await rwReviewedAtlasHTML(intents._rwDestinationId);if(reviewed)parts.push(reviewed);}catch(e){}}
   if(actions.length) parts.push(actions.join('<br><br>'));
   if(!parts.length) parts.push('I can handle destinations, dates, budgets, weather, cafes, buses/trains and sharing \u2014 try: \u201cPlan 4 days in Udaipur under \u20b912,000.\u201d');
   try{ rwRemember('tusk', (answerHTML||'').replace(/<[^>]*>/g,' ').slice(0,200), {}); }catch(e){ /* best-effort, ignore */ }
@@ -186,9 +182,9 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   try{ if(intents.smalltalk==='greet' && typeof rwUmChipsHTML==='function') _html += rwUmChipsHTML(); }catch(e){ /* optional */ }
   try{ if(!intents.smalltalk && typeof rwUmNotice==='function') _html += rwUmNotice(); }catch(e){ /* optional */ }
   /* Every answer ends with tappable actions — an answer is never a dead end. */
-  try{ if(!intents.smalltalk&&!isKasarFestival&&!intents._noGenericActions) _html += rwTuskRail(intents.dest||'', raw||''); }catch(e){ /* best-effort, ignore */ }
+  try{ if(!intents.smalltalk&&!isKasarFestival&&(!intents._noGenericActions||intents._rwAllowDestinationCommerce)) _html += rwTuskRail(intents.dest||'', raw||''); }catch(e){ /* best-effort, ignore */ }
   /* Curated, public local partners and artists only; not booking inventory. */
-  try{ if(!intents.smalltalk && !intents._noGenericActions && window.RWConnectedDiscovery) _html+=RWConnectedDiscovery.html(raw,intents); }catch(e){}
+  try{ if(!intents.smalltalk && (!intents._noGenericActions||intents._rwAllowDestinationCommerce) && window.RWConnectedDiscovery) _html+=RWConnectedDiscovery.html(raw,intents); }catch(e){}
   /* Only intent-relevant first-party cards, never inferred prices or paid action.
      Run after the answer and skip personal, emergency and existing offer replies. */
   try{ if(window.RWTuskCommerce) _html+=await RWTuskCommerce.cardsHTML(raw,intents); }catch(e){}
@@ -213,6 +209,13 @@ async function cpFinish(bubble, answerHTML, intents, raw){
   try{ if(window.RWTuskVoiceStudio) RWTuskVoiceStudio.answer(_html,raw,intents); }catch(e){}
   _cpHist.push({q:raw, a:bubble.textContent.slice(0,300)}); if(_cpHist.length>8) _cpHist.shift();
   try{ track('copilot_uses'); }catch(e){ /* analytics best-effort, ignore */ }
+}
+function rwIsTrekQuestion(raw){
+  var q=String(raw||'');
+  if(/\b(trek|treks|trekking|trekker|trekkers|hike|hikes|hiking|base camp)\b/i.test(q))return true;
+  if(/\b(conference|expo|convention|hackathon|meetup|webinar|workshop|seminar|delegate|speaker|keynote|startup|investor|business|tech|technology|ai|g20|leaders|global|economic|trade)\b/i.test(q))return false;
+  if(/\btrails?\b(?!\s*mesh)/i.test(q))return true;
+  return /\bsummit\b/i.test(q)&&/\b(climb|climbing|peak|mountain|altitude|ascent|expedition|push|attempt)\b/i.test(q);
 }
 function cpGoPlan(dest, days){
   closeCopilot();
@@ -300,7 +303,7 @@ async function cpActionsHTML(it){
     return [rwProgressHTML()];
   }
   /* trekking */
-  if(/\b(trek|trekking|trail|summit|base camp|hike|hiking)\b/i.test(String(it._raw||''))){
+  if(rwIsTrekQuestion(String(it._raw||''))){
     var _tg = null;
     var _rw = String(it._raw||'').toLowerCase();
     ['easy','moderate','difficult','hard','extreme'].forEach(function(g){ if(_rw.indexOf(g)>-1) _tg=g; });
