@@ -104,6 +104,7 @@ function cpModelChips(targetId){
   var provs = admin ? ['sarvam','groq','cerebras','gemini','openrouter','mistral','anthropic','custom','ondevice','webgpu'].filter(function(p){ return lsGet('rwKey_'+p); }) : [];
   var cur = (typeof activeProv!=='undefined')? activeProv : 'smart';
   var chips = [['smart','\u26a1 Ailon Tusk Automatic']].concat(provs.map(function(p){ return [p, p.charAt(0).toUpperCase()+p.slice(1)]; }));
+  chips.sort(function(a,b){ return (b[0]===cur)-(a[0]===cur); });
   host.innerHTML = chips.map(function(c){
     var on = cur===c[0];
     return '<button onclick="cpSetModel(\'' + c[0] + '\')" style="font-size:10px;padding:4px 10px;border-radius:999px;border:1px solid '
@@ -804,6 +805,7 @@ function copilotSend(fromHero, spokenText){
     var hl=el('heroLog'); if(hl) hl.style.display='block';
   } else { _cpTargetLog='cpLog'; }
   var aiText=null; cpBubble(t.replace(/[<>]/g,''),'me');
+  if(window.RWVoiceStayBooking&&RWVoiceStayBooking.accept(t,function(html,intents,raw){cpFinish(cpBubble('…','bot'),html,intents,raw);},direct))return;
   try{if(window.RWEventHandoff&&RWEventHandoff.answerInCopilot(t,fromHero))return;}catch(e){/* normal copilot fallback */}
   try{var summit=window.RWSummitAtlas&&window.RWSummitAtlas.answer(t,{force:false,language:document.getElementById('rwHomeVoiceLang')?.value||'en-IN'});if(summit){var safe=String(summit.text).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});var html='<b>✦ Ailon Tusk · BTS 2026</b><p>'+safe+'</p><p><a href="/summit/">Explore summit toolkit ↗</a> · <a href="'+summit.source+'" target="_blank" rel="noopener">Official source ↗</a></p>';cpBubble(html,'bot');try{if(window.RWTuskVoiceStudio)RWTuskVoiceStudio.answer(html,t,{});}catch(e){}return;}}catch(e){/* normal copilot fallback */}
   try{

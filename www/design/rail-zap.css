@@ -1,0 +1,18 @@
+/* Electric tap on rail cards and quick icons (js/ui/rail-engine.js). */
+.rw-zap-host{position:relative}
+.rw-zap{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;pointer-events:none;z-index:5}
+.rw-zap i{position:absolute;inset:42px;border-radius:50%;background:radial-gradient(circle,#fff 0,#9be7ff 30%,rgba(120,170,255,.55) 55%,transparent 72%);animation:rwZapCore .45s ease-out forwards}
+.rw-zap svg{position:absolute;inset:0;overflow:visible;filter:drop-shadow(0 0 3px #7fd8ff) drop-shadow(0 0 7px #8f7bff)}
+.rw-zap path{fill:none;stroke:#e9fbff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:80;stroke-dashoffset:80;animation:rwZapBolt .42s cubic-bezier(.2,.8,.2,1) forwards}
+.rw-zap-on{animation:rwZapJolt .32s steps(2,end)}
+@keyframes rwZapCore{0%{transform:scale(.2);opacity:1}60%{opacity:.9}100%{transform:scale(2.4);opacity:0}}
+@keyframes rwZapBolt{0%{stroke-dashoffset:80;opacity:1}55%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-80;opacity:0}}
+@keyframes rwZapJolt{0%{transform:translate(0,0)}25%{transform:translate(1px,-1px)}50%{transform:translate(-1px,1px)}75%{transform:translate(1px,0)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.rw-zap,.rw-zap-on{animation:none!important}}
+/* Spotlight rails and lists (RWRail.spotlight): the focused item is lit, the rest sit back in shadow. */
+.rw-spot>*{transition:opacity .28s ease,transform .28s ease,filter .28s ease}
+.rw-spot>*:not([data-spot]){opacity:.42;filter:saturate(.55) brightness(.72)}
+.rw-spot-x>*:not([data-spot]){transform:scale(.94)}
+.rw-spot-y>*:not([data-spot]){transform:scale(.96)}
+.rw-spot>[data-spot]{opacity:1;filter:none;transform:none;box-shadow:0 10px 34px rgba(110,170,255,.18)}
+@media (prefers-reduced-motion:reduce){.rw-spot>*{transition:none}}
